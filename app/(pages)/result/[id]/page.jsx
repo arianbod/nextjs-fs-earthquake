@@ -12,7 +12,7 @@ const page = ({ params }) => {
 				<h1 className='text-5xl font-bold text-center text-gray-900 capitalize mb-8'>
 					{title}
 				</h1>
-				<h2 className='text-xl text-gray-700 mb-4'>{text}</h2>
+				<h2 className='text-xl text-gray-700 mb-2'>{text}</h2>
 				<p className='text-md text-gray-600'>{description}</p>
 			</div>
 		</div>
