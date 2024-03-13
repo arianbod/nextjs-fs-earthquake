@@ -69,7 +69,7 @@ const Seven = () => {
 				{/* <Button type='submit'>Submit</Button> */}
 			</form>
 			<Link
-				href='/9'
+				href='/8'
 				passHref>
 				<Button variant=''>Next Step</Button>
 			</Link>
