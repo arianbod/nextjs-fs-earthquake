@@ -1,13 +1,13 @@
 {
-	"project_overview": {
-		"name": "Earthquake Impact Estimation Application",
-		"description": "A web application designed to estimate the impacts of an earthquake on user buildings based on user-provided data through a series of form steps.",
-		"objectives": [
-			"Collect building-specific data from users",
-			"Estimate the impact of different levels of earthquakes on the buildings",
-			"Provide users with a detailed report of potential risks and damages"
-		]
-	},
+	"name": "Earthquake Impact Estimation Application",
+	"description": "A web application designed to estimate the impacts of an earthquake on user buildings based on user-provided data through a series of form steps.",
+	"text": "Under supervision of assistant professor Hamid FG Antalya bilim",
+	"welcomeTitle": "How it Works?",
+	"objectives": [
+		"Collect building-specific data from users",
+		"Estimate the impact of different levels of earthquakes on the buildings",
+		"Provide users with a detailed report of potential risks and damages"
+	],
 	"steps": [
 		{
 			"step": 1,
@@ -80,6 +80,78 @@
 					"description": "Select the structural system of your building."
 				}
 			]
+		},
+		{
+			"step": 4,
+			"title": "is there any irregularity?",
+			"description": "if not just click next step",
+
+			"inputs": [
+				{
+					"type": "number",
+					"label": "Year of Maintenance",
+					"description": "Enter the most recent year your building underwent maintenance."
+				},
+				{
+					"type": "select",
+					"label": "Structural System",
+					"options": [
+						"Steel Structure",
+						"Concrete Structure",
+						"Masonry Structure",
+						"Timber Structure",
+						"Skylife Structure"
+					],
+					"description": "Select the structural system of your building."
+				}
+			]
+		},
+		{
+			"step": 5,
+			"title": "Definition of plan",
+			"description": "Collect basic information about the user's building.",
+			"inputs": [
+				{
+					"type": "number",
+					"label": "how many columns there are?",
+					"description": "Enter the number of stories in your building."
+				},
+				{
+					"type": "number",
+					"label": "how many rows there are?",
+					"description": "Enter the number of stories in your building."
+				},
+				{
+					"type": "number",
+					"label": "height of columns?",
+					"description": "Enter the number of stories in your building."
+				},
+				{
+					"type": "number",
+					"label": "cross section of columns?",
+					"description": "Enter the number of stories in your building."
+				}
+			]
+		},
+		{
+			"step": 6,
+			"title": "is your building manipulated?",
+			"description": "Provide detailed specifications of your building for a more accurate estimation."
+		},
+		{
+			"step": 7,
+			"title": "is there any Specific  condition?",
+			"description": "Provide detailed specifications of your building for a more accurate estimation."
+		},
+		{
+			"step": 8,
+			"title": "is there any extra load on the building?",
+			"description": "Provide detailed specifications of your building for a more accurate estimation."
+		},
+		{
+			"step": 9,
+			"title": "Detailed Building Specifications",
+			"description": "Provide detailed specifications of your building for a more accurate estimation."
 		}
 	],
 	"functionalities": [
@@ -92,7 +164,9 @@
 			"description": "Present the user with a series of form steps, dynamically adjusting subsequent options based on previous inputs."
 		}
 	],
-	"potential_results": {
+	"results": {
+		"title": "Congragulation!",
+		"text": "your building is stronger than 94% of other users",
 		"description": "After processing the user's input, the application will generate a detailed report estimating the potential impact of various earthquake levels on the user's building, including structural risks and recommended preventive measures."
 	}
 }
