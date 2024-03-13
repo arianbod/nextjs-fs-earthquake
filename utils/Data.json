@@ -1,0 +1,98 @@
+{
+	"project_overview": {
+		"name": "Earthquake Impact Estimation Application",
+		"description": "A web application designed to estimate the impacts of an earthquake on user buildings based on user-provided data through a series of form steps.",
+		"objectives": [
+			"Collect building-specific data from users",
+			"Estimate the impact of different levels of earthquakes on the buildings",
+			"Provide users with a detailed report of potential risks and damages"
+		]
+	},
+	"steps": [
+		{
+			"step": 1,
+			"title": "Introduction and Location Access",
+			"description": "Introduce the application and request access to the user's location for tailored earthquake impact estimation.",
+			"inputs": [
+				{
+					"type": "button",
+					"action": "request_location",
+					"label": "Allow Location Access"
+				}
+			]
+		},
+		{
+			"step": 2,
+			"title": "Building Information",
+			"description": "Collect basic information about the user's building.",
+			"inputs": [
+				{
+					"type": "select",
+					"label": "Type of Earthquake",
+					"options": ["DD-1", "DD-2", "DD-3", "DD-4"],
+					"description": "Select the type of earthquake to estimate impact for."
+				},
+				{
+					"type": "select",
+					"label": "Type of Soil",
+					"options": ["ZA", "ZB", "ZC", "ZD", "ZE"],
+					"description": "Select the type of soil your building is built on."
+				},
+				{
+					"type": "select",
+					"label": "Design Regulation",
+					"options": [
+						"Before 1975",
+						"1975 to 1999",
+						"1999 to 2007",
+						"2007 to 2018",
+						"After 2018"
+					],
+					"description": "Select the period your building was designed in."
+				},
+				{
+					"type": "number",
+					"label": "Number of Stories",
+					"description": "Enter the number of stories in your building."
+				}
+			]
+		},
+		{
+			"step": 3,
+			"title": "Detailed Building Specifications",
+			"description": "Provide detailed specifications of your building for a more accurate estimation.",
+			"inputs": [
+				{
+					"type": "number",
+					"label": "Year of Maintenance",
+					"description": "Enter the most recent year your building underwent maintenance."
+				},
+				{
+					"type": "select",
+					"label": "Structural System",
+					"options": [
+						"Steel Structure",
+						"Concrete Structure",
+						"Masonry Structure",
+						"Timber Structure",
+						"Skylife Structure"
+					],
+					"description": "Select the structural system of your building."
+				}
+			]
+		}
+	],
+	"functionalities": [
+		{
+			"name": "Location-based Data Retrieval",
+			"description": "Automatically adjust form options and default values based on the user's location, such as soil type and earthquake risk level."
+		},
+		{
+			"name": "Dynamic Form Steps",
+			"description": "Present the user with a series of form steps, dynamically adjusting subsequent options based on previous inputs."
+		}
+	],
+	"potential_results": {
+		"description": "After processing the user's input, the application will generate a detailed report estimating the potential impact of various earthquake levels on the user's building, including structural risks and recommended preventive measures."
+	}
+}
