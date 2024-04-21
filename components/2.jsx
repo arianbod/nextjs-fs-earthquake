@@ -59,6 +59,14 @@ const Two = () => {
 									</option>
 								))}
 							</select>
+							<p className='flex gap-4'>
+								{input.description}
+								<Link
+									href={input.url}
+									className='text-blue-500'>
+									Learn more
+								</Link>
+							</p>
 						</div>
 					) : (
 						<div
@@ -75,6 +83,7 @@ const Two = () => {
 								min={0}
 								className='mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
 							/>
+							<p>{input.description}</p>
 						</div>
 					)
 				)}

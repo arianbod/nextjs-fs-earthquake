@@ -32,13 +32,15 @@
 					"type": "select",
 					"label": "Type of Earthquake",
 					"options": ["DD-1", "DD-2", "DD-3", "DD-4"],
-					"description": "Select the type of earthquake to estimate impact for."
+					"description": "Select the type of earthquake to estimate impact for.",
+					"url": "/hint.pdf"
 				},
 				{
 					"type": "select",
 					"label": "Type of Soil",
 					"options": ["ZA", "ZB", "ZC", "ZD", "ZE"],
-					"description": "Select the type of soil your building is built on."
+					"description": "Select the type of soil your building is built on.",
+					"url": "/hint.pdf"
 				},
 				{
 					"type": "select",
@@ -50,12 +52,14 @@
 						"2007 to 2018",
 						"After 2018"
 					],
-					"description": "Select the period your building was designed in."
+					"description": "Select the period your building was designed in.",
+					"url": "/hint.pdf"
 				},
 				{
 					"type": "number",
 					"label": "Number of Stories",
-					"description": "Enter the number of stories in your building."
+					"description": "Enter the number of stories in your building.",
+					"url": "/hint.pdf"
 				}
 			]
 		},
