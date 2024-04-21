@@ -4,11 +4,14 @@ import Link from 'next/link';
 import Data from '@/utils/Data.json';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
-
+import Option1 from '@/assets/stepFour/1.png';
+import Option2 from '@/assets/stepFour/2.png';
+import { nanoid } from 'nanoid';
+const id = nanoid();
 const Six = () => {
 	const [selectedPhoto, setSelectedPhoto] = useState('');
 	const [imagePreview, setImagePreview] = useState(null);
-
+	const [manipulated, setManipulated] = useState(false);
 	const stepSixData = Data.steps.find((step) => step.step === 6);
 
 	const handleSelectionChange = (e) => {
@@ -32,47 +35,54 @@ const Six = () => {
 	};
 
 	return (
-		<div>
+		<div className='flex flex-col place-items-center gap-8'>
 			<Progress value={55} />
 
 			<h1 className='text-2xl'>{stepSixData.title}</h1>
 			<p>{stepSixData.description}</p>
-			<form onSubmit={handleSubmit}>
-				<div className='grid grid-cols-2 gap-4'>
-					{/* Assuming you have other content here */}
+
+			<div className='flex gap-8 text-center'>
+				<div
+					onClick={() => setManipulated(true)}
+					className={`hover:scale-110 transition-all rounded-3xl p-4  ${
+						manipulated && 'border-8 border-blue-500'
+					}`}>
+					{' '}
+					<Image
+						src={Option1}
+						width={200}
+						height={200}
+						alt='manipulated'
+					/>
+					<span>manipulated</span>
 				</div>
-				<div className='mt-8'>
-					<h2 className='text-lg mb-2'>Upload a Photo</h2>
-					<label className='block w-full border-2 border-dashed border-gray-300 p-6 rounded-md text-center cursor-pointer hover:bg-gray-50'>
-						{imagePreview ? (
-							<Image
-								src={imagePreview}
-								alt='Preview'
-								className='mx-auto max-h-40'
-							/>
-						) : (
-							<div>
-								<p className='text-gray-700'>
-									Drag and drop your image here or{' '}
-									<span className='text-blue-500 underline'>browse</span>
-								</p>
-							</div>
-						)}
-						<input
-							type='file'
-							className='hidden'
-							onChange={handleImageChange}
-							accept='image/*'
-						/>
-					</label>
+				<div
+					onClick={(e) => setManipulated(false)}
+					className={`hover:scale-110 transition-all rounded-3xl p-4 ${
+						!manipulated && 'border-8 border-blue-500'
+					}`}>
+					<Image
+						src={Option1}
+						width={200}
+						height={200}
+						alt='manipulated'
+					/>
+					<span>without manipulation</span>
 				</div>
-				{/* <Button type='submit'>Submit</Button> */}
-			</form>
-			<Link
-				href='/7'
-				passHref>
-				<Button variant=''>Next Step</Button>
-			</Link>
+			</div>
+			{manipulated ? (
+				<Link
+					href='/7'
+					passHref>
+					<Button variant=''>Next Step</Button>
+				</Link>
+			) : (
+				<Link
+					href={`/9`}
+					passHref>
+					<Button variant=''>next</Button>
+				</Link>
+			)}
 		</div>
 	);
 };

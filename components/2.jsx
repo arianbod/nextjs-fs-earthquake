@@ -28,7 +28,7 @@ const Two = () => {
 	const stepTwoData = Data.steps.find((step) => step.step === 2);
 
 	return (
-		<div className='max-w-4xl mx-auto p-5'>
+		<div className='max-w-4xl mx-auto p-5 text-center'>
 			<Progress value={20} />
 
 			<h1 className='text-3xl font-bold text-center mb-4'>
@@ -63,7 +63,7 @@ const Two = () => {
 								{input.description}
 								<Link
 									href={input.url}
-									className='text-blue-500'>
+									className='text-blue-500 text-sm'>
 									Learn more
 								</Link>
 							</p>
@@ -87,14 +87,14 @@ const Two = () => {
 								{input.description}
 								<Link
 									href={input.url}
-									className='text-blue-500'>
+									className='text-blue-500 text-sm'>
 									Learn more
 								</Link>
 							</p>
 						</div>
 					)
 				)}
-				<div className='flex justify-end'>
+				<div className='flex place-content-center'>
 					<Link
 						href='/3'
 						passHref>

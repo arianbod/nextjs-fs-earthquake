@@ -40,7 +40,7 @@ const Four = () => {
 			<p className='text-lg mx-auto text-center'>{stepThreeData.description}</p>
 			<form
 				onSubmit={handleSubmit}
-				className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				className='flex flex-wrap place-content-center md:grid-cols-2 gap-6'>
 				{photos.map((photo) => (
 					<label
 						key={photo.id}
@@ -54,9 +54,9 @@ const Four = () => {
 							className='hidden'
 						/>
 						<div
-							className={`cursor-pointer p-4 border-2 ${
+							className={`cursor-pointer p-4 border-8 transition-all w-64 ${
 								selectedPhoto === photo.id
-									? 'border-blue-500'
+									? 'border-blue-500 scale-110'
 									: 'border-transparent'
 							} rounded-lg`}>
 							<Image
@@ -70,16 +70,16 @@ const Four = () => {
 						</div>
 					</label>
 				))}
-				<div className='flex justify-center mt-6'>
-					<Link
-						href='/4'
-						passHref>
-						<Button className=' text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
-							Next Step
-						</Button>
-					</Link>
-				</div>
 			</form>
+			<div className='flex justify-center mt-6'>
+				<Link
+					href='/4'
+					passHref>
+					<Button className=' text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
+						Next Step
+					</Button>
+				</Link>
+			</div>
 		</div>
 	);
 };

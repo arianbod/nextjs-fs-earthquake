@@ -122,7 +122,7 @@
 		},
 		{
 			"step": 6,
-			"title": "is your building manipulated?",
+			"title": "Manipulation review",
 			"description": "Provide detailed specifications of your building for a more accurate estimation."
 		},
 		{
@@ -137,8 +137,8 @@
 		},
 		{
 			"step": 9,
-			"title": "show your neighbour buildings 4 side of yours ",
-			"description": "Provide detailed specifications of your building for a more accurate estimation."
+			"title": "Neighbor buildings at any side",
+			"description": "which one is look like your building state?"
 		}
 	],
 	"functionalities": [
