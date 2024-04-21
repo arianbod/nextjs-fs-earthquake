@@ -16,7 +16,7 @@ export default function Home() {
                     <h1 className='capitalize text-4xl md:text-5xl font-bold'>
                         {Data.welcomeTitle}
                     </h1>
-
+                    <h1>{Data.welcomeDescription}</h1>
                     <ul className='md:pl-12 leading-loose max-w-md mt-4 list-disc'>
 
                         {Data.objectives.map((item) => {

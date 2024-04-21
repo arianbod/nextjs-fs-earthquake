@@ -3,6 +3,7 @@
 	"description": "A web application (Application) designed for quick assessment of the earthquake impact on buildings based on user-provided information.",
 	"text": "Supported by: Assistant professor Hamid F Ghatte, Antalya bilim University",
 	"welcomeTitle": "How it Works?",
+	"welcomeDescription": "Three main steps:",
 	"objectives": [
 		"Collect building-specific data from users",
 		"Estimate the impact of different levels of earthquakes on the buildings",
