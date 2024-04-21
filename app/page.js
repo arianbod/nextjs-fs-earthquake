@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Camera, LogOut } from 'lucide-react';
-import LandingImg from '@/assets/main.webp';
+import LandingImg from '@/assets/main.png';
 import Data from '@/utils/Data.json'
 // import Logo from '@/assets/logo.svg';
 import Link from 'next/link';
