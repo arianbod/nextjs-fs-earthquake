@@ -98,7 +98,7 @@ const Two = () => {
 					<Link
 						href='/3'
 						passHref>
-						<Button className='inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'>
+						<Button className='inline-flex items-center justify-center px-5 py-2 border border-transparent text-base font-medium rounded-md text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'>
 							Next Step
 						</Button>
 					</Link>
