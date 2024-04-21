@@ -5,9 +5,9 @@
 	"welcomeTitle": "How it Works?",
 	"welcomeDescription": "Three main steps:",
 	"objectives": [
-		"Collect building-specific data from users",
-		"Estimate the impact of different levels of earthquakes on the buildings",
-		"Provide users with a detailed report of potential risks and damages"
+		"Collecting the basic information about the building",
+		"Evaluation of seismic performance during the possible earthquake",
+		"Presenting Three Three-dimensional (3D) models of the building and possible failure mechanisms"
 	],
 	"steps": [
 		{
