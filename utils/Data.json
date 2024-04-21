@@ -1,7 +1,7 @@
 {
 	"name": "Earthquake Impact Estimation Application",
-	"description": "A web application designed to estimate the impacts of an earthquake on user buildings based on user-provided data through a series of form steps.",
-	"text": "Under supervision of assistant professor Hamid FG Antalya bilim",
+	"description": "A web application (Application) designed for quick assessment of the earthquake impact on buildings based on user-provided information.",
+	"text": "Supported by: Assistant professor Hamid F Ghatte, Antalya bilim University",
 	"welcomeTitle": "How it Works?",
 	"objectives": [
 		"Collect building-specific data from users",
