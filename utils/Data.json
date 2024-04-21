@@ -60,19 +60,20 @@
 					"label": "Number of Stories",
 					"description": "Enter the number of stories in your building.",
 					"url": "/hint.pdf"
+				},
+				{
+					"type": "number",
+					"label": "Year of Maintenance",
+					"description": "Enter the most recent year your building underwent maintenance.",
+					"url": "/hint.pdf"
 				}
 			]
 		},
 		{
 			"step": 3,
-			"title": "Detailed Building Specifications",
-			"description": "Provide detailed specifications of your building for a more accurate estimation.",
+			"title": "Structural System",
+			"description": "which one is your home? RC, SS, M, T, and SL",
 			"inputs": [
-				{
-					"type": "number",
-					"label": "Year of Maintenance",
-					"description": "Enter the most recent year your building underwent maintenance."
-				},
 				{
 					"type": "select",
 					"label": "Structural System",
@@ -90,27 +91,7 @@
 		{
 			"step": 4,
 			"title": "is there any irregularity?",
-			"description": "if not just click next step",
-
-			"inputs": [
-				{
-					"type": "number",
-					"label": "Year of Maintenance",
-					"description": "Enter the most recent year your building underwent maintenance."
-				},
-				{
-					"type": "select",
-					"label": "Structural System",
-					"options": [
-						"Steel Structure",
-						"Concrete Structure",
-						"Masonry Structure",
-						"Timber Structure",
-						"Skylife Structure"
-					],
-					"description": "Select the structural system of your building."
-				}
-			]
+			"description": "if not just click next step"
 		},
 		{
 			"step": 5,
