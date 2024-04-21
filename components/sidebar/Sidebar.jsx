@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import Logo from '@/assets/main.webp';
+import Logo from '@/assets/main.png';
 import { links } from '@/utils/links';
 import Image from 'next/image';
 import Link from 'next/link';
