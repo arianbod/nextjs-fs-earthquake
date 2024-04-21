@@ -14,6 +14,7 @@
 			"step": 1,
 			"title": "Location Using Google Earth for finding the Area and initial measurements",
 			"description": "Introduce the application and request access to the user's location for tailored earthquake impact estimation.",
+			"error": "you should provide location access",
 			"inputs": [
 				{
 					"type": "button",
