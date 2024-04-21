@@ -80,7 +80,7 @@ const Three = () => {
 				)}
 				<div className='flex justify-end'>
 					<Link
-						href='/4'
+						href='/3-2'
 						passHref>
 						<Button
 							type='submit'
