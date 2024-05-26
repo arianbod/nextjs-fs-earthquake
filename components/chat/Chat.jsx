@@ -64,8 +64,8 @@ const Chat = () => {
 	};
 
 	return (
-		<div className='min-h-[calc(100vh-6rem)] grid grid-rows-[1fr,auto] -mx-8'>
-			<div className='max-h-[calc(100vh-12rem)] overflow-y-auto overflow-x-hidden'>
+		<div className='min-h-[calc(100vh-20rem)] grid grid-rows-[1fr,auto] -mx-8'>
+			<div className='max-h-[calc(100vh-18.5rem)] overflow-y-auto overflow-x-hidden'>
 				<ul>
 					<GetFirstname />
 					{messages.map(({ role, content }, index) => {
@@ -73,10 +73,10 @@ const Chat = () => {
 						return (
 							<li
 								key={id}
-								className={`flex items-baseline gap-3 py-6 px-4 text-lg leading-loose border-b border-base-300 ${
-									role === 'assistant' && 'bg-base-100  px-12'
+								className={`flex items-baseline gap-3 py-6 px-4 text-lg leading-loose border-b border-gray-300 ${
+									role === 'assistant' ? 'bg-gray-100 px-12' : ''
 								}`}>
-								<span className='avatar'>
+								<span className='flex-shrink-0'>
 									{role === 'user' && <FaUserLarge />}
 									{role === 'assistant' && <BsChatRightText />}
 								</span>
@@ -98,21 +98,21 @@ const Chat = () => {
 			<form
 				onSubmit={handleSubmit}
 				className='max-w-4xl px-8 pt-12'>
-				<div className='join w-full'>
+				<div className='flex w-full'>
 					<input
 						type='text'
 						placeholder='Message GeniusGPT'
-						className='input input-bordered join-item w-full'
+						className='flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-300'
 						value={text}
 						onChange={(e) => {
 							setText(e.target.value);
 						}}
 					/>
 					<button
-						className='btn btn-primary join-item'
+						className='px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring focus:bg-blue-700'
 						type='submit'
 						disabled={isPending}>
-						{isPending ? 'wait...' : <IoMdSend />}
+						{isPending ? 'Wait...' : <IoMdSend />}
 					</button>
 				</div>
 			</form>

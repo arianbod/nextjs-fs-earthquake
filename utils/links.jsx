@@ -1,4 +1,10 @@
-import { AreaChart, Layers, AppWindow, HomeIcon } from 'lucide-react';
+import {
+	AreaChart,
+	Layers,
+	AppWindow,
+	HomeIcon,
+	MessageCircle,
+} from 'lucide-react';
 import React from 'react';
 
 export const links = [
@@ -16,5 +22,10 @@ export const links = [
 		href: '/',
 		label: 'home',
 		icon: <HomeIcon />,
+	},
+	{
+		href: '/chat',
+		label: 'AI Assistant',
+		icon: <MessageCircle />,
 	},
 ];

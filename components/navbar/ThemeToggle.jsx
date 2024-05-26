@@ -16,7 +16,7 @@ const ModeToggle = () => {
 	React.useEffect(() => {
 		console.log('theme is : ', theme);
 		console.log('resolvedTheme is : ', resolvedTheme);
-	}, [resolvedTheme]);
+	}, [resolvedTheme, theme]);
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>

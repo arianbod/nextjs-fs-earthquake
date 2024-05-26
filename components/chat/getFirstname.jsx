@@ -19,8 +19,8 @@ const GetFirstname = () => {
 				<BsChatRightText />
 			</span>
 			<p className='max-w-3xl'>
-				Hi {firstName}, I'm so happy you are here. Let me know how I can help
-				you.
+				Hi {firstName}, I&apos;m so happy you are here. Let me know how I can
+				help you.
 			</p>
 		</li>
 	);
