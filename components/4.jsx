@@ -40,7 +40,7 @@ const Four = () => {
 			<p className='text-lg mx-auto text-center'>{stepFourData.description}</p>
 			<form
 				onSubmit={handleSubmit}
-				className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				className='flex flex-wrap flex-row gap-6'>
 				{photos.map((photo) => (
 					<label
 						key={photo.id}

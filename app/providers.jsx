@@ -3,9 +3,9 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 // import { Toaster } from '@/components/ui/toaster';
-
+import { Toaster } from 'react-hot-toast';
 const Providers = ({ children }) => {
 	const [queryClient] = useState(
 		() =>
