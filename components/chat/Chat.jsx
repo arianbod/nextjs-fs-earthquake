@@ -101,7 +101,7 @@ const Chat = () => {
 				<div className='flex w-full'>
 					<input
 						type='text'
-						placeholder='Message GeniusGPT'
+						placeholder='start here like what is a building structure...'
 						className='flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring focus:border-blue-300'
 						value={text}
 						onChange={(e) => {

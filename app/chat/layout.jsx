@@ -13,7 +13,7 @@ const layout = ({ children }) => {
 			{/* second-col hide dropdown on big-screen */}
 			<div className='lg:col-span-4'>
 				<Navbar />
-				<div className='py-16 px-4 sm:px-8 lg:px-16'>{children}</div>
+				<div className=' sm:px-8'>{children}</div>
 			</div>
 		</main>
 	);
