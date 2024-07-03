@@ -71,7 +71,7 @@ const Chat = () => {
 					<GetFirstname />
 					{messages.map(({ role, content }, index) => {
 						const id = nanoid();
-						const directionClass = getTextDirection(content);
+						const directionClass = '';
 						return (
 							<li
 								key={id}
