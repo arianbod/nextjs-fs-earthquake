@@ -43,7 +43,7 @@ const Two = () => {
 						<div
 							key={index}
 							className='flex flex-col'>
-							<label className='text-sm font-medium text-gray-700'>
+							<label className='text-sm font-medium text-gray-400'>
 								{input.label}
 							</label>
 							<select
@@ -72,7 +72,7 @@ const Two = () => {
 						<div
 							key={index}
 							className='flex flex-col'>
-							<label className='text-sm font-medium text-gray-700'>
+							<label className='text-sm font-medium text-gray-500'>
 								{input.label}
 							</label>
 							<input
@@ -81,7 +81,7 @@ const Two = () => {
 								value={formData[input.label.replace(/\s+/g, '').toLowerCase()]}
 								onChange={handleChange}
 								min={0}
-								className='mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+								className='mt-1 block w-full py-2 px-3 border border-gray-300 text-black bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
 							/>
 							<p className='flex gap-4'>
 								{input.description}
