@@ -48,7 +48,9 @@ const Eight = () => {
 							<Image
 								src={imagePreview}
 								alt='Preview'
-								className='mx-auto max-h-40'
+								width={500}
+								height={500}
+								className='mx-auto max-h-40 max-w-full max-h-screen'
 							/>
 						) : (
 							<div>
