@@ -10,10 +10,31 @@ import { Button } from './ui/button';
 import { Progress } from '@/components/ui/progress';
 
 const photos = [
-	{ id: '1', url: Option1, description: 'Description for photo 1' },
-	{ id: '2', url: Option2, description: 'Description for photo 2' },
-	{ id: '3', url: Option3, description: 'Description for photo 3' },
-	{ id: '4', url: Option4, description: 'Description for photo 4' },
+	{
+		id: '1',
+		url: '/images/building-types/RC.webp',
+		description: 'Description for photo 1',
+	},
+	{
+		id: '2',
+		url: '/images/building-types/SS.png',
+		description: 'Description for photo 2',
+	},
+	{
+		id: '3',
+		url: '/images/building-types/T.png',
+		description: 'Description for photo 3',
+	},
+	{
+		id: '4',
+		url: '/images/building-types/SL.webp',
+		description: 'Description for photo 4',
+	},
+	{
+		id: '5',
+		url: '/images/building-types/M.png',
+		description: 'Description for photo 4',
+	},
 ];
 
 const Four = () => {

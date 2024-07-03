@@ -72,7 +72,7 @@
 		{
 			"step": 3,
 			"title": "Structural System",
-			"description": "which one is your home? RC, SS, M, T, and SL",
+			"description": "which one is your home?",
 			"inputs": [
 				{
 					"type": "select",
@@ -100,22 +100,22 @@
 			"inputs": [
 				{
 					"type": "number",
-					"label": "how many columns there are?",
+					"label": "how many rows in X direction there are?",
 					"description": "Enter the number of stories in your building."
 				},
 				{
 					"type": "number",
-					"label": "how many rows there are?",
+					"label": "how many rows in Y direction are?",
 					"description": "Enter the number of stories in your building."
 				},
 				{
 					"type": "number",
-					"label": "height of columns?",
+					"label": "height of columns? (all of them are equal)",
 					"description": "Enter the number of stories in your building."
 				},
 				{
-					"type": "number",
-					"label": "cross section of columns?",
+					"type": "text",
+					"label": "",
 					"description": "Enter the number of stories in your building."
 				}
 			]

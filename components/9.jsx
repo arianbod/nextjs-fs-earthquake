@@ -11,10 +11,26 @@ import { Progress } from '@/components/ui/progress';
 import { nanoid } from 'nanoid';
 const id = nanoid();
 const photos = [
-	{ id: '1', url: Option1, description: 'Description for photo 1' },
-	{ id: '2', url: Option2, description: 'Description for photo 2' },
-	{ id: '3', url: Option3, description: 'Description for photo 3' },
-	{ id: '4', url: Option4, description: 'Description for photo 4' },
+	{
+		id: '2',
+		url: '/images/Neighbours/1.png',
+		description: 'Description for photo 2',
+	},
+	{
+		id: '3',
+		url: '/images/Neighbours/2.png',
+		description: 'Description for photo 3',
+	},
+	{
+		id: '1',
+		url: '/images/Neighbours/3.png',
+		description: 'Description for photo 1',
+	},
+	{
+		id: '4',
+		url: '/images/Neighbours/4.png',
+		description: 'Description for photo 4',
+	},
 ];
 
 const Four = () => {
@@ -33,7 +49,7 @@ const Four = () => {
 
 	return (
 		<div className='max-w-4xl mx-auto p-5 flex flex-col gap-4 place-items-center place-content-center'>
-			<Progress value={40} />
+			<Progress value={90} />
 
 			<h1 className='text-3xl font-bold text-center mb-6'>
 				{stepFourData.title}

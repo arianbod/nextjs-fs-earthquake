@@ -18,6 +18,10 @@ const Six = () => {
 		setSelectedPhoto(e.target.value);
 	};
 
+	const options = [
+		{ id: 1, url: '/images/no-manipulation.jpeg', description: '' },
+		{ id: 2, url: '/images/manipulated.png', description: '' },
+	];
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		console.log('Selected photo:', selectedPhoto);
@@ -49,10 +53,10 @@ const Six = () => {
 					}`}>
 					{' '}
 					<Image
-						src={Option1}
-						width={200}
-						height={200}
-						alt='manipulated'
+						src={options[0].url}
+						width={150}
+						height={100}
+						alt={options[0].description}
 					/>
 					<span>manipulated</span>
 				</div>
@@ -62,7 +66,7 @@ const Six = () => {
 						!manipulated && 'border-8 border-blue-500'
 					}`}>
 					<Image
-						src={Option1}
+						src={options[1].url}
 						width={200}
 						height={200}
 						alt='manipulated'

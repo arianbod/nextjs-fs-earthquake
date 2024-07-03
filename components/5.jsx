@@ -31,7 +31,11 @@ const StepFive = () => {
 
 	// Get the step data from your JSON data
 	const stepData = Data.steps.find((step) => step.step === 5);
-
+	let building = {
+		height: 20,
+		xrows: 10,
+		yrows: 20,
+	};
 	return (
 		<div className='max-w-4xl mx-auto p-5'>
 			<Progress value={48} />
@@ -89,6 +93,8 @@ const StepFive = () => {
 					</Button> */}
 				</div>
 			</form>
+
+			<div></div>
 			<Link
 				href='/6'
 				passHref>

@@ -50,7 +50,7 @@ const Two = () => {
 								name={input.label.replace(/\s+/g, '').toLowerCase()}
 								value={formData[input.label.replace(/\s+/g, '').toLowerCase()]}
 								onChange={handleChange}
-								className='mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'>
+								className='mt-1 block w-full py-2 px-3 border border-gray-300 bg-white text-black rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'>
 								{input.options.map((option) => (
 									<option
 										key={option}
