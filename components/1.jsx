@@ -42,25 +42,8 @@ const One = () => {
 			</h1>
 			<p className='text-lg text-gray-700 mb-6'>{Data.steps[0].description}</p>
 			{locationData && (
-				<div className='grid grid-cols-1 md:grid-cols-2 bg-white shadow-md rounded-lg place-content-center place-items-center'>
-					<div className='flex  flex-col gap-8'>
-						<p className='font-semibold text-md text-gray-600'>
-							Your location data
-						</p>
-						<p className=' text-gray-600 flex flex-col place-items-center place-content-center text-center'>
-							Latitude
-							<span className='w-full bg-slate-200  px-10 py-4  font-extrabold'>
-								{locationData.latitude}
-							</span>
-						</p>
-						<p className='  text-gray-600 flex flex-col place-items-center text-center'>
-							Longitude{' '}
-							<span className='w-full bg-slate-200  px-10 py-4 font-extrabold'>
-								{locationData.longitude}{' '}
-							</span>
-						</p>
-					</div>
-					<div className='mt-4'>
+				<div className='flex w-full bg-white shadow-md rounded-lg place-content-center place-items-center'>
+					<div className='mt-4 w-full'>
 						<MyMapComponent
 							latitude={parseFloat(locationData.latitude)}
 							longitude={parseFloat(locationData.longitude)}
