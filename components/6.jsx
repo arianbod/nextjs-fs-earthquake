@@ -58,7 +58,7 @@ const Six = () => {
 						height={100}
 						alt={options[0].description}
 					/>
-					<span>manipulated</span>
+					<span>without manipulation</span>
 				</div>
 				<div
 					onClick={(e) => setManipulated(false)}
@@ -71,7 +71,7 @@ const Six = () => {
 						height={200}
 						alt='manipulated'
 					/>
-					<span>without manipulation</span>
+					<span>manipulated</span>
 				</div>
 			</div>
 			{manipulated ? (
