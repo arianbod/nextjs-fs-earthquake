@@ -12,7 +12,6 @@ import GetFirstname from './getFirstname';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dark as darkStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { getTextDirection } from '@/utils';
 
 const Chat = () => {
 	const { userId } = useAuth();
