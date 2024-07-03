@@ -84,3 +84,49 @@
 		margin-top: 20px;
 	}
 }
+.certificate-container {
+	padding: 20px;
+	border: 10px solid #e0e0e0;
+	border-radius: 10px;
+	background-color: white;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	max-width: 800px;
+	margin: 20px auto;
+	text-align: center;
+}
+
+.certificate-header {
+	font-size: 24px;
+	font-weight: bold;
+	color: #333;
+	margin-bottom: 10px;
+}
+
+.certificate-title {
+	font-size: 32px;
+	font-weight: bold;
+	margin: 20px 0;
+	color: #4a90e2;
+}
+
+.certificate-body {
+	font-size: 18px;
+	color: #555;
+	margin: 20px 0;
+}
+
+.certificate-footer {
+	margin-top: 30px;
+}
+
+.certificate-signature {
+	margin-top: 50px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.certificate-signature img {
+	width: 150px;
+	height: auto;
+}
