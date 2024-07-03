@@ -57,3 +57,30 @@
 		@apply bg-background text-foreground;
 	}
 }
+@media print {
+	body {
+		-webkit-print-color-adjust: exact; /* Ensure colors are printed as seen on screen */
+	}
+
+	.no-print {
+		display: none;
+	}
+
+	.print-only {
+		display: block;
+	}
+
+	.print-header {
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.print-title {
+		font-size: 24px;
+		font-weight: bold;
+	}
+
+	.print-summary {
+		margin-top: 20px;
+	}
+}
