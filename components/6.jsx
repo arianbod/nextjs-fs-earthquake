@@ -47,7 +47,7 @@ const Six = () => {
 
 			<div className='flex gap-8 text-center'>
 				<div
-					onClick={() => setManipulated(true)}
+					onClick={() => setManipulated(false)}
 					className={`hover:scale-110 transition-all rounded-3xl p-4  ${
 						manipulated && 'border-8 border-blue-500'
 					}`}>
@@ -61,7 +61,7 @@ const Six = () => {
 					<span>without manipulation</span>
 				</div>
 				<div
-					onClick={(e) => setManipulated(false)}
+					onClick={(e) => setManipulated(true)}
 					className={`hover:scale-110 transition-all rounded-3xl p-4 ${
 						!manipulated && 'border-8 border-blue-500'
 					}`}>
