@@ -12,7 +12,7 @@ const ResultPage = ({ params }) => {
 	};
 
 	return (
-		<div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8'>
+		<div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8 text-black'>
 			<div className='certificate-container'>
 				<div className='certificate-header'>
 					{/* <Image
@@ -45,7 +45,7 @@ const ResultPage = ({ params }) => {
 				</div>
 				<div className='certificate-footer'>
 					<p>Date of Issuance: {Date()}</p>
-					<div className='certificate-signature'>
+					<div className='certificate-signature '>
 						<div>
 							<p>__________________________</p>
 							<p>Authorized Signature</p>
@@ -60,7 +60,7 @@ const ResultPage = ({ params }) => {
 					<button
 						onClick={handleDownload}
 						className='bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-colors'>
-						Download Detailed Report
+						Download Certificate Report
 					</button>
 				</div>
 			</div>

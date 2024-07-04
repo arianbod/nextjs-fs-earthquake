@@ -47,8 +47,8 @@ const Six = () => {
 
 			<div className='flex gap-8 text-center'>
 				<div
-					onClick={() => setManipulated(false)}
-					className={`hover:scale-110 transition-all rounded-3xl p-4  ${
+					onClick={() => setManipulated(true)}
+					className={`hover:scale-110 transition-all rounded-3xl p-4 flex flex-col gap-4  ${
 						manipulated && 'border-8 border-blue-500'
 					}`}>
 					{' '}
@@ -57,12 +57,13 @@ const Six = () => {
 						width={150}
 						height={100}
 						alt={options[0].description}
+						className='rounded-lg'
 					/>
 					<span>without manipulation</span>
 				</div>
 				<div
-					onClick={(e) => setManipulated(true)}
-					className={`hover:scale-110 transition-all rounded-3xl p-4 ${
+					onClick={(e) => setManipulated(false)}
+					className={`hover:scale-110 transition-all rounded-3xl p-4 flex flex-col gap-4 ${
 						!manipulated && 'border-8 border-blue-500'
 					}`}>
 					<Image
@@ -70,21 +71,22 @@ const Six = () => {
 						width={200}
 						height={200}
 						alt='manipulated'
+						className='rounded-lg'
 					/>
 					<span>manipulated</span>
 				</div>
 			</div>
 			{manipulated ? (
 				<Link
-					href='/7'
-					passHref>
-					<Button variant=''>Next Step</Button>
-				</Link>
-			) : (
-				<Link
 					href={`/9`}
 					passHref>
 					<Button variant=''>next</Button>
+				</Link>
+			) : (
+				<Link
+					href='/7'
+					passHref>
+					<Button variant=''>Next Step</Button>
 				</Link>
 			)}
 		</div>
