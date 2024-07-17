@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { Progress } from '@/components/ui/progress';
+import Image from 'next/image';
 
 const StepFive = () => {
 	// State to hold form values
@@ -118,6 +119,13 @@ const StepFive = () => {
 						/>
 					</div>
 				))}
+				<Image
+					src='/images/axes.png'
+					width={200}
+					height={200}
+					alt='axes'
+					className='rounded-lg'
+				/>
 				{formData.dimensions.map((row, rowIndex) => (
 					<div
 						key={rowIndex}
@@ -162,33 +170,35 @@ const StepFive = () => {
 						))}
 					</div>
 				))}
-				<div className='flex space-x-4 mt-4'>
-					<Button
-						type='button'
-						onClick={addRow}
-						className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
-						Add Row
-					</Button>
-					<Button
-						type='button'
-						onClick={addColumn}
-						className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
-						Add Column
-					</Button>
-				</div>
-				<div>
-					<Link
-						href='/6'
-						passHref>
-						<Button className='inline-block hover:bg-zinc-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4'>
-							Next Step
+				<div className='flex'>
+					<div className='flex space-x-4 mt-4'>
+						<Button
+							type='button'
+							onClick={addRow}
+							className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
+							Add Row
 						</Button>
-					</Link>
-					{/* <Button
+						<Button
+							type='button'
+							onClick={addColumn}
+							className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
+							Add Column
+						</Button>
+					</div>
+					<div>
+						<Link
+							href='/6'
+							passHref>
+							<Button className='inline-block hover:bg-zinc-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4'>
+								Next Step
+							</Button>
+						</Link>
+						{/* <Button
 						type='submit'
 						className='mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'>
 						Submit
-					</Button> */}
+						</Button> */}
+					</div>
 				</div>
 			</form>
 		</div>

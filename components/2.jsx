@@ -37,7 +37,7 @@ const Two = () => {
 			<p className='text-lg mb-6'>{stepTwoData.description}</p>
 			<form
 				onSubmit={handleSubmit}
-				className='grid grid-cols-1 gap-6'>
+				className='flex justify-between flex-col'>
 				{stepTwoData.inputs.map((input, index) =>
 					input.type === 'select' ? (
 						<div
@@ -83,13 +83,15 @@ const Two = () => {
 								min={0}
 								className='mt-1 block w-full py-2 px-3 border border-gray-300 text-black bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
 							/>
-							<p className='flex gap-4'>
+							<p className='flex gap-4 justify-between'>
 								{input.description}
-								<Link
-									href={input.url}
-									className='text-blue-500 text-sm'>
-									Learn more
-								</Link>
+								{input.url && (
+									<Link
+										href={input.url}
+										className='text-blue-500 text-sm'>
+										Learn more
+									</Link>
+								)}
 							</p>
 						</div>
 					)

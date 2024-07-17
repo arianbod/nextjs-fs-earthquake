@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Data from '@/utils/Data.json';
-import Option1 from '@/assets/stepFour/1.png';
-import Option2 from '@/assets/stepFour/2.png';
-import Option3 from '@/assets/stepFour/3.png';
-import Option4 from '@/assets/stepFour/4.png';
+
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { Progress } from '@/components/ui/progress';
 
 const photos = [
-	{ id: '1', url: Option1, description: 'Description for photo 1' },
-	{ id: '2', url: Option2, description: 'Description for photo 2' },
-	{ id: '3', url: Option3, description: 'Description for photo 3' },
-	{ id: '4', url: Option4, description: 'Description for photo 4' },
+	{
+		id: '1',
+		url: '/images/irregularity/horızontal-irreqularity.png',
+		description: 'horızontal irreqularity',
+	},
+	{
+		id: '2',
+		url: '/images/irregularity/natural-slope-irreqularity.png',
+		description: 'natural slope irreqularity',
+	},
+	{
+		id: '3',
+		url: '/images/irregularity/slabs-irreqularity.png',
+		description: 'slabs irreqularity',
+	},
+	{
+		id: '4',
+		url: '/images/irregularity/vertical-irreqularity.png',
+		description: 'vertical irreqularity',
+	},
 ];
 
 const Four = () => {
@@ -40,7 +53,7 @@ const Four = () => {
 			<p className='text-lg mx-auto text-center'>{stepFourData.description}</p>
 			<form
 				onSubmit={handleSubmit}
-				className='flex flex-wrap flex-row gap-6'>
+				className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 				{photos.map((photo) => (
 					<label
 						key={photo.id}
@@ -67,6 +80,9 @@ const Four = () => {
 								objectFit='cover' // Cover to ensure the image covers the area nicely
 								className='rounded-md'
 							/>
+							<h6 className='bg-gray-800 text-white text-center rounded-lg py-1'>
+								{photo.description}
+							</h6>
 						</div>
 					</label>
 				))}

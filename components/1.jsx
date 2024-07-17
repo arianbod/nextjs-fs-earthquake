@@ -41,6 +41,7 @@ const One = () => {
 				{Data.steps[0].title}
 			</h1>
 			<p className='text-lg text-gray-700 mb-6'>{Data.steps[0].description}</p>
+			<p className='text-lg text-gray-700'>*{Data.steps[0].info}</p>
 			{locationData && (
 				<div className='flex w-full bg-white shadow-md rounded-lg place-content-center place-items-center'>
 					<div className='mt-4 w-full'>

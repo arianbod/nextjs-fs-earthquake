@@ -3,11 +3,11 @@
 	"description": "A web application (Application) designed for quick assessment of the earthquake impact on buildings based on user-provided information.",
 	"text": "Supported by: Assistant professor Hamid F Ghatte, Antalya bilim University",
 	"welcomeTitle": "How it Works?",
-	"welcomeDescription": "Three main steps:",
+	"welcomeDescription": "The program has three main steps:",
 	"objectives": [
 		"Collecting the basic information about the building",
 		"Evaluation of seismic performance during the possible earthquake",
-		"Presenting Three Three-dimensional (3D) models of the building and possible failure mechanisms"
+		"Presenting a Three-dimensional (3D) models of the building and possible failure mechanisms"
 	],
 	"steps": [
 		{
@@ -21,7 +21,8 @@
 					"action": "request_location",
 					"label": "Allow Location Access"
 				}
-			]
+			],
+			"info": "if you want to change the spot you can drag it and move it wherever you want."
 		},
 		{
 			"step": 2,
@@ -33,14 +34,16 @@
 					"label": "Type of Earthquake",
 					"options": ["DD-1", "DD-2", "DD-3", "DD-4"],
 					"description": "Select the type of earthquake to estimate impact for.",
-					"url": "/hint.pdf"
+					"url": "/hint.pdf",
+					"photoName": "DD1-DD4.png"
 				},
 				{
 					"type": "select",
 					"label": "Type of Soil",
 					"options": ["ZA", "ZB", "ZC", "ZD", "ZE"],
 					"description": "Select the type of soil your building is built on.",
-					"url": "/hint.pdf"
+					"url": "/hint.pdf",
+					"photoName": "zemin-cesitleri-2024.png"
 				},
 				{
 					"type": "select",
@@ -53,19 +56,20 @@
 						"After 2018"
 					],
 					"description": "Select the period your building was designed in.",
-					"url": "/hint.pdf"
+					"url": "/hint.pdf",
+					"photoName": "Deprem-yonetmelikler.png"
 				},
 				{
 					"type": "number",
 					"label": "Number of Stories",
 					"description": "Enter the number of stories in your building.",
-					"url": "/hint.pdf"
+					"url": "/hint.pdf",
+					"photoName": "bina-kac-kat.png"
 				},
 				{
 					"type": "number",
-					"label": "Year of Maintenance",
-					"description": "Enter the most recent year your building underwent maintenance.",
-					"url": "/hint.pdf"
+					"label": "Year of Construction",
+					"description": "Enter the construction year of the building. (when the building construction started)"
 				}
 			]
 		},
@@ -90,8 +94,8 @@
 		},
 		{
 			"step": 4,
-			"title": "is there any irregularity?",
-			"description": "if not just click next step"
+			"title": "Is there any irregularity?",
+			"description": "*If there is no irregularity skip selection and just click next step"
 		},
 		{
 			"step": 5,
