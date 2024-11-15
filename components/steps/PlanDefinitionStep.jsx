@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button } from './ui/button';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
 import { useUserInput } from '@/context/UserInputContext';
+import { Input } from '@/components/ui/input';
+import Data from '@/utils/Data.json';
 
-const StepFive = () => {
+const PlanDefinitionStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 
 	const handleChange = (e) => {
@@ -37,16 +38,22 @@ const StepFive = () => {
 		});
 	};
 
+	const handleSubmit = (e) => {
+		e.preventDefault();
+		onNext();
+	};
+
+	const stepFiveData = Data.steps.find((step) => step.step === 5);
+
 	return (
 		<div className='max-w-4xl mx-auto p-5'>
 			<Progress value={48} />
 
-			<h1 className='text-2xl font-bold mb-4'>Step 5: Building Plan</h1>
-			<p className='mb-6'>
-				Please provide the dimensions and cross-sections for each section of
-				your building plan.
-			</p>
-			<form className='grid gap-y-4'>
+			<h1 className='text-2xl font-bold mb-4'>{stepFiveData.title}</h1>
+			<p className='mb-6'>{stepFiveData.description}</p>
+			<form
+				onSubmit={handleSubmit}
+				className='grid gap-y-4'>
 				{['numberOfStories', 'height'].map((field) => (
 					<div
 						key={field}
@@ -54,7 +61,7 @@ const StepFive = () => {
 						<label className='text-gray-700 font-medium mb-2'>
 							{field.replace(/([A-Z])/g, ' $1').trim()}
 						</label>
-						<input
+						<Input
 							type='text'
 							name={field}
 							value={userInput[field] || ''}
@@ -68,7 +75,7 @@ const StepFive = () => {
 					width={200}
 					height={200}
 					alt='axes'
-					className='rounded-lg'
+					className='rounded-lg mx-auto'
 				/>
 				{(userInput.dimensions || [[]]).map((row, rowIndex) => (
 					<div
@@ -86,7 +93,7 @@ const StepFive = () => {
 										?
 									</span>
 								</label>
-								<input
+								<Input
 									type='text'
 									value={userInput.dimensions[rowIndex][colIndex] || ''}
 									onChange={(e) =>
@@ -102,7 +109,7 @@ const StepFive = () => {
 										?
 									</span>
 								</label>
-								<input
+								<Input
 									type='text'
 									value={userInput.crossSections[rowIndex][colIndex] || ''}
 									onChange={(e) =>
@@ -129,17 +136,15 @@ const StepFive = () => {
 							Add Column
 						</Button>
 					</div>
-					<Link
-						href='/6'
-						passHref>
-						<Button className='inline-block hover:bg-zinc-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4'>
-							Next Step
-						</Button>
-					</Link>
+					<Button
+						type='submit'
+						className='inline-block hover:bg-zinc-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4'>
+						Next Step
+					</Button>
 				</div>
 			</form>
 		</div>
 	);
 };
 
-export default StepFive;
+export default PlanDefinitionStep;

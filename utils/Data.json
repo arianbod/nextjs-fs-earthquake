@@ -159,5 +159,10 @@
 		"title": "Congragulation!",
 		"text": "your building is stronger than 94% of other users",
 		"description": "After processing the user's input, the application will generate a detailed report estimating the potential impact of various earthquake levels on the user's building, including structural risks and recommended preventive measures."
+	},
+	"about": {
+		"missionStatement": "Our mission is to empower building owners with knowledge about their structures' resilience to earthquakes.",
+		"academicSupport": "This application is supported by Assistant Professor Hamid F Ghatte from Antalya Bilim University.",
+		"disclaimer": "While our application provides valuable insights, it's not a substitute for professional structural engineering assessments."
 	}
 }

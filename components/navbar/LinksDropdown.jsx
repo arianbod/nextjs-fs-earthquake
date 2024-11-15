@@ -1,3 +1,5 @@
+// components/navigation/LinksDropdown.jsx
+'use client';
 import React from 'react';
 import {
 	DropdownMenu,
@@ -5,10 +7,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { AlignLeft } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { links } from '@/utils/links';
 import Link from 'next/link';
+
 const LinksDropdown = () => {
 	return (
 		<DropdownMenu>
@@ -16,27 +19,27 @@ const LinksDropdown = () => {
 				asChild
 				className='lg:hidden'>
 				<Button
-					variant='outline'
+					variant='ghost'
 					size='icon'>
-					<AlignLeft />
-					<span className='sr-only'>Toggle links</span>
+					<Menu className='h-5 w-5' />
+					<span className='sr-only'>Open menu</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
-				className='w-52 lg:hidden'
 				align='start'
-				sideOffset={25}>
-				{links.map(({ href, label, icon }) => {
-					return (
-						<DropdownMenuItem key={href}>
-							<Link
-								href={href}
-								className='flex items-center gap-x-2'>
-								{icon} <span className='capitalize'>{label}</span>
-							</Link>
-						</DropdownMenuItem>
-					);
-				})}
+				className='w-56'>
+				{links.map(({ href, label, icon }) => (
+					<DropdownMenuItem
+						key={href}
+						className='p-0'>
+						<Link
+							href={href}
+							className='flex items-center gap-2 px-3 py-2 w-full hover:bg-gray-100 dark:hover:bg-gray-800'>
+							{icon}
+							<span>{label}</span>
+						</Link>
+					</DropdownMenuItem>
+				))}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

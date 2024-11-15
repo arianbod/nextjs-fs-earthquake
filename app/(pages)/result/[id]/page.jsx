@@ -1,68 +1,85 @@
 'use client';
-import React from 'react';
-import Data from '@/utils/Data.json';
-import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
+import { useUserInput } from '@/context/UserInputContext';
+import EnhancedCertificate from '@/components/EnhancedCertificate';
+import SafetyCalculator from '@/components/SafetyCalculator';
 
-const ResultPage = ({ params }) => {
-	const id = params.id;
-	const { title, text, description } = Data.results;
+const ResultPage = () => {
+	const { userInput } = useUserInput();
+	const [safetyResult, setSafetyResult] = useState(null);
+	const [error, setError] = useState(null);
+
+	useEffect(() => {
+		try {
+			const calculator = new SafetyCalculator();
+			const result = calculator.calculateSafety(userInput);
+			setSafetyResult(result);
+		} catch (err) {
+			console.error('Error calculating safety score:', err);
+			setError('An error occurred while calculating the safety score.');
+		}
+	}, [userInput]);
 
 	const handleDownload = () => {
 		window.print();
 	};
 
+	if (error) {
+		return <div className='text-red-500'>{error}</div>;
+	}
+
+	if (!safetyResult) {
+		return <div>Calculating safety score...</div>;
+	}
+
+	const passingScore = 70;
+	const isPassingScore = safetyResult.overallScore >= passingScore;
+
 	return (
 		<div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8 text-black'>
-			<div className='certificate-container'>
-				<div className='certificate-header'>
-					{/* <Image
-						src='/logo.png'
-						alt='Deprem Platform'
-						width={100}
-						height={100}
-						style={{ maxWidth: '150px', margin: '0 auto' }}
-					/> */}
-					<p>Deprem Platform</p>
-				</div>
-				<div className='certificate-title'>
-					Certificate of Safety and Analysis
-				</div>
-				<div className='certificate-body'>
-					<p>
-						This is to certify that this building, has been thoroughly analyzed
-						by the Deprem Platform.
+			{isPassingScore ? (
+				<EnhancedCertificate
+					score={safetyResult}
+					userInput={userInput}
+				/>
+			) : (
+				<div className='bg-white border border-red-500 p-8 max-w-2xl mx-auto my-8'>
+					<h2 className='text-2xl font-bold text-red-600 mb-4'>
+						Safety Concerns Identified
+					</h2>
+					<p className='mb-4'>
+						Based on the provided information, we've identified some safety
+						concerns with your building.
 					</p>
-					<p>According to our assessment:</p>
-					<ul className='list-disc list-inside'>
-						<li>Structural integrity: 94%</li>
-						<li>Estimated impact of a moderate earthquake: Low risk</li>
-						<li>Recommendations for improvements</li>
+					<ul className='list-disc list-inside mb-4'>
+						<li>
+							Overall Safety Score:{' '}
+							{Number(safetyResult?.overallScore || 0).toFixed(2)}%
+						</li>
+						<li>
+							Structural Integrity:{' '}
+							{Number(safetyResult?.structuralIntegrity || 0).toFixed(2)}%
+						</li>
+						<li>Earthquake Impact: {safetyResult?.earthquakeImpact}</li>
+						<li>Interpretation: {safetyResult?.interpretation}</li>
 					</ul>
-					<p>
-						This certificate is issued to confirm the safety and structural
-						analysis performed by the Deprem Platform.
+					<p className='mb-4'>
+						We recommend consulting with a structural engineer for a more
+						detailed assessment and to discuss potential improvements to enhance
+						your building's safety.
+					</p>
+					<p className='font-bold'>
+						For expert consultation, please call:{' '}
+						<span className='text-blue-600'>054-512-351233</span>
 					</p>
 				</div>
-				<div className='certificate-footer'>
-					<p>Date of Issuance: {Date()}</p>
-					<div className='certificate-signature '>
-						<div>
-							<p>__________________________</p>
-							<p>Authorized Signature</p>
-						</div>
-						<div>
-							<p>__________________________</p>
-							<p>Seal of Deprem Platform</p>
-						</div>
-					</div>
-				</div>
-				<div className='flex justify-center mt-8 no-print'>
-					<button
-						onClick={handleDownload}
-						className='bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-colors'>
-						Download Certificate Report
-					</button>
-				</div>
+			)}
+			<div className='flex justify-center mt-8 no-print'>
+				<button
+					onClick={handleDownload}
+					className='bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-colors'>
+					Download {isPassingScore ? 'Certificate' : 'Report'}
+				</button>
 			</div>
 		</div>
 	);

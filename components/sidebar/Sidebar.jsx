@@ -1,41 +1,55 @@
+// components/navigation/Sidebar.jsx
 'use client';
 import React from 'react';
-import Logo from '@/assets/main.png';
-import { links } from '@/utils/links';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { links } from '@/utils/links';
+import { Button } from '@/components/ui/button';
+import Logo from '@/assets/main.png';
 
 const Sidebar = () => {
 	const pathname = usePathname();
+
 	return (
-		<aside className='py-4 px-8 bg-muted h-full'>
-			<Link href='/'>
-				<Image
-					src={Logo}
-					alt='logo'
-					className='mx-auto rounded-full max-w-48'
-				/>
+		<div className='h-full py-8 px-4'>
+			{/* Logo */}
+			<Link
+				href='/'
+				className='block mb-8'>
+				<div className='flex justify-center'>
+					<Image
+						src={Logo}
+						alt='logo'
+						className='w-32 h-32 rounded-full border-4 border-blue-100 dark:border-blue-900'
+						priority
+					/>
+				</div>
 			</Link>
-			<div className='flex flex-col mt-20 gap-y-4'>
+
+			{/* Navigation Links */}
+			<nav className='space-y-2'>
 				{links.map(({ href, icon, label }) => {
+					const isActive = pathname === href;
 					return (
-						<Button
-							asChild
-							key={href}
-							variant={pathname === href ? 'default' : 'link'}>
-							<Link
-								href={href}
-								className='flex items-center gap-x-2'>
+						<Link
+							href={href}
+							key={href}>
+							<Button
+								variant={isActive ? 'default' : 'ghost'}
+								className={`w-full justify-start ${
+									isActive
+										? 'bg-blue-600 text-white hover:bg-blue-700'
+										: 'hover:bg-gray-100 dark:hover:bg-gray-800'
+								}`}>
 								{icon}
-								<span className='capitalize'>{label}</span>
-							</Link>
-						</Button>
+								<span className='ml-2'>{label}</span>
+							</Button>
+						</Link>
 					);
 				})}
-			</div>
-		</aside>
+			</nav>
+		</div>
 	);
 };
 

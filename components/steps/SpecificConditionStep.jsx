@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import Data from '@/utils/Data.json';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
 import { useUserInput } from '@/context/UserInputContext';
 
-const Eight = () => {
+const SpecificConditionStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	const [imagePreview, setImagePreview] = useState(null);
 
-	const stepEightData = Data.steps.find((step) => step.step === 8);
+	const stepSevenData = Data.steps.find((step) => step.step === 7);
 
 	const handleImageChange = (e) => {
 		const file = e.target.files[0];
@@ -18,7 +17,7 @@ const Eight = () => {
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				setImagePreview(reader.result);
-				updateUserInput({ extraLoad: reader.result });
+				updateUserInput({ specificCondition: reader.result });
 			};
 			reader.readAsDataURL(file);
 		}
@@ -26,10 +25,10 @@ const Eight = () => {
 
 	return (
 		<div className='flex flex-col place-content-center gap-8 place-items-center'>
-			<Progress value={80} />
+			<Progress value={65} />
 
-			<h1 className='text-2xl'>{stepEightData.title}</h1>
-			<p>{stepEightData.description}</p>
+			<h1 className='text-2xl'>{stepSevenData.title}</h1>
+			<p>{stepSevenData.description}</p>
 			<div className='mt-8'>
 				<h2 className='text-lg mb-2'>Upload a Photo</h2>
 				<label className='block w-full border-2 border-dashed border-gray-300 p-6 rounded-md text-center cursor-pointer hover:bg-gray-50'>
@@ -57,13 +56,9 @@ const Eight = () => {
 					/>
 				</label>
 			</div>
-			<Link
-				href='/9'
-				passHref>
-				<Button variant=''>Next Step</Button>
-			</Link>
+			<Button onClick={onNext}>Next Step</Button>
 		</div>
 	);
 };
 
-export default Eight;
+export default SpecificConditionStep;

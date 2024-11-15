@@ -1,11 +1,9 @@
 import React from 'react';
-import Link from 'next/link';
 import Data from '@/utils/Data.json';
 import Image from 'next/image';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useUserInput } from '@/context/UserInputContext';
-import { nanoid } from 'nanoid';
 
 const photos = [
 	{
@@ -30,7 +28,7 @@ const photos = [
 	},
 ];
 
-const Nine = () => {
+const NeighborBuildingsStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 
 	const stepNineData = Data.steps.find((step) => step.step === 9);
@@ -79,14 +77,14 @@ const Nine = () => {
 				))}
 			</div>
 			<div className='flex place-content-center place-items-center w-full mt-6'>
-				<Link
-					href={`/result/${nanoid()}`}
-					passHref>
-					<Button variant=''>Analyze</Button>
-				</Link>
+				<Button
+					onClick={onNext}
+					variant=''>
+					Analyze
+				</Button>
 			</div>
 		</div>
 	);
 };
 
-export default Nine;
+export default NeighborBuildingsStep;

@@ -1,12 +1,11 @@
 import React from 'react';
-import { Button } from './ui/button';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import Data from '@/utils/Data.json';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
 import { useUserInput } from '@/context/UserInputContext';
 
-const Six = () => {
+const ManipulationReviewStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	const stepSixData = Data.steps.find((step) => step.step === 6);
 
@@ -52,13 +51,9 @@ const Six = () => {
 					</div>
 				))}
 			</div>
-			<Link
-				href={userInput.manipulated ? '/7' : '/9'}
-				passHref>
-				<Button variant=''>Next Step</Button>
-			</Link>
+			<Button onClick={onNext}>Next Step</Button>
 		</div>
 	);
 };
 
-export default Six;
+export default ManipulationReviewStep;

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Button } from './ui/button';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import Data from '@/utils/Data.json';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
 import { useUserInput } from '@/context/UserInputContext';
 
-const Eight = () => {
+const ExtraLoadStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	const [imagePreview, setImagePreview] = useState(null);
 
@@ -57,13 +56,9 @@ const Eight = () => {
 					/>
 				</label>
 			</div>
-			<Link
-				href='/9'
-				passHref>
-				<Button variant=''>Next Step</Button>
-			</Link>
+			<Button onClick={onNext}>Next Step</Button>
 		</div>
 	);
 };
 
-export default Eight;
+export default ExtraLoadStep;

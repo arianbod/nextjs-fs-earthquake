@@ -1,28 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Data from '@/utils/Data.json';
 import { Button } from './ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useUserInput } from '@/context/UserInputContext';
 
 const Two = () => {
-	const [formData, setFormData] = useState({
-		typeOfEarthquake: '',
-		typeOfSoil: '',
-		designRegulation: '',
-		numberOfStories: 0,
-	});
+	const { userInput, updateUserInput } = useUserInput();
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
-		setFormData((prevState) => ({
-			...prevState,
-			[name]: value,
-		}));
+		updateUserInput({ [name]: value });
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(formData);
+		// You can perform any additional actions here before moving to the next step
 	};
 
 	const stepTwoData = Data.steps.find((step) => step.step === 2);
@@ -30,7 +23,6 @@ const Two = () => {
 	return (
 		<div className='max-w-4xl mx-auto p-5 text-center'>
 			<Progress value={20} />
-
 			<h1 className='text-3xl font-bold text-center mb-4'>
 				{stepTwoData.title}
 			</h1>
@@ -48,7 +40,7 @@ const Two = () => {
 							</label>
 							<select
 								name={input.label.replace(/\s+/g, '').toLowerCase()}
-								value={formData[input.label.replace(/\s+/g, '').toLowerCase()]}
+								value={userInput[input.label.replace(/\s+/g, '').toLowerCase()]}
 								onChange={handleChange}
 								className='mt-1 block w-full py-2 px-3 border border-gray-300 bg-white text-black rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'>
 								{input.options.map((option) => (
@@ -78,7 +70,7 @@ const Two = () => {
 							<input
 								type='number'
 								name={input.label.replace(/\s+/g, '').toLowerCase()}
-								value={formData[input.label.replace(/\s+/g, '').toLowerCase()]}
+								value={userInput[input.label.replace(/\s+/g, '').toLowerCase()]}
 								onChange={handleChange}
 								min={0}
 								className='mt-1 block w-full py-2 px-3 border border-gray-300 text-black bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'

@@ -1,8 +1,6 @@
+// components/navigation/ThemeToggle.jsx
 'use client';
-
-import * as React from 'react';
 import { useTheme } from 'next-themes';
-
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
@@ -11,22 +9,21 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Moon, Sun } from 'lucide-react';
-const ModeToggle = () => {
-	const { setTheme, theme, resolvedTheme } = useTheme();
-	React.useEffect(() => {
-		console.log('theme is : ', theme);
-		console.log('resolvedTheme is : ', resolvedTheme);
-	}, [resolvedTheme, theme]);
+
+const ThemeToggle = () => {
+	const { setTheme, resolvedTheme } = useTheme();
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button
-					variant='outline'
-					size='icon'>
+					variant='ghost'
+					size='icon'
+					className='hover:bg-gray-100 dark:hover:bg-gray-800'>
 					{resolvedTheme === 'dark' ? (
-						<Moon className='h-[1.2rem] w-[1.2rem]' />
+						<Moon className='h-5 w-5' />
 					) : (
-						<Sun className='h-[1.2rem] w-[1.2rem]' />
+						<Sun className='h-5 w-5' />
 					)}
 					<span className='sr-only'>Toggle theme</span>
 				</Button>
@@ -45,4 +42,5 @@ const ModeToggle = () => {
 		</DropdownMenu>
 	);
 };
-export default ModeToggle;
+
+export default ThemeToggle;

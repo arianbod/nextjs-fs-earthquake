@@ -6,7 +6,7 @@ import Data from '@/utils/Data.json';
 
 export default function AboutPage() {
 	return (
-		<div className='min-h-screen bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800'>
+		<div className='min-h-screen'>
 			<main className='container mx-auto px-4 py-16'>
 				<h1 className='text-5xl font-bold text-center mb-8'>
 					About Earthquake Impact Estimation

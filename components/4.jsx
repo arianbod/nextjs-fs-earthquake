@@ -1,46 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Data from '@/utils/Data.json';
-
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useUserInput } from '@/context/UserInputContext';
 
 const photos = [
 	{
 		id: '1',
-		url: '/images/irregularity/horızontal-irreqularity.png',
-		description: 'horızontal irreqularity',
+		url: '/images/irregularity/horizontal-irregularity.png',
+		description: 'Horizontal Irregularity',
 	},
 	{
 		id: '2',
-		url: '/images/irregularity/natural-slope-irreqularity.png',
-		description: 'natural slope irreqularity',
+		url: '/images/irregularity/natural-slope-irregularity.png',
+		description: 'Natural Slope Irregularity',
 	},
 	{
 		id: '3',
-		url: '/images/irregularity/slabs-irreqularity.png',
-		description: 'slabs irreqularity',
+		url: '/images/irregularity/slabs-irregularity.png',
+		description: 'Slabs Irregularity',
 	},
 	{
 		id: '4',
-		url: '/images/irregularity/vertical-irreqularity.png',
-		description: 'vertical irreqularity',
+		url: '/images/irregularity/vertical-irregularity.png',
+		description: 'Vertical Irregularity',
 	},
 ];
 
 const Four = () => {
-	const [selectedPhoto, setSelectedPhoto] = useState('');
+	const { userInput, updateUserInput } = useUserInput();
 
 	const stepFourData = Data.steps.find((step) => step.step === 4);
 
-	const handleSelectionChange = (e) => {
-		setSelectedPhoto(e.target.value);
-	};
-
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		console.log('Selected photo:', selectedPhoto);
+	const handleSelectionChange = (id) => {
+		updateUserInput({ irregularity: id });
 	};
 
 	return (
@@ -51,9 +46,7 @@ const Four = () => {
 				{stepFourData.title}
 			</h1>
 			<p className='text-lg mx-auto text-center'>{stepFourData.description}</p>
-			<form
-				onSubmit={handleSubmit}
-				className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 				{photos.map((photo) => (
 					<label
 						key={photo.id}
@@ -62,22 +55,22 @@ const Four = () => {
 							type='radio'
 							name='photoOption'
 							value={photo.id}
-							checked={selectedPhoto === photo.id}
-							onChange={handleSelectionChange}
+							checked={userInput.irregularity === photo.id}
+							onChange={() => handleSelectionChange(photo.id)}
 							className='hidden'
 						/>
 						<div
 							className={`cursor-pointer p-4 border-8 transition-all w-64 ${
-								selectedPhoto === photo.id
+								userInput.irregularity === photo.id
 									? 'border-blue-500 scale-110'
 									: 'border-transparent'
 							} rounded-lg`}>
 							<Image
 								src={photo.url}
 								alt={photo.description}
-								width={500} // Specify width
-								height={300} // Specify height to maintain aspect ratio
-								objectFit='cover' // Cover to ensure the image covers the area nicely
+								width={500}
+								height={300}
+								objectFit='cover'
 								className='rounded-md'
 							/>
 							<h6 className='bg-gray-800 text-white text-center rounded-lg py-1'>
@@ -86,12 +79,12 @@ const Four = () => {
 						</div>
 					</label>
 				))}
-			</form>
+			</div>
 			<div className='flex justify-center mt-6'>
 				<Link
 					href='/5'
 					passHref>
-					<Button className=' text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
+					<Button className='text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
 						Next Step
 					</Button>
 				</Link>

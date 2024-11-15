@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Data from '@/utils/Data.json';
 import Image from 'next/image';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useUserInput } from '@/context/UserInputContext';
 
@@ -34,7 +34,7 @@ const photos = [
 	},
 ];
 
-const Three = () => {
+const StructuralSystemStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 
 	const stepThreeData = Data.steps.find((step) => step.step === 3);
@@ -86,16 +86,14 @@ const Three = () => {
 				))}
 			</div>
 			<div className='flex justify-center mt-6'>
-				<Link
-					href='/4'
-					passHref>
-					<Button className='text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
-						Next Step
-					</Button>
-				</Link>
+				<Button
+					onClick={onNext}
+					className='text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
+					Next Step
+				</Button>
 			</div>
 		</div>
 	);
 };
 
-export default Three;
+export default StructuralSystemStep;

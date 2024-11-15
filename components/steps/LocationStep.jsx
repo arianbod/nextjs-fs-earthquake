@@ -1,13 +1,12 @@
-// One.js
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Data from '@/utils/Data.json';
-import { MyMapComponent } from './MyMapComponent';
-import { Button } from './ui/button';
+import { MyMapComponent } from '@/components/MyMapComponent';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useUserInput } from '@/context/UserInputContext';
 
-const One = () => {
+const LocationStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -85,15 +84,15 @@ const One = () => {
 			)}
 
 			<div className='flex justify-center'>
-				<Link
-					href='/2'
-					className='hover:bg-zinc-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'
-					passHref>
+				<Button
+					onClick={onNext}
+					disabled={!userInput.location}
+					className='hover:bg-zinc-400 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-colors duration-150'>
 					Next
-				</Link>
+				</Button>
 			</div>
 		</div>
 	);
 };
 
-export default One;
+export default LocationStep;
