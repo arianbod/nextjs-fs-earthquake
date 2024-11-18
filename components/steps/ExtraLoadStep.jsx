@@ -25,7 +25,7 @@ const ExtraLoadStep = ({ onNext }) => {
 
 	return (
 		<div className='flex flex-col place-content-center gap-8 place-items-center'>
-			<Progress value={80} />
+			{/* <Progress value={80} /> */}
 
 			<h1 className='text-2xl'>{stepEightData.title}</h1>
 			<p>{stepEightData.description}</p>

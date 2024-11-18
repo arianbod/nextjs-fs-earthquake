@@ -25,7 +25,7 @@ const SpecificConditionStep = ({ onNext }) => {
 
 	return (
 		<div className='flex flex-col place-content-center gap-8 place-items-center'>
-			<Progress value={65} />
+			{/* <Progress value={65} /> */}
 
 			<h1 className='text-2xl'>{stepSevenData.title}</h1>
 			<p>{stepSevenData.description}</p>

@@ -1,5 +1,5 @@
 // Building Types
-const BUILDING_TYPES = {
+export const BUILDING_TYPES = {
     W1: 'Wood Light Frame',
     W1A: 'Multi-Story, Multi-Unit Residential Wood',
     W2: 'Wood Frame Commercial and Industrial',
@@ -20,13 +20,13 @@ const BUILDING_TYPES = {
 };
 
 // Initial Scores
-const INITIAL_SCORES = {
+export const INITIAL_SCORES = {
     W1: 4.1, W1A: 3.7, W2: 3.2, S1: 2.3, S2: 2.2, S3: 2.9, S4: 2.2, S5: 2.1,
     C1: 1.7, C2: 2.1, C3: 1.4, PC1: 1.8, PC2: 1.5, RM1: 1.8, RM2: 1.8, URM: 1.2, MH: 2.2
 };
 
 // Modifiers
-const MODIFIERS = {
+export const MODIFIERS = {
     verticalIrregularityHigh: {
         W1: -1.3, W1A: -1.3, W2: -1.3, S1: -1.1, S2: -1, S3: -1.2, S4: -1, S5: -0.9,
         C1: -1, C2: -1.1, C3: -0.8, PC1: -1, PC2: -0.9, RM1: -1, RM2: -1, URM: -0.8, MH: 0
@@ -66,12 +66,12 @@ const MODIFIERS = {
 };
 
 // Minimum Scores
-const MIN_SCORES = {
+export const MIN_SCORES = {
     W1: 1.6, W1A: 1.2, W2: 0.8, S1: 0.5, S2: 0.5, S3: 0.9, S4: 0.5, S5: 0.5,
     C1: 0.3, C2: 0.3, C3: 0.3, PC1: 0.3, PC2: 0.2, RM1: 0.3, RM2: 0.3, URM: 0.2, MH: 1.4
 };
 
-function calculateFemaSafetyScore(buildingType, params) {
+export function calculateFemaSafetyScore(buildingType, params) {
     let score = INITIAL_SCORES[buildingType];
 
     if (params.verticalIrregularityHigh) score += MODIFIERS.verticalIrregularityHigh[buildingType];
@@ -93,7 +93,7 @@ function calculateFemaSafetyScore(buildingType, params) {
     return score;
 }
 
-function interpretScore(score) {
+export function interpretScore(score) {
     if (score < 0.3) return "High probability of Grade 5 damage; Very High probability of Grade 4 damage";
     if (score < 0.7) return "High probability of Grade 4 damage; Very High probability of Grade 3 damage";
     if (score < 2.0) return "High probability of Grade 3 damage; Very High probability of Grade 2 damage";

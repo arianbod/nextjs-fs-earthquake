@@ -11,8 +11,10 @@ const ResultPage = () => {
 
 	useEffect(() => {
 		try {
+			console.log('Current userInput:', userInput); // Debug log
 			const calculator = new SafetyCalculator();
 			const result = calculator.calculateSafety(userInput);
+			console.log('Calculated result:', result); // Debug log
 			setSafetyResult(result);
 		} catch (err) {
 			console.error('Error calculating safety score:', err);
@@ -20,9 +22,12 @@ const ResultPage = () => {
 		}
 	}, [userInput]);
 
-	const handleDownload = () => {
-		window.print();
-	};
+	// Add debug output
+	if (!userInput || Object.keys(userInput).length === 0) {
+		return (
+			<div>No input data available. Please complete the assessment form.</div>
+		);
+	}
 
 	if (error) {
 		return <div className='text-red-500'>{error}</div>;
@@ -33,7 +38,7 @@ const ResultPage = () => {
 	}
 
 	const passingScore = 70;
-	const isPassingScore = safetyResult.overallScore >= passingScore;
+	const isPassingScore = parseFloat(safetyResult.overallScore) >= passingScore;
 
 	return (
 		<div className='min-h-screen bg-gray-100 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8 text-black'>
@@ -52,14 +57,8 @@ const ResultPage = () => {
 						concerns with your building.
 					</p>
 					<ul className='list-disc list-inside mb-4'>
-						<li>
-							Overall Safety Score:{' '}
-							{Number(safetyResult?.overallScore || 0).toFixed(2)}%
-						</li>
-						<li>
-							Structural Integrity:{' '}
-							{Number(safetyResult?.structuralIntegrity || 0).toFixed(2)}%
-						</li>
+						<li>Overall Safety Score: {safetyResult?.overallScore}%</li>
+						<li>Structural Integrity: {safetyResult?.structuralIntegrity}%</li>
 						<li>Earthquake Impact: {safetyResult?.earthquakeImpact}</li>
 						<li>Interpretation: {safetyResult?.interpretation}</li>
 					</ul>
@@ -76,7 +75,7 @@ const ResultPage = () => {
 			)}
 			<div className='flex justify-center mt-8 no-print'>
 				<button
-					onClick={handleDownload}
+					onClick={() => window.print()}
 					className='bg-blue-500 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-600 transition-colors'>
 					Download {isPassingScore ? 'Certificate' : 'Report'}
 				</button>

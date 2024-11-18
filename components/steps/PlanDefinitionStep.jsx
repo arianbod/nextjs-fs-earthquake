@@ -47,7 +47,7 @@ const PlanDefinitionStep = ({ onNext }) => {
 
 	return (
 		<div className='max-w-4xl mx-auto p-5'>
-			<Progress value={48} />
+			{/* <Progress value={48} /> */}
 
 			<h1 className='text-2xl font-bold mb-4'>{stepFiveData.title}</h1>
 			<p className='mb-6'>{stepFiveData.description}</p>

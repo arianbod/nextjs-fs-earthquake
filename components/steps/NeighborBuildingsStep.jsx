@@ -39,7 +39,7 @@ const NeighborBuildingsStep = ({ onNext }) => {
 
 	return (
 		<div className='max-w-4xl mx-auto p-5 flex flex-col gap-4 place-items-center place-content-center'>
-			<Progress value={90} />
+			{/* <Progress value={90} /> */}
 
 			<h1 className='text-3xl font-bold text-center mb-6'>
 				{stepNineData.title}

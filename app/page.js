@@ -9,6 +9,7 @@ import {
   Award, GraduationCap, Zap
 } from 'lucide-react';
 import Data from '@/utils/Data.json';
+import HowItWorksSection from '@/components/homepage/HowItWorksSection';
 
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
@@ -118,7 +119,7 @@ export default function HomePage() {
         </section>
 
         {/* How It Works Section */}
-        <section className="space-y-8">
+        {/* <section className="space-y-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-4">{Data.welcomeTitle}</h2>
             <p className="text-xl mb-8">{Data.welcomeDescription}</p>
@@ -133,8 +134,9 @@ export default function HomePage() {
               />
             ))}
           </div>
-        </section>
+        </section> */}
 
+        <HowItWorksSection />
         {/* Value Proposition Section */}
         <section className="space-y-8">
           <div className="text-center mb-12">

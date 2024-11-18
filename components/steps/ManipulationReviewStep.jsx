@@ -24,7 +24,7 @@ const ManipulationReviewStep = ({ onNext }) => {
 
 	return (
 		<div className='flex flex-col place-items-center gap-8'>
-			<Progress value={55} />
+			{/* <Progress value={55} /> */}
 
 			<h1 className='text-2xl'>{stepSixData.title}</h1>
 			<p>{stepSixData.description}</p>
@@ -45,7 +45,7 @@ const ManipulationReviewStep = ({ onNext }) => {
 							width={200}
 							height={200}
 							alt={option.description}
-							className='rounded-lg'
+							className='rounded-lg w-36 mx-auto h-36'
 						/>
 						<span>{option.description}</span>
 					</div>
