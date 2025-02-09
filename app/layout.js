@@ -40,8 +40,8 @@ export default function RootLayout({ children }) {
                     min-h-screen 
                     flex 
                     flex-col 
-                    bg-[#1B224C]
-                    text-white
+                    dark:bg-[#1B224C]
+                    dark:text-white
                 `}>
           <Providers>
 
