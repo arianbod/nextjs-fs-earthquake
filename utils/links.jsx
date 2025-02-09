@@ -23,9 +23,4 @@ export const links = [
 		label: 'home',
 		icon: <HomeIcon />,
 	},
-	{
-		href: '/chat',
-		label: 'AI Assistant',
-		icon: <MessageCircle />,
-	},
 ];
