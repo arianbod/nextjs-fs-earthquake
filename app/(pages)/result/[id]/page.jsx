@@ -53,7 +53,7 @@ const ResultPage = () => {
 						Safety Concerns Identified
 					</h2>
 					<p className='mb-4'>
-						Based on the provided information, we've identified some safety
+						Based on the provided information, we&apos;ve identified some safety
 						concerns with your building.
 					</p>
 					<ul className='list-disc list-inside mb-4'>
@@ -65,7 +65,7 @@ const ResultPage = () => {
 					<p className='mb-4'>
 						We recommend consulting with a structural engineer for a more
 						detailed assessment and to discuss potential improvements to enhance
-						your building's safety.
+						your building&apos;s safety.
 					</p>
 					<p className='font-bold'>
 						For expert consultation, please call:{' '}
