@@ -112,8 +112,8 @@ const AssistantPanel = () => {
 									/>
 								</div>
 								<div className='flex flex-col'>
-									<h2 className='text-base font-semibold leading-tight text-gray-900 dark:text-gray-100'>
-										Baba AI Assistant
+									<h2 className='capitalize text-base font-semibold leading-tight text-gray-900 dark:text-gray-100'>
+										helper support
 									</h2>
 									<span className='text-xs text-gray-500 dark:text-gray-400'>
 										Online • Ready to help
