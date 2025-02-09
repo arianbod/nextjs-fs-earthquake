@@ -1,4 +1,6 @@
+// File: /context/UserInputContext.js
 'use client';
+
 import React, { createContext, useContext, useState } from 'react';
 
 const UserInputContext = createContext();
@@ -20,13 +22,17 @@ export const UserInputProvider = ({ children }) => {
 		neighborBuildings: '',
 	});
 
-	  const updateUserInput = (newData) => {
-			setUserInput((prevData) => ({ ...prevData, ...newData }));
-		};
+	const updateUserInput = (newData) => {
+		setUserInput((prevData) => ({ ...prevData, ...newData }));
+	};
 
+	const value = {
+		userInput,
+		updateUserInput,
+	};
 
 	return (
-		<UserInputContext.Provider value={{ userInput, updateUserInput }}>
+		<UserInputContext.Provider value={value}>
 			{children}
 		</UserInputContext.Provider>
 	);
@@ -39,3 +45,5 @@ export const useUserInput = () => {
 	}
 	return context;
 };
+
+export default UserInputContext;
