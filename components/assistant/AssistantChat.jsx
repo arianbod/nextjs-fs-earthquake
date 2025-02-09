@@ -48,10 +48,10 @@ const AssistantChat = () => {
 
 	const handleStartConference = async () => {
 		const currentTimestamp = new Date().getTime();
-		const conferenceUrl = `https://expert.earthquakeapp.org/${currentTimestamp}`;
+		const conferenceUrl = `https://conf.babaai.ca/${currentTimestamp}`;
 
 		try {
-			const userEmail = 'support@earthquakeapp.org';
+			const userEmail = 'arianbod@outlook.com';
 			const relevantMessages = messages.filter(
 				(msg) =>
 					msg.content?.trim() &&
@@ -258,9 +258,9 @@ const AssistantChat = () => {
 					</div>
 
 					<Link
-						href='https://earthquakeapp.org'
+						href='https://babaai.ca'
 						className='text-blue-900/50 dark:text-blue-300/50 text-xs text-center flex place-content-center place-items-center mt-2'>
-						Learn more about our Earthquake Assessment System
+						Learn more about assistant!
 					</Link>
 				</form>
 			</div>

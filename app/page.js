@@ -16,9 +16,9 @@ const FeatureCard = ({ icon: Icon, title, description }) => (
     <CardHeader>
       <div className="flex items-center space-x-2">
         <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardTitle className="text-lg text-gray-900 dark:text-white">{title}</CardTitle>
       </div>
-      <CardDescription>{description}</CardDescription>
+      <CardDescription className="text-gray-700 dark:text-gray-300">{description}</CardDescription>
     </CardHeader>
   </Card>
 );
@@ -29,8 +29,8 @@ const StepIndicator = ({ number, title, description }) => (
       {number}
     </div>
     <div>
-      <h3 className="font-semibold text-lg">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-300">{description}</p>
+      <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{title}</h3>
+      <p className="text-gray-700 dark:text-gray-300">{description}</p>
     </div>
   </div>
 );
@@ -40,8 +40,8 @@ const StatCard = ({ icon: Icon, value, label }) => (
     <CardContent className="p-6 flex items-center space-x-4">
       <Icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
       <div>
-        <div className="text-2xl font-bold">{value}</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">{label}</div>
+        <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+        <div className="text-sm text-gray-700 dark:text-gray-300">{label}</div>
       </div>
     </CardContent>
   </Card>
@@ -52,9 +52,9 @@ const ValueCard = ({ icon: Icon, title, description, stats }) => (
     <CardHeader>
       <div className="flex items-center space-x-2">
         <Icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardTitle className="text-lg text-gray-900 dark:text-white">{title}</CardTitle>
       </div>
-      <CardDescription className="text-base">{description}</CardDescription>
+      <CardDescription className="text-base text-gray-700 dark:text-gray-300">{description}</CardDescription>
     </CardHeader>
     {stats && (
       <CardContent>
@@ -78,32 +78,32 @@ export default function HomePage() {
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-2">
               Academic Backing
             </h2>
-            <p className="text-xl text-gray-700 dark:text-gray-300">
+            <p className="text-xl text-gray-900 dark:text-gray-200">
               Supported by: <span className="font-semibold">Assistant Professor Hamid F Ghatte</span>
             </p>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-lg text-gray-700 dark:text-gray-300">
               Antalya Bilim University
             </p>
           </div>
 
           {/* Main Title */}
           <div>
-            <h1 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+            <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
               {Data.name}
             </h1>
-            <p className="text-xl max-w-2xl mx-auto mt-6">
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mt-6">
               {Data.description}
             </p>
           </div>
 
           <div className="flex justify-center space-x-4">
             <Link href="/assessment/1">
-              <Button size="lg" className="text-lg bg-blue-600 hover:bg-blue-700">
+              <Button size="lg" className="text-lg bg-blue-600 hover:bg-blue-700 text-white">
                 Start Assessment <ArrowRight className="ml-2" />
               </Button>
             </Link>
             <Link href="/about">
-              <Button size="lg" variant="outline" className="text-lg">
+              <Button size="lg" variant="outline" className="text-lg text-gray-900 dark:text-white">
                 Learn More <Shield className="ml-2" />
               </Button>
             </Link>
@@ -118,30 +118,13 @@ export default function HomePage() {
           <StatCard icon={Clock} value="5 min" label="Average Assessment Time" />
         </section>
 
-        {/* How It Works Section */}
-        {/* <section className="space-y-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold mb-4">{Data.welcomeTitle}</h2>
-            <p className="text-xl mb-8">{Data.welcomeDescription}</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {Data.objectives.map((objective, index) => (
-              <StepIndicator
-                key={index}
-                number={index + 1}
-                title={`Step ${index + 1}`}
-                description={objective}
-              />
-            ))}
-          </div>
-        </section> */}
-
         <HowItWorksSection />
+
         {/* Value Proposition Section */}
         <section className="space-y-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Platform Impact & Value</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Platform Impact & Value</h2>
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
               Transform your building assessment process with our AI-powered platform, providing rapid, accurate, and comprehensive safety verifications.
             </p>
           </div>
@@ -193,12 +176,12 @@ export default function HomePage() {
           <div className="mt-12 text-center">
             <Card className="bg-blue-50 dark:bg-blue-900/20 border-none shadow-lg max-w-2xl mx-auto">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Start-Up Innovation</h3>
-                <p className="text-gray-600 dark:text-gray-300">
+                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Start-Up Innovation</h3>
+                <p className="text-gray-700 dark:text-gray-300">
                   Our platform represents the future of building safety assessment, combining cutting-edge AI technology with engineering expertise. Join the community of forward-thinking property owners and managers who are revolutionizing building safety verification.
                 </p>
                 <Link href="/assessment/1">
-                  <Button size="lg" className="mt-6 bg-blue-600 hover:bg-blue-700">
+                  <Button size="lg" className="mt-6 bg-blue-600 hover:bg-blue-700 text-white">
                     Start Free Assessment <ArrowRight className="ml-2" />
                   </Button>
                 </Link>
@@ -209,7 +192,7 @@ export default function HomePage() {
 
         {/* Features Grid */}
         <section className="space-y-8">
-          <h2 className="text-3xl font-bold text-center">Key Features</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Key Features</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <FeatureCard
               icon={MapPin}
@@ -242,27 +225,27 @@ export default function HomePage() {
               <Card className="bg-white/50 dark:bg-gray-800/50">
                 <CardContent className="p-6 text-center">
                   <GraduationCap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Research-Based</h3>
-                  <p className="text-sm">Built on peer-reviewed research and engineering principles</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Research-Based</h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Built on peer-reviewed research and engineering principles</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/50 dark:bg-gray-800/50">
                 <CardContent className="p-6 text-center">
                   <Award className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Expert Validated</h3>
-                  <p className="text-sm">Verified by structural engineering experts</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Expert Validated</h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Verified by structural engineering experts</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/50 dark:bg-gray-800/50">
                 <CardContent className="p-6 text-center">
                   <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Continuously Updated</h3>
-                  <p className="text-sm">Regular updates based on latest research</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Continuously Updated</h3>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">Regular updates based on latest research</p>
                 </CardContent>
               </Card>
             </div>
           </div>
-          <div className="mt-6 text-sm text-gray-600 dark:text-gray-400 text-center">
+          <div className="mt-6 text-sm text-gray-700 dark:text-gray-300 text-center">
             {Data.about.disclaimer}
           </div>
         </section>
