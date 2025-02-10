@@ -51,7 +51,7 @@ const AssistantChat = () => {
 		const conferenceUrl = `https://conf.babaai.ca/${currentTimestamp}`;
 
 		try {
-			const userEmail = 'arianbod@outlook.com';
+			const userEmail = 'h.f.gate@gmail.com';
 			const relevantMessages = messages.filter(
 				(msg) =>
 					msg.content?.trim() &&
