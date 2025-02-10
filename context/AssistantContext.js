@@ -13,7 +13,7 @@ const AssistantContext = createContext();
 
 export const AssistantProvider = ({ children }) => {
     // UI States
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isSending, setIsSending] = useState(false);
