@@ -100,7 +100,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="flex justify-center space-x-4">
+          <div className="lg:flex flex-wrap max-w-full justify-center space-x-4">
             <Link href="/assessment/1">
               <Button size="lg" className="text-lg bg-blue-600 hover:bg-blue-700 text-white">
                 Start Assessment <ArrowRight className="ml-2" />
