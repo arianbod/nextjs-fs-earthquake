@@ -80,7 +80,7 @@ export default function HomePage() {
             <div className='flex flex-col gap-2 px-2 py-8 border-2 border-gray-300 rounded-xl'>
 
               <Image src="/images/logo.png" width="200" height="200" unoptimized alt="logo" className="w-20 h-20 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-              <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-3xl lg:text-6xl font-bold text-gray-900 dark:text-white">
                 {Data.name}
               </h1>
               <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
