@@ -1,4 +1,5 @@
 {
+	"appName": "QuakeWise",
 	"name": "Earthquake Impact Estimation Application",
 	"description": "A web application (Application) designed for quick assessment of the earthquake impact on buildings based on user-provided information.",
 	"text": "Supported by: Assistant professor Hamid F Ghatte, Antalya bilim University",
