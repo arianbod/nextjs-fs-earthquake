@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Data from '@/utils/Data.json';
 import HowItWorksSection from '@/components/homepage/HowItWorksSection';
+import Image from 'next/image';
 
 const FeatureCard = ({ icon: Icon, title, description }) => (
   <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
@@ -74,14 +75,17 @@ export default function HomePage() {
         <div className="text-center space-y-12">
           {/* Academic Support First */}
           <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 max-w-3xl mx-auto">
-            <GraduationCap className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+            <Image src="/images/logo.png" unoptimized alt="logo" className="w-20 h-20 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-2">
-              Academic Backing
+              QuakeWise!
             </h2>
-            <p className="text-xl text-gray-900 dark:text-gray-200">
+            {/* <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-2">
+               
+            </h2> */}
+            <p className="text-lg text-gray-900 dark:text-gray-200">
               Supported by: <span className="font-semibold">Assistant Professor Hamid F Ghatte</span>
             </p>
-            <p className="text-lg text-gray-700 dark:text-gray-300">
+            <p className="text-md text-gray-700 dark:text-gray-300">
               Antalya Bilim University
             </p>
           </div>
