@@ -9,7 +9,7 @@ export default function AboutPage() {
 		<div className='min-h-screen'>
 			<main className='container mx-auto px-4 py-16'>
 				<h1 className='text-5xl font-bold text-center mb-8'>
-					About Earthquake Impact Estimation
+					About QuakeWisee!
 				</h1>
 				<div className='text-xl text-center mb-12 space-y-6'>
 					<p>{Data.description}</p>

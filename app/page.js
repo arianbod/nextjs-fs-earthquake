@@ -74,14 +74,16 @@ export default function HomePage() {
         {/* Enhanced Hero Section with Academic Backing */}
         <div className="text-center space-y-12">
           {/* Academic Support First */}
-          <div className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 max-w-3xl mx-auto">
-            <Image src="/images/logo.png" unoptimized alt="logo" className="w-20 h-20 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-2">
-              QuakeWise!
-            </h2>
-            {/* <h2 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-2">
-               
-            </h2> */}
+
+          {/* Main Title */}
+          <div className='flex flex-col gap-4'>
+            <Image src="/images/logo.png" width="200" height="200" unoptimized alt="logo" className="w-20 h-20 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+            <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
+              {Data.name}
+            </h1>
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+              {Data.description}
+            </p>
             <p className="text-lg text-gray-900 dark:text-gray-200">
               Supported by: <span className="font-semibold">Assistant Professor Hamid F Ghatte</span>
             </p>
@@ -90,19 +92,9 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Main Title */}
-          <div>
-            <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
-              {Data.name}
-            </h1>
-            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mt-6">
-              {Data.description}
-            </p>
-          </div>
-
-          <div className="lg:flex flex-wrap max-w-full justify-center space-x-4">
+          <div className="flex flex-col gap-4 lg:flex-row max-w-full justify-center space-x-4">
             <Link href="/assessment/1">
-              <Button size="lg" className="text-lg bg-blue-600 hover:bg-blue-700 text-white">
+              <Button size="lg" className="text-lg bg-blue-600 hover:bg-blue-700 text-white w-full">
                 Start Assessment <ArrowRight className="ml-2" />
               </Button>
             </Link>
