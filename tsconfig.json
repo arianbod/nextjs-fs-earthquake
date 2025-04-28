@@ -12,6 +12,11 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"jsx": "preserve",
+		"baseUrl": ".", // <-- added
+		"paths": {
+			// <-- added
+			"@/*": ["*"]
+		},
 		"plugins": [
 			{
 				"name": "next"

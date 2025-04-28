@@ -1,31 +1,28 @@
-import {
-	AreaChart,
-	Layers,
-	AppWindow,
-	HomeIcon,
-	MessageCircle,
-} from 'lucide-react';
-import React from 'react';
-
+// utils/links.jsx
 export const links = [
 	{
-		href: '/1',
-		label: 'new',
-		icon: <AppWindow />,
-	},
-	{
-		href: '/welcome',
-		label: 'about',
-		icon: <Layers />,
-	},
-	{
-		href: '/',
-		label: 'home',
+		href: '/dashboard',
+		label: 'Dashboard',
 		icon: <HomeIcon />,
+	},
+	{
+		href: '/assessments',
+		label: 'My Assessments',
+		icon: <ClipboardList />, // New icon
+	},
+	{
+		href: '/start-assessment',
+		label: 'New Assessment',
+		icon: <PlusCircle />, // New icon
 	},
 	{
 		href: '/chat',
 		label: 'AI Assistant',
 		icon: <MessageCircle />,
+	},
+	{
+		href: '/about',
+		label: 'About',
+		icon: <InfoIcon />, // New icon
 	},
 ];
