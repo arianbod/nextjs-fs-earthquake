@@ -1,16 +1,28 @@
-import { authMiddleware } from '@clerk/nextjs';
+// middleware.ts
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import type { NextRequest } from 'next/server';
 
-export default authMiddleware({
-	// Routes that can be accessed while signed out
-	publicRoutes: ['/'],
-	// Routes that can always be accessed, and have
-	// no authentication information
-	ignoredRoutes: ['/no-auth-in-this-route'],
+// Define which routes should remain public or completely ignored
+const publicRoutes = createRouteMatcher(['/', '/sign-in(.*)', '/sign-up(.*)']);
+const ignoredRoutes = createRouteMatcher(['/no-auth-in-this-route']);
+
+export default clerkMiddleware(async (auth, req: NextRequest) => {
+	// Skip any routes you explicitly want fully open
+	if (ignoredRoutes(req)) {
+		return;
+	}
+	const { userId, redirectToSignIn } = await auth();
+	// If the user isn’t signed in and isn’t heading to a public page, redirect
+	if (!userId && !publicRoutes(req)) {
+		return redirectToSignIn();
+	}
 });
 
 export const config = {
-	// Protects all routes, including api/trpc.
-	// See https://clerk.com/docs/references/nextjs/auth-middleware
-	// for more information about configuring your Middleware
-	matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+	matcher: [
+		// Skip static files and Next internals
+		'/((?!_next/static|_next/image|favicon.ico).*)',
+		// Protect your API or tRPC endpoints if desired
+		'/(api|trpc)(.*)',
+	],
 };
