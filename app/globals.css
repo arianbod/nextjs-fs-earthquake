@@ -140,3 +140,121 @@
 	width: 150px;
 	height: auto;
 }
+
+/* Certificate Styles */
+.certificate-container {
+  padding: 20px;
+  border: 10px solid #e0e0e0;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  text-align: center;
+  position: relative;
+}
+
+.certificate-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/logo.png');
+  background-size: 200px;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.certificate-header {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.certificate-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #4a90e2;
+}
+
+.certificate-body {
+  font-size: 18px;
+  color: #555;
+  margin: 20px 0;
+}
+
+.certificate-footer {
+  margin-top: 30px;
+}
+
+.certificate-signature {
+  margin-top: 50px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact; /* Ensure colors are printed as seen on screen */
+    color-adjust: exact;
+    background: white !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .certificate-container {
+    box-shadow: none;
+    border-color: #cccccc;
+    page-break-inside: avoid;
+    width: 100%;
+    margin: 0;
+    padding: 15mm;
+  }
+
+  /* Make sure page breaks don't occur in the middle of important content */
+  .certificate-footer, .certificate-signature {
+    page-break-inside: avoid;
+  }
+
+  /* Add some print-specific styling for better appearance */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  /* Ensure the certificate fills the full page when printing */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Improve text readability in print */
+  p, span, div {
+    color: black !important;
+  }
+
+  /* Make sure our colored elements still stand out in print */
+  .text-blue-600, .text-green-600, .text-red-600 {
+    color: black !important;
+    font-weight: bold !important;
+  }
+
+  /* Special handling for assessment results section */
+  .bg-gray-50, .bg-blue-50 {
+    background-color: white !important;
+    border: 1px solid #888 !important;
+  }
+}
