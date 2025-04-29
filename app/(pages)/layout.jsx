@@ -15,7 +15,7 @@
 // 				{/* Main Content */}
 // 				<div className='lg:col-span-4 lg:ml-[25%] min-h-screen'>
 // 					{/* <Navbar /> */}
-// 					<main className='container mx-auto px-4 py-8'>{children}</main>
+// 					<main className='container mx-auto px-4 '>{children}</main>
 // 				</div>
 // 			</div>
 // 		</div>

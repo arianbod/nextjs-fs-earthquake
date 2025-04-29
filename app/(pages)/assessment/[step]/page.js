@@ -26,8 +26,8 @@ export default function AssessmentStep({ params }) {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <ProgressBar currentStep={currentStep} totalSteps={AssessmentSteps.length} />
+        <div className="container mx-auto px-4 ">
+            {/* <ProgressBar currentStep={currentStep} totalSteps={AssessmentSteps.length} /> */}
             <StepComponent
                 userInput={userInput}
                 updateUserInput={updateUserInput}

@@ -293,7 +293,7 @@ export default function AboutPage() {
 				</div>
 			</section>
 
-			<footer className='bg-white dark:bg-gray-900 py-8 border-t border-gray-200 dark:border-gray-800'>
+			<footer className='bg-white dark:bg-gray-900  border-t border-gray-200 dark:border-gray-800'>
 				<div className='container mx-auto px-4 text-center'>
 					<p className='font-semibold capitalize text-gray-700 dark:text-gray-300'>
 						{Data.text}
