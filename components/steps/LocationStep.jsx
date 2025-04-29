@@ -92,7 +92,7 @@ const LocationStep = ({ onNext }) => {
 				<CardContent>
 					{isLoading ? (
 						<div className='space-y-4'>
-							<div className='flex justify-center items-center '>
+							<div className='flex justify-center items-center py-8'>
 								<div className='text-center'>
 									<Loader2 className='h-10 w-10 text-blue-500 animate-spin mx-auto mb-4' />
 									<p className='text-lg font-medium text-gray-900 dark:text-white'>
