@@ -1,55 +1,63 @@
-import { Inter } from "next/font/google";
-import localFont from 'next/font/local';
-import "./globals.css";
-import Data from '@/utils/Data.json'
-import { ClerkProvider } from "@clerk/nextjs";
-import Providers from "./providers";
-import AssistantWrapper from "@/components/assistant/AssistantWrapper";
-const inter = Inter({ subsets: ["latin"] });
-export const metadata = {
-  title: Data.name,
-  description: Data.description,
-};
-export const viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
-};
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
-});
+'use client';
 
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
-});
+import React from 'react';
+import Providers from './providers';
+import Navbar from '@/components/navigation/Navbar';
+import Sidebar from '@/components/sidebar/Sidebar';
+import { Progress } from '@/components/ui/progress';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
+import { usePathname } from 'next/navigation';
+import AssessmentSteps from '@/components/AssessmentSteps';
+import "./globals.css"
+const MainLayout = ({ children }) => {
+  const pathname = usePathname();
+  const isAssessmentPath = pathname.includes('/assessment/');
+  const match = pathname.match(/\/assessment\/(\d+)/);
+  const currentStep = match ? parseInt(match[1], 10) : 0;
+  const progress = currentStep
+    ? (currentStep / AssessmentSteps.length) * 100
+    : 0;
 
-export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`
-                    ${geistSans.variable} 
-                    ${geistMono.variable} 
-                    antialiased 
-                    min-h-screen 
-                    flex 
-                    flex-col 
-                    dark:bg-[#1B224C]
-                    dark:text-white
-                `}>
-          <Providers>
+    <html className="min-h-screen">
+      <body className="min-h-screen bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
+        <Providers>
+          <div className="grid grid-cols-1 lg:grid-cols-5 h-full">
 
-            <AssistantWrapper />
-            {children}
-          </Providers>
-        </body>
-      </html>
-    </ClerkProvider>
+            {/* Sidebar */}
+            <aside className="hidden lg:block lg:col-span-1 sticky top-0 h-screen bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-gray-200 dark:border-gray-800 shadow-sm z-10">
+              <Sidebar currentStep={currentStep} />
+            </aside>
+
+            {/* Main content */}
+            <div className="col-span-1 lg:col-span-4 flex flex-col">
+              <Navbar />
+
+              {/* Assessment progress bar */}
+              {isAssessmentPath && (
+                <div className="container mx-auto px-4 py-2 mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Assessment Progress</span>
+                    <span className="text-sm font-medium">{Math.round(progress)}%</span>
+                  </div>
+                  <Progress
+                    value={progress}
+                    className="h-2 bg-gray-200 dark:bg-gray-700"
+                  />
+                  <Breadcrumb currentStep={currentStep} />
+                </div>
+              )}
+
+              {/* Page children */}
+              <main className="flex-grow container mx-auto px-4 py-8">
+                {children}
+              </main>
+            </div>
+          </div>
+        </Providers>
+      </body>
+    </html>
   );
-}
+};
+
+export default MainLayout;

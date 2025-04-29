@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { UserInputProvider } from '@/context/UserInputContext';
 import { AssistantProvider } from '@/context/AssistantContext';
+import { ClerkProvider } from '@clerk/nextjs';
 const Providers = ({ children }) => {
 	const [queryClient] = useState(
 		() =>
@@ -29,9 +30,12 @@ const Providers = ({ children }) => {
 			enableSystem
 			disableTransitionOnChange>
 			{/* <Toaster /> */}
+
 			<QueryClientProvider client={queryClient}>
 				<UserInputProvider>
-					<AssistantProvider>{children}</AssistantProvider>
+					<AssistantProvider>
+						<ClerkProvider>{children}</ClerkProvider>
+					</AssistantProvider>
 				</UserInputProvider>
 				{/* <ReactQueryDevtools initialIsOpen={false} /> */}
 			</QueryClientProvider>

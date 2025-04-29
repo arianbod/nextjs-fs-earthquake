@@ -1,254 +1,223 @@
+// app/page.js
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import {
-  ArrowRight, Shield, Info, MapPin, Building,
-  ClipboardCheck, AlertTriangle, Home, Users,
-  BarChart, Clock, CheckCircle2, BookOpen,
-  Award, GraduationCap, Zap
+  ArrowRight,
+  Shield,
+  Building,
+  ClipboardCheck,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  BookOpen,
+  Award,
+  GraduationCap,
+  BarChart4
 } from 'lucide-react';
 import Data from '@/utils/Data.json';
 import HowItWorksSection from '@/components/homepage/HowItWorksSection';
-import Image from 'next/image';
-
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-shadow">
-    <CardHeader>
-      <div className="flex items-center space-x-2">
-        <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-        <CardTitle className="text-lg text-gray-900 dark:text-white">{title}</CardTitle>
-      </div>
-      <CardDescription className="text-gray-700 dark:text-gray-300">{description}</CardDescription>
-    </CardHeader>
-  </Card>
-);
-
-const StepIndicator = ({ number, title, description }) => (
-  <div className="flex items-start space-x-4">
-    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center">
-      {number}
-    </div>
-    <div>
-      <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{title}</h3>
-      <p className="text-gray-700 dark:text-gray-300">{description}</p>
-    </div>
-  </div>
-);
-
-const StatCard = ({ icon: Icon, value, label }) => (
-  <Card className="bg-white/90 dark:bg-gray-800/90 border-none shadow-lg">
-    <CardContent className="p-6 flex items-center space-x-4">
-      <Icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-      <div>
-        <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
-        <div className="text-sm text-gray-700 dark:text-gray-300">{label}</div>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const ValueCard = ({ icon: Icon, title, description, stats }) => (
-  <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-none shadow-lg hover:shadow-xl transition-all">
-    <CardHeader>
-      <div className="flex items-center space-x-2">
-        <Icon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-        <CardTitle className="text-lg text-gray-900 dark:text-white">{title}</CardTitle>
-      </div>
-      <CardDescription className="text-base text-gray-700 dark:text-gray-300">{description}</CardDescription>
-    </CardHeader>
-    {stats && (
-      <CardContent>
-        <div className="text-sm font-medium text-blue-600 dark:text-blue-400">
-          {stats}
-        </div>
-      </CardContent>
-    )}
-  </Card>
-);
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
-      <main className="container mx-auto px-4 py-16 space-y-20">
-        {/* Enhanced Hero Section with Academic Backing */}
-        <div className="text-center space-y-12">
-          {/* Academic Support First */}
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden pt-20 pb-12 lg:pt-32 lg:pb-28">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left space-y-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium mb-2">
+                <Shield className="h-4 w-4" />
+                <span>Earthquake Safety Assessment</span>
+              </div>
 
-          {/* Main Title */}
-          <div className='flex flex-col gap-4'>
-            <div className='flex flex-col gap-2 px-2 py-8 border-2 border-gray-300 rounded-xl'>
-
-              <Image src="/images/logo.png" width="200" height="200" unoptimized alt="logo" className="w-20 h-20 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-              <h1 className="text-3xl lg:text-6xl font-bold text-gray-900 dark:text-white">
-                {Data.name}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+                <span className="block text-gray-900 dark:text-white">Make Your Building</span>
+                <span className="block text-blue-600 dark:text-blue-400">Earthquake Ready</span>
               </h1>
-              <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-                {Data.description}
+
+              <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-xl mx-auto lg:mx-0">
+                {Data.description} Protect what matters most with data-driven insights.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link href="/assessment/1">
+                  <Button size="lg" className="text-base gap-2 w-full sm:w-auto">
+                    Start Assessment <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/about">
+                  <Button variant="outline" size="lg" className="text-base gap-2 w-full sm:w-auto">
+                    Learn More <Shield className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Supported by: <span className="font-semibold">Assistant Professor Hamid F Ghatte</span>, Antalya Bilim University
               </p>
             </div>
-            <p className="text-lg text-gray-900 dark:text-gray-200">
-              Supported by: <span className="font-semibold">Assistant Professor Hamid F Ghatte</span>
-            </p>
-            <p className="text-md text-gray-700 dark:text-gray-300">
-              Antalya Bilim University
+
+            <div className="relative mx-auto max-w-md lg:max-w-none">
+              <div className="relative z-10 bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden p-2 border border-gray-200 dark:border-gray-700 transform rotate-1">
+                <Image
+                  src="/images/building-earthquake-analysis.jpg"
+                  width={600}
+                  height={400}
+                  alt="Building Analysis"
+                  className="rounded-xl"
+                  priority
+                />
+                <div className="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 rounded-lg shadow-lg">
+                  <p className="font-bold">Quick & Professional Analysis</p>
+                  <p className="text-sm text-blue-100">5-minute assessment, lifetime peace of mind</p>
+                </div>
+              </div>
+
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-md max-h-64 bg-blue-400 dark:bg-blue-600 rounded-full opacity-20 blur-3xl -z-10"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-12 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-12">
+            <div className="flex flex-col items-center text-center">
+              <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 mb-4">
+                <Building className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900 dark:text-white">10,000+</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Buildings Assessed</span>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3 mb-4">
+                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900 dark:text-white">95%</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Accuracy Rate</span>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="rounded-full bg-amber-100 dark:bg-amber-900/30 p-3 mb-4">
+                <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900 dark:text-white">5 min</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Assessment Time</span>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3 mb-4">
+                <BarChart4 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span className="text-3xl font-bold text-gray-900 dark:text-white">25,000+</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Users Helped</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Key Features</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Our comprehensive assessment tool provides detailed insights into your building's earthquake readiness
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 lg:flex-row max-w-full justify-center space-x-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100 dark:border-gray-700">
+              <div className="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 inline-flex mb-4">
+                <Building className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Building Analysis</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Comprehensive structural system assessment analyzing multiple building characteristics
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100 dark:border-gray-700">
+              <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-3 inline-flex mb-4">
+                <ClipboardCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Detailed Reports</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Generate comprehensive reports with safety recommendations and retrofit suggestions
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-shadow p-6 border border-gray-100 dark:border-gray-700">
+              <div className="rounded-full bg-red-100 dark:bg-red-900/30 p-3 inline-flex mb-4">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Risk Assessment</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Evaluate potential earthquake impacts using real seismic data and structural analysis
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <HowItWorksSection />
+
+      {/* CTA Section */}
+      <section className="py-16 bg-blue-600 dark:bg-blue-900">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4 text-white">Ready to Assess Your Building?</h2>
+            <p className="text-xl text-blue-100 mb-8">
+              Get a detailed earthquake safety assessment in just 5 minutes
+            </p>
             <Link href="/assessment/1">
-              <Button size="lg" className="text-lg bg-blue-600 hover:bg-blue-700 text-white w-full">
-                Start Assessment <ArrowRight className="ml-2" />
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button size="lg" variant="outline" className="text-lg text-gray-900 dark:text-white">
-                Learn More <Shield className="ml-2" />
+              <Button variant="secondary" size="lg" className="text-base gap-2">
+                Start Free Assessment <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
         </div>
+      </section>
 
-        {/* Quick Stats */}
-        <section className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <StatCard icon={Home} value="10,000+" label="Buildings Assessed" />
-          <StatCard icon={Users} value="25,000+" label="Users Helped" />
-          <StatCard icon={CheckCircle2} value="95%" label="Accuracy Rate" />
-          <StatCard icon={Clock} value="5 min" label="Average Assessment Time" />
-        </section>
+      {/* Academic Support Section */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-800/50">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="grid md:grid-cols-3 gap-8 items-center">
+            <div className="text-center md:text-left">
+              <GraduationCap className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto md:mx-0 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Research-Based</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Built on peer-reviewed research and engineering principles
+              </p>
+            </div>
 
-        <HowItWorksSection />
+            <div className="text-center">
+              <Award className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Expert Validated</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Verified by structural engineering experts
+              </p>
+            </div>
 
-        {/* Value Proposition Section */}
-        <section className="space-y-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Platform Impact & Value</h2>
-            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
-              Transform your building assessment process with our AI-powered platform, providing rapid, accurate, and comprehensive safety verifications.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ValueCard
-              icon={Clock}
-              title="Rapid Assessment"
-              description="Get comprehensive building safety evaluations in minutes instead of weeks. Our platform accelerates the traditional assessment process by 95%."
-              stats="Average assessment time: 5 minutes"
-            />
-
-            <ValueCard
-              icon={BarChart}
-              title="Enhanced Property Value"
-              description="Verified buildings through our platform have shown increased market value. Provide confidence to buyers, insurers, and stakeholders."
-              stats="Up to 15% potential value increase"
-            />
-
-            <ValueCard
-              icon={Shield}
-              title="Risk Mitigation"
-              description="Identify potential structural vulnerabilities before they become critical. Preventive insights save both lives and resources."
-              stats="Early detection of 98% of critical issues"
-            />
-
-            <ValueCard
-              icon={CheckCircle2}
-              title="Compliance Verification"
-              description="Automatically verify compliance with current safety standards. Stay ahead of regulatory requirements and maintain building safety."
-              stats="100% compliance check coverage"
-            />
-
-            <ValueCard
-              icon={Users}
-              title="Stakeholder Confidence"
-              description="Build trust with tenants, investors, and insurance providers through transparent, data-driven safety assessments."
-              stats="92% stakeholder satisfaction rate"
-            />
-
-            <ValueCard
-              icon={Zap}
-              title="Future-Ready Solutions"
-              description="Get actionable recommendations for improvements and preventive measures, ensuring long-term building safety and value."
-              stats="5-year safety roadmap provided"
-            />
-          </div>
-
-          <div className="mt-12 text-center">
-            <Card className="bg-blue-50 dark:bg-blue-900/20 border-none shadow-lg max-w-2xl mx-auto">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Start-Up Innovation</h3>
-                <p className="text-gray-700 dark:text-gray-300">
-                  Our platform represents the future of building safety assessment, combining cutting-edge AI technology with engineering expertise. Join the community of forward-thinking property owners and managers who are revolutionizing building safety verification.
-                </p>
-                <Link href="/assessment/1">
-                  <Button size="lg" className="mt-6 bg-blue-600 hover:bg-blue-700 text-white">
-                    Start Free Assessment <ArrowRight className="ml-2" />
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* Features Grid */}
-        <section className="space-y-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Key Features</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <FeatureCard
-              icon={MapPin}
-              title="Location-Based Analysis"
-              description="Utilizes Google Earth integration for precise location and measurements, considering local soil conditions and seismic zones"
-            />
-            <FeatureCard
-              icon={Building}
-              title="Comprehensive Building Assessment"
-              description="Analyzes structural systems, irregularities, and building specifications using advanced engineering principles"
-            />
-            <FeatureCard
-              icon={ClipboardCheck}
-              title="Detailed Reporting"
-              description="Generates thorough analysis reports with safety recommendations, retrofit suggestions, and priority actions"
-            />
-            <FeatureCard
-              icon={AlertTriangle}
-              title="Risk Assessment"
-              description="Evaluates potential earthquake impacts using real seismic data and advanced structural analysis methods"
-            />
-          </div>
-        </section>
-
-        {/* Final Academic Support Section */}
-        <section className="space-y-8 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8">
-          <div className="text-center">
-            <Info className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <div className="grid md:grid-cols-3 gap-6 mt-8">
-              <Card className="bg-white/50 dark:bg-gray-800/50">
-                <CardContent className="p-6 text-center">
-                  <GraduationCap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Research-Based</h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">Built on peer-reviewed research and engineering principles</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-white/50 dark:bg-gray-800/50">
-                <CardContent className="p-6 text-center">
-                  <Award className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Expert Validated</h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">Verified by structural engineering experts</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-white/50 dark:bg-gray-800/50">
-                <CardContent className="p-6 text-center">
-                  <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">Continuously Updated</h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">Regular updates based on latest research</p>
-                </CardContent>
-              </Card>
+            <div className="text-center md:text-right">
+              <BookOpen className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto md:ml-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Continuously Updated</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Regular updates based on latest research findings
+              </p>
             </div>
           </div>
-          <div className="mt-6 text-sm text-gray-700 dark:text-gray-300 text-center">
-            {Data.about.disclaimer}
+
+          <div className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+            <p>{Data.about.disclaimer}</p>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
     </div>
   );
 }
