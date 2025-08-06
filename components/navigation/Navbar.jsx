@@ -1,6 +1,6 @@
 // components/navbar/Navbar.jsx
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { UserButton } from '@clerk/nextjs';
@@ -43,9 +43,9 @@ const Navbar = () => {
         ];
 
 	return (
-		<nav className='sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm'>
-			<div className='container mx-auto px-4 py-3'>
-				<div className='flex items-center justify-between'>
+                <nav className='sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 shadow-sm backdrop-blur-sm'>
+                        <div className='container mx-auto px-4 py-2 md:px-6'>
+                                <div className='flex items-center justify-between'>
 					{/* Logo and Title - visible on all screens */}
 					<Link
 						href='/'
@@ -72,34 +72,31 @@ const Navbar = () => {
 					</Link>
 
 					{/* Desktop Navigation - hidden on mobile */}
-					<div className='hidden md:flex items-center space-x-1'>
-						{navLinks.map((link) => (
-							<Link
-								key={link.href}
-								href={link.href}>
-								<Button
-									variant={pathname === link.href ? 'default' : 'ghost'}
-									size='sm'
-									className='text-sm'>
-									{link.icon}
-									<span className='ml-1'>{link.label}</span>
-								</Button>
-							</Link>
-						))}
-					</div>
+                                        <div className='hidden md:flex items-center space-x-1'>
+                                                {navLinks.map((link) => (
+                                                        <Link key={link.href} href={link.href}>
+                                                                <Button
+                                                                        variant={pathname === link.href ? 'default' : 'ghost'}
+                                                                        size='sm'
+                                                                        className='text-sm transition-colors hover:bg-muted'>
+                                                                        {link.icon}
+                                                                        <span className='ml-1'>{link.label}</span>
+                                                                </Button>
+                                                        </Link>
+                                                ))}
+                                        </div>
 
 					{/* Right Side Actions */}
 					<div className='flex items-center space-x-2'>
-						<Link
-							href='/about'
-							className='hidden md:flex'>
-							<Button
-								variant='ghost'
-								size='icon'
-								title='Help'>
-								<HelpCircle className='h-5 w-5' />
-							</Button>
-						</Link>
+                                                <Link href='/about' className='hidden md:flex'>
+                                                        <Button
+                                                                variant='ghost'
+                                                                size='icon'
+                                                                title='Help'
+                                                                className='transition-colors hover:bg-muted'>
+                                                                <HelpCircle className='h-5 w-5' />
+                                                        </Button>
+                                                </Link>
 
 						<ThemeToggle />
 
@@ -107,20 +104,17 @@ const Navbar = () => {
 
 						{/* Mobile Menu */}
 						<Sheet>
-							<SheetTrigger
-								asChild
-								className='md:hidden'>
-								<Button
-									variant='ghost'
-									size='icon'>
-									<Menu className='h-5 w-5' />
-									<span className='sr-only'>Open menu</span>
-								</Button>
-							</SheetTrigger>
-							<SheetContent
-								side='left'
-								className='w-[250px] sm:w-[300px]'>
-								<div className='flex flex-col h-full py-6'>
+                                                        <SheetTrigger asChild className='md:hidden'>
+                                                                <Button
+                                                                        variant='ghost'
+                                                                        size='icon'
+                                                                        className='transition-colors hover:bg-muted'>
+                                                                        <Menu className='h-5 w-5' />
+                                                                        <span className='sr-only'>Open menu</span>
+                                                                </Button>
+                                                        </SheetTrigger>
+                                                        <SheetContent side='left' className='w-[250px] sm:w-[300px]'>
+                                                                <div className='flex flex-col h-full p-6'>
 									{/* Mobile Logo */}
 									<div className='flex items-center mb-6'>
 										<div className='relative w-8 h-8 mr-2'>
@@ -134,21 +128,19 @@ const Navbar = () => {
 										<span className='font-bold text-xl'>QuakeWise</span>
 									</div>
 
-									{/* Mobile Navigation */}
-									<div className='space-y-1'>
-										{navLinks.map((link) => (
-											<Link
-												key={link.href}
-												href={link.href}>
-												<Button
-													variant={pathname === link.href ? 'default' : 'ghost'}
-													className='w-full justify-start text-base'>
-													{link.icon}
-													<span className='ml-2'>{link.label}</span>
-												</Button>
-											</Link>
-										))}
-									</div>
+                                                                        {/* Mobile Navigation */}
+                                                                        <div className='space-y-2'>
+                                                                                {navLinks.map((link) => (
+                                                                                        <Link key={link.href} href={link.href}>
+                                                                                                <Button
+                                                                                                        variant={pathname === link.href ? 'default' : 'ghost'}
+                                                                                                        className='w-full justify-start text-sm transition-colors hover:bg-muted'>
+                                                                                                        {link.icon}
+                                                                                                        <span className='ml-2'>{link.label}</span>
+                                                                                                </Button>
+                                                                                        </Link>
+                                                                                ))}
+                                                                        </div>
 
 									{/* Mobile Assessment Steps */}
 									{isAssessmentPath && (
@@ -156,41 +148,41 @@ const Navbar = () => {
 											<h3 className='font-medium text-sm mb-2'>
 												Assessment Steps
 											</h3>
-											<div className='space-y-1'>
-												{AssessmentSteps.map((step, index) => {
-													const stepNumber = index + 1;
-													const isActive = currentStep === stepNumber;
+                                                                                        <div className='space-y-2'>
+                                                                                                {AssessmentSteps.map((step, index) => {
+                                                                                                        const stepNumber = index + 1;
+                                                                                                        const isActive = currentStep === stepNumber;
 
-													return (
-														<Link
-															key={stepNumber}
-															href={`/assessment/${stepNumber}`}>
-															<Button
-																variant={isActive ? 'secondary' : 'ghost'}
-																className='w-full justify-start text-sm'>
-																<span className='w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-xs mr-2'>
-																	{stepNumber}
-																</span>
-																{step.title}
-															</Button>
-														</Link>
-													);
-												})}
-											</div>
-										</div>
-									)}
+                                                                                                        return (
+                                                                                                                <Link
+                                                                                                                        key={stepNumber}
+                                                                                                                        href={`/assessment/${stepNumber}`}>
+                                                                                                                        <Button
+                                                                                                                                variant={isActive ? 'secondary' : 'ghost'}
+                                                                                                                                className='w-full justify-start text-sm transition-colors hover:bg-muted'>
+                                                                                                                                <span className='w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-xs mr-2'>
+                                                                                                                                        {stepNumber}
+                                                                                                                                </span>
+                                                                                                                                {step.title}
+                                                                                                                        </Button>
+                                                                                                                </Link>
+                                                                                                        );
+                                                                                                })}
+                                                                                        </div>
+                                                                                </div>
+                                                                        )}
 
 									{/* Mobile Help Link */}
-									<div className='mt-auto pt-4 border-t border-gray-200 dark:border-gray-700'>
-										<Link href='/about'>
-											<Button
-												variant='outline'
-												className='w-full justify-start'>
-												<HelpCircle className='h-4 w-4 mr-2' />
-												Help & Support
-											</Button>
-										</Link>
-									</div>
+                                                                        <div className='mt-auto pt-4 border-t border-gray-200 dark:border-gray-700'>
+                                                                                <Link href='/about'>
+                                                                                        <Button
+                                                                                                variant='outline'
+                                                                                                className='w-full justify-start transition-colors hover:bg-muted'>
+                                                                                                <HelpCircle className='h-4 w-4 mr-2' />
+                                                                                                Help & Support
+                                                                                        </Button>
+                                                                                </Link>
+                                                                        </div>
 								</div>
 							</SheetContent>
 						</Sheet>
