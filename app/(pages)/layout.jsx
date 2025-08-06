@@ -24,6 +24,7 @@
 
 // export default MainLayout;
 import Script from 'next/script';
+import '../voice-assistant-bundle.css';
 import React from 'react';
 
 const layout = ({ children }) => {
