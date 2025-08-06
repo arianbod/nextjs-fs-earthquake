@@ -3,7 +3,6 @@
 import React from 'react';
 import Providers from './providers';
 import Navbar from '@/components/navigation/Navbar';
-import Sidebar from '@/components/sidebar/Sidebar';
 import { Progress } from '@/components/ui/progress';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { usePathname } from 'next/navigation';
@@ -22,15 +21,8 @@ const MainLayout = ({ children }) => {
     <html className="min-h-screen">
       <body className="min-h-screen bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
         <Providers>
-          <div className="grid grid-cols-1 lg:grid-cols-5 h-full">
-
-            {/* Sidebar */}
-            <aside className="hidden lg:block lg:col-span-1 sticky top-0 h-screen bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-gray-200 dark:border-gray-800 shadow-sm z-10">
-              <Sidebar currentStep={currentStep} />
-            </aside>
-
-            {/* Main content */}
-            <div className="col-span-1 lg:col-span-4 flex flex-col">
+          <div className="grid grid-cols-1 h-full">
+            <div className="flex flex-col">
               <Navbar />
 
               {/* Assessment progress bar */}
