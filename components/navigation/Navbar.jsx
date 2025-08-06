@@ -7,13 +7,14 @@ import { UserButton } from '@clerk/nextjs';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 import {
-	Menu,
-	X,
-	HomeIcon,
-	InfoIcon,
-	BarChart4,
-	Building,
-	HelpCircle,
+        Menu,
+        X,
+        HomeIcon,
+        InfoIcon,
+        BarChart4,
+        Building,
+        HelpCircle,
+        LayoutDashboard,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -26,15 +27,20 @@ const Navbar = () => {
 	const currentStep = currentStepMatch ? parseInt(currentStepMatch[1]) : 0;
 
 	// Navigation links
-	const navLinks = [
-		{ href: '/', label: 'Home', icon: <HomeIcon className='h-4 w-4' /> },
-		{ href: '/about', label: 'About', icon: <InfoIcon className='h-4 w-4' /> },
-		{
-			href: '/assessment/1',
-			label: 'Start Assessment',
-			icon: <BarChart4 className='h-4 w-4' />,
-		},
-	];
+        const navLinks = [
+                { href: '/', label: 'Home', icon: <HomeIcon className='h-4 w-4' /> },
+                { href: '/about', label: 'About', icon: <InfoIcon className='h-4 w-4' /> },
+                {
+                        href: '/dashboard',
+                        label: 'Dashboard',
+                        icon: <LayoutDashboard className='h-4 w-4' />,
+                },
+                {
+                        href: '/assessment/1',
+                        label: 'Start Assessment',
+                        icon: <BarChart4 className='h-4 w-4' />,
+                },
+        ];
 
 	return (
 		<nav className='sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm'>
