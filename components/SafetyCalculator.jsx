@@ -1,4 +1,6 @@
 // SafetyCalculator.jsx
+import { CALCULATION_CONFIG, CalculationHelpers } from '@/config/earthquakeParameters';
+
 class SafetyCalculator {
 	calculateSafety(userInput) {
 		// Add input validation and logging
@@ -6,62 +8,72 @@ class SafetyCalculator {
 
 		// Ensure all required fields exist and have valid values
 		const validatedInput = {
-			structuralSystem: userInput.structuralSystem || 'W1', // Default to W1 if not specified
+			structuralSystem: userInput.structuralSystem || CALCULATION_CONFIG.defaults.buildingType,
 			verticalIrregularityHigh: Boolean(userInput.verticalIrregularityHigh),
-			verticalIrregularityModerate: Boolean(
-				userInput.verticalIrregularityModerate
-			),
+			verticalIrregularityModerate: Boolean(userInput.verticalIrregularityModerate),
 			planIrregularity: Boolean(userInput.planIrregularity),
-			yearofconstruction: parseInt(userInput.yearOfConstruction) || 2000,
-			typeofsoil: userInput.typeOfSoil || 'D', // Default to soil type D if not specified
-			numberOfStories: parseInt(userInput.numberOfStories) || 1,
+			yearOfConstruction: parseInt(userInput.yearOfConstruction) || CALCULATION_CONFIG.defaults.yearOfConstruction,
+			typeOfSoil: userInput.typeOfSoil || CALCULATION_CONFIG.defaults.soilType,
+			typeOfEarthquake: userInput.typeOfEarthquake || CALCULATION_CONFIG.defaults.zone,
+			designRegulation: userInput.designRegulation || CALCULATION_CONFIG.defaults.regulation,
+			numberOfStories: parseInt(userInput.numberOfStories) || CALCULATION_CONFIG.defaults.stories,
 		};
 
 		console.log('Validated Input:', validatedInput);
 
-		// Calculate basic scores
-		const age = new Date().getFullYear() - validatedInput.yearofconstruction;
-		const baseScore = 100;
+		// Start with building type base score
+		let baseScore = CALCULATION_CONFIG.buildingTypeScores[validatedInput.structuralSystem] || 70;
 
-		// Age impact
-		let ageImpact = 0;
-		if (age < 10) ageImpact = 10;
-		else if (age < 30) ageImpact = 0;
-		else if (age < 50) ageImpact = -10;
-		else ageImpact = -20;
+		// Add regulation score impact
+		const regulationImpact = CALCULATION_CONFIG.regulationScores[validatedInput.designRegulation] || 70;
+		
+		// Add soil modifier
+		const soilImpact = CALCULATION_CONFIG.soilModifiers[validatedInput.typeOfSoil] || 0;
+		
+		// Add zone factor
+		const zoneImpact = CALCULATION_CONFIG.zoneFactors[validatedInput.typeOfEarthquake] || 0;
+		
+		// Add age factor
+		const ageCategory = CalculationHelpers.getAgeCategory(validatedInput.yearOfConstruction);
+		const ageImpact = CALCULATION_CONFIG.ageFactors[ageCategory] || 0;
+		
+		// Add story impact
+		const storyCategory = CalculationHelpers.getStoryCategory(validatedInput.numberOfStories);
+		const storyImpact = CALCULATION_CONFIG.storyImpact[storyCategory] || 0;
 
-		// Soil type impact
-		let soilImpact = 0;
-		switch (validatedInput.typeofsoil) {
-			case 'ZA':
-			case 'ZB':
-				soilImpact = 10;
-				break;
-			case 'ZC':
-				soilImpact = 0;
-				break;
-			case 'ZD':
-			case 'ZE':
-				soilImpact = -10;
-				break;
-			default:
-				soilImpact = -5;
+		// Apply irregularity penalties
+		let irregularityPenalty = 0;
+		if (validatedInput.verticalIrregularityHigh) {
+			irregularityPenalty += CALCULATION_CONFIG.irregularityPenalties.verticalHigh;
+		}
+		if (validatedInput.verticalIrregularityModerate) {
+			irregularityPenalty += CALCULATION_CONFIG.irregularityPenalties.verticalModerate;
+		}
+		if (validatedInput.planIrregularity) {
+			irregularityPenalty += CALCULATION_CONFIG.irregularityPenalties.planIrregularity;
 		}
 
-		// Stories impact
-		const storiesImpact = validatedInput.numberOfStories > 5 ? -10 : 0;
-
-		// Calculate final scores
-		const structuralIntegrity = Math.max(
-			0,
-			Math.min(100, baseScore + ageImpact + soilImpact + storiesImpact)
+		// Calculate weighted score (regulation score is primary, others are modifiers)
+		const overallScore = Math.max(
+			CALCULATION_CONFIG.scoreBounds.minimum,
+			Math.min(
+				CALCULATION_CONFIG.scoreBounds.maximum,
+				(regulationImpact * 0.4) + // Regulation is 40% of score
+				(baseScore * 0.3) + // Building type is 30% of score
+				(soilImpact + zoneImpact + ageImpact + storyImpact + irregularityPenalty) // Modifiers are 30%
+			)
 		);
-		const overallScore = structuralIntegrity;
+
+		// Calculate structural integrity (simplified version)
+		const structuralIntegrity = Math.max(0, overallScore + (ageImpact * 0.5));
 
 		// Determine earthquake impact
-		let earthquakeImpact = 'Moderate';
-		if (overallScore >= 80) earthquakeImpact = 'Low';
-		else if (overallScore < 60) earthquakeImpact = 'High';
+		const earthquakeImpact = this.interpretEarthquakeImpact(overallScore);
+
+		// Get performance levels and classification
+		const performanceLevels = CalculationHelpers.getPerformanceLevel(overallScore);
+		const buildingClassification = CalculationHelpers.getBuildingClassification(overallScore);
+		const maxSafeRichter = CalculationHelpers.calculateMaxSafeRichter(overallScore);
 
 		const result = {
 			rawScore: ((overallScore / 100) * 4.1).toFixed(2),
@@ -71,10 +83,42 @@ class SafetyCalculator {
 			structuralIntegrity: structuralIntegrity.toFixed(2),
 			earthquakeImpact: earthquakeImpact,
 			overallScore: overallScore.toFixed(2),
+			performanceLevels: performanceLevels,
+			maxSafeRichter: maxSafeRichter.toFixed(1),
+			buildingClassification: buildingClassification,
+			// Add breakdown for transparency
+			scoreBreakdown: {
+				baseScore,
+				regulationImpact,
+				soilImpact,
+				zoneImpact,
+				ageImpact,
+				storyImpact,
+				irregularityPenalty
+			}
 		};
 
 		console.log('Calculated Result:', result);
 		return result;
+	}
+
+	calculateRichterPerformance() {
+		// This function returns performance data for different Richter scales
+		const data = [];
+		for (let richter = 4.0; richter <= 8.0; richter += 0.5) {
+			// Calculate expected performance at this magnitude
+			// Higher magnitudes reduce performance exponentially
+			const basePerformance = 100;
+			const degradationFactor = Math.pow((richter - 3.5) / 4.5, 2.5);
+			const performance = Math.max(0, basePerformance * (1 - degradationFactor));
+			
+			data.push({
+				richter: richter.toFixed(1),
+				performance: Math.round(performance),
+				status: richter < 5.5 ? 'Safe' : richter <= 6.5 ? 'Caution' : 'Danger'
+			});
+		}
+		return data;
 	}
 
 	getInterpretation(score) {

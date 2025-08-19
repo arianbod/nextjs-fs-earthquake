@@ -204,7 +204,7 @@
 @media print {
   body {
     -webkit-print-color-adjust: exact; /* Ensure colors are printed as seen on screen */
-    color-adjust: exact;
+    print-color-adjust: exact;
     background: white !important;
   }
 

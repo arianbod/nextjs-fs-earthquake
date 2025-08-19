@@ -4,6 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useUserInput } from '@/context/UserInputContext';
 import EnhancedCertificate from '@/components/EnhancedCertificate';
 import SafetyCalculator from '@/components/SafetyCalculator';
+import EarthquakePerformanceChart from '@/components/results/EarthquakePerformanceChart';
+import PerformanceSummaryCard from '@/components/results/PerformanceSummaryCard';
+import BuildingComparisonChart from '@/components/results/BuildingComparisonChart';
+import CostBenefitCard from '@/components/results/CostBenefitCard';
+import SuccessAnimation from '@/components/results/SuccessAnimation';
 import {
 	AlertTriangle,
 	CheckCircle2,
@@ -32,6 +37,7 @@ const ResultPage = () => {
 	const [safetyResult, setSafetyResult] = useState(null);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -40,6 +46,14 @@ const ResultPage = () => {
 			const result = calculator.calculateSafety(userInput);
 			setSafetyResult(result);
 			setLoading(false);
+			
+			// Show success animation for passing scores
+			const overallScore = parseFloat(result.overallScore || 0);
+			if (overallScore >= 70) {
+				setTimeout(() => {
+					setShowSuccessAnimation(true);
+				}, 500); // Delay to let the page load first
+			}
 		} catch (err) {
 			console.error('Error calculating safety score:', err);
 			setError('An error occurred while calculating the safety score.');
@@ -103,6 +117,13 @@ const ResultPage = () => {
 
 	return (
 		<div className='max-w-5xl mx-auto py-12 sm:px-6'>
+			{/* Success Animation */}
+			<SuccessAnimation 
+				score={safetyResult} 
+				show={showSuccessAnimation} 
+				onComplete={() => setShowSuccessAnimation(false)} 
+			/>
+
 			{/* Back Navigation */}
 			<div className='flex justify-between items-center mb-8'>
 				<Link href='/'>
@@ -283,6 +304,11 @@ const ResultPage = () => {
 							</CardFooter>
 						</Card>
 					</div>
+
+					{/* Earthquake Performance Chart */}
+					<div className="mt-8">
+						<EarthquakePerformanceChart buildingData={safetyResult} />
+					</div>
 				</TabsContent>
 
 				{/* Details Tab */}
@@ -456,6 +482,21 @@ const ResultPage = () => {
 
 				{/* Certificate Tab */}
 				<TabsContent value='certificate'>
+					{/* Performance Summary Card */}
+					<div className="mb-8">
+						<PerformanceSummaryCard safetyResult={safetyResult} userInput={userInput} />
+					</div>
+
+					{/* Building Comparison Chart */}
+					<div className="mb-8">
+						<BuildingComparisonChart safetyResult={safetyResult} userInput={userInput} />
+					</div>
+
+					{/* Cost-Benefit Analysis Card */}
+					<div className="mb-8">
+						<CostBenefitCard safetyResult={safetyResult} userInput={userInput} />
+					</div>
+
 					<Card>
 						<CardHeader>
 							<CardTitle>
