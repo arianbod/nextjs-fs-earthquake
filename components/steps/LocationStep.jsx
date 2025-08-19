@@ -6,6 +6,9 @@ import { MyMapComponent } from '@/components/MyMapComponent';
 import { Button } from '@/components/ui/button';
 import { useUserInput } from '@/context/UserInputContext';
 import { getZoneByCoordinates, getZoneColor, getZoneDefinition } from '@/utils/turkeySeismicData';
+import { googlePlacesService } from '@/services/googlePlacesService';
+import { streetViewService } from '@/services/streetViewService';
+import BuildingPhotoAnalysis from '@/components/BuildingPhotoAnalysis';
 import {
 	MapPin,
 	AlertTriangle,
@@ -15,6 +18,11 @@ import {
 	LocateFixed,
 	Shield,
 	Activity,
+	Zap,
+	Camera,
+	Building,
+	Eye,
+	Sparkles
 } from 'lucide-react';
 import {
 	Card,
@@ -26,6 +34,8 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 
 const LocationStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
@@ -35,6 +45,66 @@ const LocationStep = ({ onNext }) => {
 	const [loadingProgress, setLoadingProgress] = useState(0);
 	const [loadingStep, setLoadingStep] = useState('');
 	const [showMinimumDisplay, setShowMinimumDisplay] = useState(false);
+	
+	// Enhanced automation states
+	const [enhancedData, setEnhancedData] = useState(null);
+	const [streetViewData, setStreetViewData] = useState(null);
+	const [autoDataLoading, setAutoDataLoading] = useState(false);
+	const [activeTab, setActiveTab] = useState('location');
+	const [photoAnalysisResults, setPhotoAnalysisResults] = useState(null);
+
+	// Enhanced automatic data collection
+	const collectEnhancedData = async (latitude, longitude) => {
+		setAutoDataLoading(true);
+		
+		try {
+			// Parallel data collection from multiple sources
+			const [placesData, streetViewData] = await Promise.allSettled([
+				googlePlacesService.getEnhancedLocationData(latitude, longitude),
+				streetViewService.getBuildingAnalysis(latitude, longitude)
+			]);
+
+			// Process Google Places data
+			if (placesData.status === 'fulfilled' && placesData.value.success) {
+				setEnhancedData(placesData.value.data);
+				
+				// Auto-populate building characteristics from Places API
+				const buildingInfo = placesData.value.data.buildingInfo;
+				const addressInfo = placesData.value.data.address;
+				
+				updateUserInput(prev => ({
+					...prev,
+					// Update building characteristics with AI predictions
+					numberOfStories: buildingInfo.estimatedStories || prev.numberOfStories,
+					typeOfSoil: buildingInfo.suggestedSoilType || prev.typeOfSoil,
+					// Add address information
+					address: addressInfo?.formatted || prev.address,
+					neighborhood: addressInfo?.components?.neighborhood || prev.neighborhood
+				}));
+			}
+
+			// Process Street View data
+			if (streetViewData.status === 'fulfilled' && streetViewData.value.success) {
+				setStreetViewData(streetViewData.value.data);
+				
+				// Auto-populate structural information from Street View analysis
+				const analysis = streetViewData.value.data.analysis;
+				if (analysis && analysis.estimatedCharacteristics) {
+					updateUserInput(prev => ({
+						...prev,
+						// Update with Street View analysis
+						designRegulation: analysis.estimatedCharacteristics.ageEstimationContext || prev.designRegulation,
+						structuralNotes: `AI Analysis: ${analysis.estimatedCharacteristics.estimatedType}` || prev.structuralNotes
+					}));
+				}
+			}
+
+		} catch (error) {
+			console.error('Error collecting enhanced data:', error);
+		} finally {
+			setAutoDataLoading(false);
+		}
+	};
 
 	const requestLocationPermission = () => {
 		setIsLoading(true);
@@ -46,9 +116,10 @@ const LocationStep = ({ onNext }) => {
 		// Enhanced loading simulation with progress steps
 		const loadingSteps = [
 			{ step: 'Requesting location access...', progress: 10 },
-			{ step: 'Accessing GPS coordinates...', progress: 30 },
-			{ step: 'Analyzing seismic data...', progress: 60 },
-			{ step: 'Processing earthquake zones...', progress: 80 },
+			{ step: 'Accessing GPS coordinates...', progress: 25 },
+			{ step: 'Analyzing seismic data...', progress: 45 },
+			{ step: 'Collecting building data...', progress: 65 },
+			{ step: 'Processing Street View...', progress: 80 },
 			{ step: 'Finalizing assessment...', progress: 95 }
 		];
 
@@ -59,44 +130,46 @@ const LocationStep = ({ onNext }) => {
 				setLoadingProgress(loadingSteps[stepIndex].progress);
 				stepIndex++;
 			}
-		}, 400);
+		}, 600);
 
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(
-				(position) => {
+				async (position) => {
 					clearInterval(progressInterval);
 					
-					// Set to final loading state
+					const latitude = position.coords.latitude;
+					const longitude = position.coords.longitude;
+					
+					// Set to processing state
 					setLoadingStep('Processing location data...');
 					setLoadingProgress(90);
 					
-					setTimeout(() => {
-						const latitude = position.coords.latitude;
-						const longitude = position.coords.longitude;
-						
-						// Get seismic zone information
-						const zoneInfo = getZoneByCoordinates(latitude, longitude);
-						setSeismicZoneInfo(zoneInfo);
-						
-						setLoadingStep('Analysis complete!');
-						setLoadingProgress(100);
-						
-						updateUserInput({
-							location: {
-								latitude: latitude,
-								longitude: longitude,
-							},
-							// Auto-set earthquake zone based on location
-							typeOfEarthquake: zoneInfo.zone,
-							// Also set detected soil type if available
-							typeOfSoil: zoneInfo.soilType || userInput.typeOfSoil,
-						});
+					// Get seismic zone information
+					const zoneInfo = getZoneByCoordinates(latitude, longitude);
+					setSeismicZoneInfo(zoneInfo);
+					
+					// Update basic location data
+					updateUserInput({
+						location: {
+							latitude: latitude,
+							longitude: longitude,
+						},
+						// Auto-set earthquake zone based on location
+						typeOfEarthquake: zoneInfo.zone,
+						// Also set detected soil type if available
+						typeOfSoil: zoneInfo.soilType || userInput.typeOfSoil,
+					});
 
-						// Ensure minimum display time for smooth UX
-						setTimeout(() => {
-							setIsLoading(false);
-						}, 800);
-					}, 500);
+					// Collect enhanced data in background
+					collectEnhancedData(latitude, longitude);
+					
+					setLoadingStep('Analysis complete!');
+					setLoadingProgress(100);
+
+					// Ensure minimum display time for smooth UX
+					setTimeout(() => {
+						setIsLoading(false);
+					}, 800);
 				},
 				(err) => {
 					clearInterval(progressInterval);
@@ -118,6 +191,44 @@ const LocationStep = ({ onNext }) => {
 		setTimeout(() => {
 			setShowMinimumDisplay(true);
 		}, 2000);
+	};
+
+	// Handle photo analysis results
+	const handlePhotoAnalysis = (analysisResults) => {
+		setPhotoAnalysisResults(analysisResults);
+		
+		// Auto-populate building data from photo analysis
+		if (analysisResults && analysisResults.detectedFeatures) {
+			const features = analysisResults.detectedFeatures;
+			
+			updateUserInput(prev => ({
+				...prev,
+				numberOfStories: features.estimatedStories || prev.numberOfStories,
+				structuralSystem: features.structuralSystem || prev.structuralSystem,
+				designRegulation: features.constructionPeriod || prev.designRegulation,
+				buildingCondition: features.materialCondition || prev.buildingCondition,
+				// Add AI insights
+				aiInsights: analysisResults.aiInsights || prev.aiInsights
+			}));
+		}
+	};
+
+	// Handle location change from map
+	const handleLocationChange = (lat, lng) => {
+		// Update seismic zone info for new location
+		const zoneInfo = getZoneByCoordinates(lat, lng);
+		setSeismicZoneInfo(zoneInfo);
+		
+		// Update user input
+		updateUserInput(prev => ({
+			...prev,
+			location: { latitude: lat, longitude: lng },
+			typeOfEarthquake: zoneInfo.zone,
+			typeOfSoil: zoneInfo.soilType || prev.typeOfSoil
+		}));
+
+		// Collect enhanced data for new location
+		collectEnhancedData(lat, lng);
 	};
 
 	useEffect(() => {
@@ -241,17 +352,218 @@ const LocationStep = ({ onNext }) => {
 						</div>
 					) : userInput.location ? (
 						<div className='space-y-4'>
-							<div className='rounded-lg overflow-hidden h-[400px] border border-gray-200 dark:border-gray-700'>
+							{/* Auto-Collection Status */}
+							{autoDataLoading && (
+								<Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+									<CardContent className="pt-4">
+										<div className="flex items-center gap-3">
+											<Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+											<div>
+												<div className="font-medium text-blue-900 dark:text-blue-200">
+													🤖 Collecting Enhanced Building Data
+												</div>
+												<div className="text-sm text-blue-700 dark:text-blue-300">
+													Analyzing location with Google Places API and Street View...
+												</div>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							)}
+
+							{/* Enhanced Map with new features */}
+							<div className='rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 								<MyMapComponent
 									latitude={userInput.location.latitude}
 									longitude={userInput.location.longitude}
+									onLocationChange={handleLocationChange}
+									showSeismicData={true}
+									showStreetView={true}
+									seismicZoneInfo={seismicZoneInfo}
 								/>
 							</div>
 
-							<div className='flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400'>
-								<Info className='h-4 w-4 mt-0.5 flex-shrink-0' />
-								<p>{stepOneData.info}</p>
-							</div>
+							{/* Tabbed Interface for Enhanced Data */}
+							<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+								<TabsList className="grid w-full grid-cols-4">
+									<TabsTrigger value="location" className="gap-2">
+										<MapPin className="h-4 w-4" />
+										Location
+									</TabsTrigger>
+									<TabsTrigger value="auto-data" className="gap-2">
+										<Zap className="h-4 w-4" />
+										Auto Data
+									</TabsTrigger>
+									<TabsTrigger value="street-view" className="gap-2">
+										<Camera className="h-4 w-4" />
+										Street View
+									</TabsTrigger>
+									<TabsTrigger value="photos" className="gap-2">
+										<Eye className="h-4 w-4" />
+										Photo AI
+									</TabsTrigger>
+								</TabsList>
+
+								<TabsContent value="location" className="space-y-4">
+									<div className='flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400'>
+										<Info className='h-4 w-4 mt-0.5 flex-shrink-0' />
+										<p>{stepOneData.info}</p>
+									</div>
+									{/* Existing location details */}
+								</TabsContent>
+
+								<TabsContent value="auto-data" className="space-y-4">
+									{enhancedData ? (
+										<Card>
+											<CardHeader>
+												<CardTitle className="flex items-center gap-2">
+													<Sparkles className="h-5 w-5 text-purple-600" />
+													AI-Enhanced Building Data
+												</CardTitle>
+												<CardDescription>
+													Automatically collected from Google Places API
+												</CardDescription>
+											</CardHeader>
+											<CardContent className="space-y-4">
+												{/* Building Characteristics */}
+												<div>
+													<h4 className="font-medium mb-2">Inferred Building Characteristics</h4>
+													<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400">Building Type</div>
+															<div className="font-medium">{enhancedData.buildingInfo.likelyBuildingType}</div>
+														</div>
+														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400">Estimated Stories</div>
+															<div className="font-medium">{enhancedData.buildingInfo.estimatedStories}</div>
+														</div>
+														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400">Construction Period</div>
+															<div className="font-medium">{enhancedData.buildingInfo.estimatedConstructionPeriod}</div>
+														</div>
+														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400">Suggested Soil Type</div>
+															<div className="font-medium">{enhancedData.buildingInfo.suggestedSoilType}</div>
+														</div>
+													</div>
+												</div>
+
+												{/* Neighborhood Analysis */}
+												<div>
+													<h4 className="font-medium mb-2">Neighborhood Analysis</h4>
+													<div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+														<div className="text-sm text-blue-700 dark:text-blue-300">
+															Development Level: <Badge variant="outline">{enhancedData.neighborhood.developmentLevel}</Badge>
+														</div>
+														<div className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+															Safety Score: {enhancedData.neighborhood.safetyFactors.score}/5
+														</div>
+													</div>
+												</div>
+
+												{/* Confidence Metrics */}
+												<div>
+													<h4 className="font-medium mb-2">Data Confidence</h4>
+													<div className="flex gap-2">
+														<Badge variant={enhancedData.buildingInfo.confidence.overall === 'high' ? 'default' : 'secondary'}>
+															Overall: {enhancedData.buildingInfo.confidence.overall}
+														</Badge>
+														<Badge variant={enhancedData.buildingInfo.confidence.buildingType === 'high' ? 'default' : 'secondary'}>
+															Building: {enhancedData.buildingInfo.confidence.buildingType}
+														</Badge>
+													</div>
+												</div>
+											</CardContent>
+										</Card>
+									) : (
+										<Card>
+											<CardContent className="pt-6 text-center">
+												<Zap className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+												<p className="text-gray-600 dark:text-gray-400">
+													Enhanced data will appear here after location analysis
+												</p>
+											</CardContent>
+										</Card>
+									)}
+								</TabsContent>
+
+								<TabsContent value="street-view" className="space-y-4">
+									{streetViewData ? (
+										<Card>
+											<CardHeader>
+												<CardTitle className="flex items-center gap-2">
+													<Camera className="h-5 w-5 text-green-600" />
+													Street View Analysis
+												</CardTitle>
+												<CardDescription>
+													Building analysis from Google Street View imagery
+												</CardDescription>
+											</CardHeader>
+											<CardContent className="space-y-4">
+												{streetViewData.analysis.buildingVisible ? (
+													<>
+														<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+															<div>
+																<h4 className="font-medium mb-2">Visual Assessment</h4>
+																<div className="space-y-2 text-sm">
+																	<div>Views Available: {streetViewData.analysis.viewsAnalyzed}</div>
+																	<div>Confidence: <Badge>{streetViewData.analysis.confidence}</Badge></div>
+																</div>
+															</div>
+															<div>
+																<h4 className="font-medium mb-2">Structural Features</h4>
+																<div className="text-sm text-gray-600 dark:text-gray-400">
+																	{streetViewData.analysis.structuralObservations.irregularityAssessment.recommendation}
+																</div>
+															</div>
+														</div>
+														
+														{/* Street View Images */}
+														<div>
+															<h4 className="font-medium mb-2">Available Views</h4>
+															<div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+																{streetViewData.images.slice(0, 6).map((img, index) => (
+																	<div key={index} className="text-center">
+																		<img 
+																			src={img.url} 
+																			alt={img.description}
+																			className="w-full h-20 object-cover rounded border"
+																		/>
+																		<div className="text-xs text-gray-500 mt-1">{img.description}</div>
+																	</div>
+																))}
+															</div>
+														</div>
+													</>
+												) : (
+													<div className="text-center py-4">
+														<AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-2" />
+														<p className="text-amber-700 dark:text-amber-300">
+															{streetViewData.analysis.error || 'No Street View imagery available for this location'}
+														</p>
+													</div>
+												)}
+											</CardContent>
+										</Card>
+									) : (
+										<Card>
+											<CardContent className="pt-6 text-center">
+												<Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+												<p className="text-gray-600 dark:text-gray-400">
+													Street View analysis will appear here after location processing
+												</p>
+											</CardContent>
+										</Card>
+									)}
+								</TabsContent>
+
+								<TabsContent value="photos" className="space-y-4">
+									<BuildingPhotoAnalysis 
+										onAnalysisComplete={handlePhotoAnalysis}
+										existingData={userInput}
+									/>
+								</TabsContent>
+							</Tabs>
 
 							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 								{/* Location Details */}
