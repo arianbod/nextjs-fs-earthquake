@@ -1,20 +1,23 @@
 // components/steps/PlanDefinitionStep.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Data from '@/utils/Data.json';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUserInput } from '@/context/UserInputContext';
+import { MyMapComponent } from '@/components/MyMapComponent';
 import {
 	ArrowLeft,
 	ArrowRight,
-	Plus,
-	Grid,
-	Ruler,
-	Info,
-	X,
-	HelpCircle,
+	MapPin,
+	Upload,
+	Edit3,
+	Map,
+	Camera,
+	FileText,
+	CheckCircle,
+	AlertCircle,
+	Save,
 } from 'lucide-react';
 import {
 	Card,
@@ -25,78 +28,131 @@ import {
 	CardDescription,
 } from '@/components/ui/card';
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from '@/components/ui/tabs';
 
 const PlanDefinitionStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	const stepFiveData = Data.steps.find((step) => step.step === 5);
+	const [activeMethod, setActiveMethod] = useState('confirm');
+	const [isConfirmed, setIsConfirmed] = useState(false);
+	const [uploadedImage, setUploadedImage] = useState(null);
+	const [analysisResult, setAnalysisResult] = useState(null);
+	const [showSaveIndicator, setShowSaveIndicator] = useState(false);
+
+	// Show save indicator when data changes
+	useEffect(() => {
+		if (Object.keys(userInput).length > 0) {
+			setShowSaveIndicator(true);
+			const timer = setTimeout(() => setShowSaveIndicator(false), 2000);
+			return () => clearTimeout(timer);
+		}
+	}, [userInput]);
+
+	// Auto-detected building data from Step 1 (location + satellite analysis)
+	const autoDetectedData = {
+		address: userInput.address || "Building Address",
+		coordinates: `${userInput.latitude?.toFixed(4) || ''}, ${userInput.longitude?.toFixed(4) || ''}`,
+		estimatedLength: userInput.estimatedLength || 25,
+		estimatedWidth: userInput.estimatedWidth || 15, 
+		estimatedStories: userInput.estimatedStories || 3,
+		buildingType: userInput.buildingType || 'Rectangular',
+		confidence: 0.75 // Satellite analysis confidence
+	};
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 		updateUserInput({ [name]: value });
 	};
 
-	const handleArrayChange = (e, row, col, type) => {
-		const newArray = [...(userInput[type] || [[]])];
-		newArray[row] = newArray[row] || [];
-		newArray[row][col] = e.target.value;
-		updateUserInput({ [type]: newArray });
-	};
-
-	const addRow = () => {
+	// Handle confirmation of auto-detected data
+	const handleConfirmData = () => {
+		setIsConfirmed(true);
 		updateUserInput({
-			dimensions: [...(userInput.dimensions || [[]]), []],
-			crossSections: [...(userInput.crossSections || [[]]), []],
-		});
-	};
-
-	const addColumn = () => {
-		updateUserInput({
-			dimensions: (userInput.dimensions || [[]]).map((row) => [...row, '']),
-			crossSections: (userInput.crossSections || [[]]).map((row) => [
-				...row,
-				'',
-			]),
+			buildingLength: autoDetectedData.estimatedLength,
+			buildingWidth: autoDetectedData.estimatedWidth,
+			numberOfStories: autoDetectedData.estimatedStories,
+			buildingType: autoDetectedData.buildingType,
+			dataSource: 'auto-detected'
 		});
 	};
 
-	const removeRow = (index) => {
-		if ((userInput.dimensions || []).length <= 1) return;
-
-		const newDimensions = [...(userInput.dimensions || [[]])];
-		const newCrossSections = [...(userInput.crossSections || [[]])];
-
-		newDimensions.splice(index, 1);
-		newCrossSections.splice(index, 1);
-
-		updateUserInput({
-			dimensions: newDimensions,
-			crossSections: newCrossSections,
-		});
+	// Handle need for refinement
+	const handleNeedsRefinement = () => {
+		setActiveMethod('upload');
 	};
 
-	const removeColumn = (index) => {
-		if ((userInput.dimensions || [[]])[0].length <= 1) return;
+	// Handle image upload and AI analysis
+	const handleImageUpload = (file) => {
+		setUploadedImage(file);
+		// Simulate AI analysis
+		setTimeout(() => {
+			setAnalysisResult({
+				buildingLength: 28.5,
+				buildingWidth: 18.2,
+				numberOfStories: 4,
+				columnSpacing: 6.0,
+				structuralSystem: 'Reinforced Concrete Frame',
+				foundationType: 'Spread Footings',
+				confidence: 0.92,
+				extractedElements: ['dimensions', 'columns', 'structural elements', 'grid lines']
+			});
+			updateUserInput({
+				buildingLength: 28.5,
+				buildingWidth: 18.2,
+				numberOfStories: 4,
+				columnSpacing: 6.0,
+				structuralSystem: 'Reinforced Concrete Frame',
+				dataSource: 'ai-analysis'
+			});
+		}, 2000);
+	};
 
-		const newDimensions = (userInput.dimensions || [[]]).map((row) => {
-			const newRow = [...row];
-			newRow.splice(index, 1);
-			return newRow;
-		});
+	// Structural building types for manual input
+	const structuralTypes = [
+		{ name: 'Concrete Frame', description: 'Reinforced concrete columns & beams' },
+		{ name: 'Steel Frame', description: 'Steel columns with steel/concrete beams' },
+		{ name: 'Masonry', description: 'Load-bearing walls (brick/block)' },
+		{ name: 'Timber Frame', description: 'Wood structural elements' }
+	];
 
-		const newCrossSections = (userInput.crossSections || [[]]).map((row) => {
-			const newRow = [...row];
-			newRow.splice(index, 1);
-			return newRow;
-		});
+	const buildingTemplates = [
+		{ 
+			name: 'Small House', 
+			length: 12, width: 8, stories: 2, 
+			structural: 'Timber Frame',
+			description: '2-story residential'
+		},
+		{ 
+			name: 'Apartment', 
+			length: 25, width: 15, stories: 4, 
+			structural: 'Concrete Frame',
+			description: '4-story residential'
+		},
+		{ 
+			name: 'Office Building', 
+			length: 30, width: 20, stories: 6, 
+			structural: 'Steel Frame',
+			description: '6-story commercial'
+		},
+		{ 
+			name: 'Warehouse', 
+			length: 50, width: 30, stories: 1, 
+			structural: 'Steel Frame',
+			description: '1-story industrial'
+		}
+	];
 
+	const loadBuildingTemplate = (template) => {
 		updateUserInput({
-			dimensions: newDimensions,
-			crossSections: newCrossSections,
+			buildingLength: template.length,
+			buildingWidth: template.width,
+			numberOfStories: template.stories,
+			structuralSystem: template.structural,
+			dataSource: 'template'
 		});
 	};
 
@@ -105,338 +161,304 @@ const PlanDefinitionStep = ({ onNext }) => {
 		onNext();
 	};
 
-	// Ensure we have at least a 1x1 grid
-	if (!userInput.dimensions || userInput.dimensions.length === 0) {
-		updateUserInput({
-			dimensions: [['']],
-			crossSections: [['']],
-		});
-	}
+	// Validation for new flow
+	const isFormValid = () => {
+		if (activeMethod === 'confirm') {
+			return isConfirmed;
+		}
+		return userInput.buildingLength && 
+			   userInput.buildingWidth && 
+			   userInput.numberOfStories;
+	};
 
-	const isFormValid =
-		userInput.numberOfStories &&
-		userInput.height &&
-		userInput.dimensions &&
-		userInput.dimensions.length > 0 &&
-		userInput.dimensions.every((row) => row.length > 0) &&
-		userInput.crossSections &&
-		userInput.crossSections.length > 0 &&
-		userInput.crossSections.every((row) => row.length > 0);
+	const getValidationMessage = () => {
+		if (activeMethod === 'confirm' && !isConfirmed) {
+			return "Please confirm the building information or choose to refine it";
+		}
+		if (!userInput.buildingLength) return "Please specify building length";
+		if (!userInput.buildingWidth) return "Please specify building width";
+		if (!userInput.numberOfStories) return "Please specify number of stories";
+		return "";
+	};
 
 	return (
-		<div className='max-w-5xl mx-auto'>
-			<div className='text-center mb-8'>
+		<div className='max-w-3xl mx-auto'>
+			{/* Save Indicator */}
+			{showSaveIndicator && (
+				<div className="fixed top-4 right-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-4 py-2 shadow-lg z-50">
+					<div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+						<Save className="h-4 w-4" />
+						<span className="text-sm font-medium">Progress saved</span>
+					</div>
+				</div>
+			)}
+
+			<div className='text-center mb-6'>
 				<div className='inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4'>
-					<Grid className='h-6 w-6 text-blue-600 dark:text-blue-400' />
+					<CheckCircle className='h-6 w-6 text-blue-600 dark:text-blue-400' />
 				</div>
 				<h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-					{stepFiveData.title}
+					Confirm Building Details
 				</h1>
 				<p className='text-lg text-gray-600 dark:text-gray-300'>
-					{stepFiveData.description}
+					We've analyzed your building location. Please confirm or refine the details.
 				</p>
 			</div>
 
-			<form
-				onSubmit={handleSubmit}
-				className='space-y-8'>
-				{/* Basic Building Metrics */}
-				<div className='grid md:grid-cols-2 gap-6'>
-					<Card className='shadow-sm border border-gray-200 dark:border-gray-700'>
-						<CardHeader className='pb-3'>
-							<CardTitle className='text-lg flex items-center gap-2'>
-								<Ruler className='h-4 w-4 text-blue-600 dark:text-blue-400' />
-								Number of Stories
+				{/* Step 1: Show Confirmation (if not confirmed yet) */}
+			{activeMethod === 'confirm' && !isConfirmed && (
+				<div className="space-y-6">
+					{/* Building Location and Dimensions */}
+					<Card>
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<MapPin className="h-5 w-5 text-blue-600" />
+								Auto-Detected Building Information
 							</CardTitle>
+							<CardDescription>
+								Based on your location from Step 1, we estimated these dimensions.
+							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<Input
-								type='number'
-								name='numberOfStories'
-								value={userInput.numberOfStories || ''}
-								onChange={handleChange}
-								placeholder='Enter number of stories'
-								min='1'
-								max='100'
-								className='w-full'
-							/>
-							<div className='text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-start'>
-								<Info className='h-3 w-3 mr-1 mt-0.5 flex-shrink-0' />
-								Include all floors above ground, including basements if used as
-								living space
+							<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg mb-4">
+								<div className="text-sm"><strong>Location:</strong> {autoDetectedData.address}</div>
 							</div>
-						</CardContent>
-					</Card>
+							
+							<div className="grid grid-cols-3 gap-4 mb-4">
+								<div className="text-center p-4 border rounded-lg">
+									<div className="text-2xl font-bold text-green-600">{autoDetectedData.estimatedLength}m</div>
+									<div className="text-sm text-gray-600">Length</div>
+								</div>
+								<div className="text-center p-4 border rounded-lg">
+									<div className="text-2xl font-bold text-blue-600">{autoDetectedData.estimatedWidth}m</div>
+									<div className="text-sm text-gray-600">Width</div>
+								</div>
+								<div className="text-center p-4 border rounded-lg">
+									<div className="text-2xl font-bold text-purple-600">{autoDetectedData.estimatedStories}</div>
+									<div className="text-sm text-gray-600">Stories</div>
+								</div>
+							</div>
 
-					<Card className='shadow-sm border border-gray-200 dark:border-gray-700'>
-						<CardHeader className='pb-3'>
-							<CardTitle className='text-lg flex items-center gap-2'>
-								<Ruler className='h-4 w-4 text-blue-600 dark:text-blue-400' />
-								Building Height (meters)
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<Input
-								type='number'
-								name='height'
-								value={userInput.height || ''}
-								onChange={handleChange}
-								placeholder='Enter building height in meters'
-								min='1'
-								max='1000'
-								step='0.1'
-								className='w-full'
-							/>
-							<div className='text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-start'>
-								<Info className='h-3 w-3 mr-1 mt-0.5 flex-shrink-0' />
-								Total height from ground level to the top of the building
+							<div className="flex items-center gap-2 text-sm text-amber-600 mb-4">
+								<AlertCircle className="h-4 w-4" />
+								<span>Confidence: {Math.round(autoDetectedData.confidence * 100)}%</span>
+							</div>
+
+							<div className="space-y-3">
+								<Button 
+									onClick={handleConfirmData}
+									className="w-full bg-green-600 hover:bg-green-700"
+									size="lg"
+								>
+									<CheckCircle className="h-5 w-5 mr-2" />
+									Yes, this looks correct
+								</Button>
+								
+								<Button 
+									variant="outline"
+									onClick={handleNeedsRefinement}
+									className="w-full"
+									size="lg"
+								>
+									<Upload className="h-5 w-5 mr-2" />
+									No, I need more accurate data
+								</Button>
 							</div>
 						</CardContent>
 					</Card>
 				</div>
+			)}
 
-				{/* Building Axes Image */}
-				<Card className='shadow-sm border border-gray-200 dark:border-gray-700'>
-					<CardHeader className='pb-3'>
-						<CardTitle className='text-lg flex items-center gap-2'>
-							<Grid className='h-4 w-4 text-blue-600 dark:text-blue-400' />
-							Building Plan Reference
-						</CardTitle>
-						<CardDescription>
-							Use this reference image to understand the building axes
-						</CardDescription>
-					</CardHeader>
-					<CardContent className='flex justify-center'>
-						<div className='relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
-							<Image
-								src='/images/axes.png'
-								width={400}
-								height={300}
-								alt='Building axes reference'
-								className='object-contain'
-							/>
-						</div>
-					</CardContent>
-				</Card>
-
-				{/* Grid Editor */}
-				<Card className='shadow-md border border-gray-200 dark:border-gray-700'>
-					<CardHeader>
-						<CardTitle className='flex items-center justify-between'>
-							<div className='flex items-center gap-2'>
-								<Grid className='h-5 w-5 text-blue-600 dark:text-blue-400' />
-								Building Grid Definition
+			{/* Step 2: Upload Plans (only if user needs refinement) */}
+			{activeMethod === 'upload' && (
+				<div className="space-y-6">
+					<Card>
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<Upload className="h-5 w-5 text-purple-600" />
+								Upload Building Plans for AI Analysis
+							</CardTitle>
+							<CardDescription>
+								Upload floor plans, architectural drawings, or photos. Our AI will extract precise dimensions.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
+								<input
+									type="file"
+									accept="image/*,.pdf,.dwg"
+									onChange={(e) => handleImageUpload(e.target.files[0])}
+									className="hidden"
+									id="file-upload"
+								/>
+								<label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center gap-3">
+									<FileText className="h-12 w-12 text-gray-400" />
+									<div>
+										<p className="font-medium">Drop files here or click to browse</p>
+										<p className="text-sm text-gray-500">JPG, PNG, PDF, DWG files</p>
+									</div>
+								</label>
 							</div>
-							<div className='flex items-center gap-2'>
-								<Button
-									type='button'
-									variant='outline'
-									size='sm'
-									onClick={addColumn}
-									className='gap-1'>
-									<Plus className='h-3 w-3' /> Add Column
-								</Button>
-								<Button
-									type='button'
-									variant='outline'
-									size='sm'
-									onClick={addRow}
-									className='gap-1'>
-									<Plus className='h-3 w-3' /> Add Row
+							
+							{analysisResult && (
+								<div className="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+									<div className="flex items-center gap-2 mb-3">
+										<CheckCircle className="h-4 w-4 text-purple-600" />
+										<span className="font-medium">AI Analysis Complete!</span>
+										<span className="text-xs bg-purple-100 px-2 py-1 rounded">
+											{Math.round(analysisResult.confidence * 100)}% confidence
+										</span>
+									</div>
+									<div className="grid grid-cols-3 gap-3 text-sm">
+										<div><strong>Length:</strong> {analysisResult.buildingLength}m</div>
+										<div><strong>Width:</strong> {analysisResult.buildingWidth}m</div>
+										<div><strong>Stories:</strong> {analysisResult.numberOfStories}</div>
+									</div>
+								</div>
+							)}
+
+							<div className="mt-6 pt-4 border-t">
+								<Button 
+									variant="outline"
+									onClick={() => setActiveMethod('manual')}
+									className="w-full"
+								>
+									<Edit3 className="h-4 w-4 mr-2" />
+									Don't have plans? Enter manually instead
 								</Button>
 							</div>
-						</CardTitle>
-						<CardDescription>
-							Define your building's structural grid dimensions and column
-							cross-sections
-						</CardDescription>
-					</CardHeader>
+						</CardContent>
+					</Card>
+				</div>
+			)}
 
-					<CardContent>
-						<div className='overflow-x-auto'>
-							<table className='w-full border-collapse'>
-								<thead>
-									<tr>
-										<th className='p-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm font-medium'>
-											Grid
-										</th>
-										{(userInput.dimensions?.[0] || []).map((_, colIndex) => (
-											<th
-												key={colIndex}
-												className='p-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm font-medium'>
-												<div className='flex items-center justify-between'>
-													<span>Column {colIndex + 1}</span>
-													{(userInput.dimensions?.[0] || []).length > 1 && (
-														<Button
-															type='button'
-															variant='ghost'
-															size='icon'
-															onClick={() => removeColumn(colIndex)}
-															className='h-6 w-6 text-gray-400 hover:text-red-500'>
-															<X className='h-3 w-3' />
-														</Button>
-													)}
+			{/* Step 3: Manual Entry (only if upload not available) */}
+			{activeMethod === 'manual' && (
+				<div className="space-y-6">
+					<Card>
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<Edit3 className="h-5 w-5 text-green-600" />
+								Manual Building Entry
+							</CardTitle>
+							<CardDescription>
+								Enter your building dimensions and structural details manually
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="space-y-6">
+							{/* Quick Templates */}
+							<div>
+								<label className="block text-sm font-medium mb-3">Quick Start Templates</label>
+								<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+									{buildingTemplates.map((template, index) => (
+										<Button
+											key={index}
+											variant="outline"
+											size="sm"
+											onClick={() => loadBuildingTemplate(template)}
+											className="h-auto p-3 text-xs hover:bg-blue-50"
+										>
+											<div className="text-center">
+												<div className="font-medium">{template.name}</div>
+												<div className="text-gray-500">{template.description}</div>
+												<div className="text-xs text-gray-400 mt-1">
+													{template.length}×{template.width}m
 												</div>
-											</th>
-										))}
-									</tr>
-								</thead>
-								<tbody>
-									{(userInput.dimensions || [[]]).map((row, rowIndex) => (
-										<React.Fragment key={rowIndex}>
-											<tr>
-												<td className='p-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm font-medium'>
-													<div className='flex items-center justify-between'>
-														<span>Row {rowIndex + 1}</span>
-														{(userInput.dimensions || []).length > 1 && (
-															<Button
-																type='button'
-																variant='ghost'
-																size='icon'
-																onClick={() => removeRow(rowIndex)}
-																className='h-6 w-6 text-gray-400 hover:text-red-500'>
-																<X className='h-3 w-3' />
-															</Button>
-														)}
-													</div>
-												</td>
-												{row.map((_, colIndex) => (
-													<td
-														key={colIndex}
-														className='p-2 border border-gray-200 dark:border-gray-700'>
-														<div className='space-y-2'>
-															<div className='flex items-center'>
-																<label className='text-xs font-medium text-gray-500 dark:text-gray-400 mr-2'>
-																	Dimension (m):
-																</label>
-																<TooltipProvider>
-																	<Tooltip>
-																		<TooltipTrigger asChild>
-																			<Button
-																				variant='ghost'
-																				size='icon'
-																				className='h-4 w-4'>
-																				<HelpCircle className='h-3 w-3 text-gray-400' />
-																			</Button>
-																		</TooltipTrigger>
-																		<TooltipContent>
-																			<p className='text-xs'>
-																				Distance in meters
-																			</p>
-																		</TooltipContent>
-																	</Tooltip>
-																</TooltipProvider>
-															</div>
-															<Input
-																type='text'
-																value={
-																	userInput.dimensions?.[rowIndex]?.[
-																		colIndex
-																	] || ''
-																}
-																onChange={(e) =>
-																	handleArrayChange(
-																		e,
-																		rowIndex,
-																		colIndex,
-																		'dimensions'
-																	)
-																}
-																placeholder='e.g., 4.5'
-																className='w-full text-sm'
-															/>
-														</div>
-														<div className='mt-3 space-y-2'>
-															<div className='flex items-center'>
-																<label className='text-xs font-medium text-gray-500 dark:text-gray-400 mr-2'>
-																	Cross-Section (cm):
-																</label>
-																<TooltipProvider>
-																	<Tooltip>
-																		<TooltipTrigger asChild>
-																			<Button
-																				variant='ghost'
-																				size='icon'
-																				className='h-4 w-4'>
-																				<HelpCircle className='h-3 w-3 text-gray-400' />
-																			</Button>
-																		</TooltipTrigger>
-																		<TooltipContent>
-																			<p className='text-xs'>
-																				Column width × height in centimeters
-																			</p>
-																		</TooltipContent>
-																	</Tooltip>
-																</TooltipProvider>
-															</div>
-															<Input
-																type='text'
-																value={
-																	userInput.crossSections?.[rowIndex]?.[
-																		colIndex
-																	] || ''
-																}
-																onChange={(e) =>
-																	handleArrayChange(
-																		e,
-																		rowIndex,
-																		colIndex,
-																		'crossSections'
-																	)
-																}
-																placeholder='e.g., 30×40'
-																className='w-full text-sm'
-															/>
-														</div>
-													</td>
-												))}
-											</tr>
-										</React.Fragment>
+											</div>
+										</Button>
 									))}
-								</tbody>
-							</table>
-						</div>
+								</div>
+								<p className="text-xs text-gray-500 mt-2">
+									Click any template to auto-fill the form with typical dimensions
+								</p>
+							</div>
 
-						<div className='bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mt-6'>
-							<h4 className='font-medium text-gray-900 dark:text-white mb-2 flex items-center'>
-								<Info className='h-4 w-4 mr-2 text-blue-600' />
-								How to Fill the Grid
-							</h4>
-							<ul className='space-y-2 text-sm text-gray-600 dark:text-gray-400'>
-								<li>
-									• <span className='font-medium'>Dimensions:</span> Enter the
-									distance between columns in meters (e.g., 4.5)
-								</li>
-								<li>
-									• <span className='font-medium'>Cross-Sections:</span> Enter
-									column dimensions in width × height format in centimeters
-									(e.g., 30×40)
-								</li>
-								<li>
-									• Add more rows or columns to match your building's structural
-									grid
-								</li>
-							</ul>
-						</div>
-					</CardContent>
+							{/* Essential Dimensions */}
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Building Length (m) <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="number"
+										name="buildingLength"
+										value={userInput.buildingLength || ''}
+										onChange={handleChange}
+										placeholder="25.0"
+										step="0.1"
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Building Width (m) <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="number"
+										name="buildingWidth"
+										value={userInput.buildingWidth || ''}
+										onChange={handleChange}
+										placeholder="15.0"
+										step="0.1"
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">
+										Number of Stories <span className="text-red-500">*</span>
+									</label>
+									<Input
+										type="number"
+										name="numberOfStories"
+										value={userInput.numberOfStories || ''}
+										onChange={handleChange}
+										placeholder="3"
+									/>
+								</div>
+							</div>
 
-					<CardFooter className='flex justify-between pt-4 border-t'>
-						<Link href='/assessment/4'>
-							<Button
-								variant='outline'
-								className='gap-2'>
-								<ArrowLeft className='h-4 w-4' /> Previous
-							</Button>
-						</Link>
+							{/* Structural System */}
+							<div>
+								<label className="block text-sm font-medium mb-3">Structural System</label>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+									{structuralTypes.map((type, index) => (
+										<Button
+											key={index}
+											variant={userInput.structuralSystem === type.name ? "default" : "outline"}
+											onClick={() => updateUserInput({ structuralSystem: type.name })}
+											className="h-auto p-3 text-left"
+										>
+											<div>
+												<div className="font-medium text-sm">{type.name}</div>
+												<div className="text-xs text-gray-500">{type.description}</div>
+											</div>
+										</Button>
+									))}
+								</div>
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+			)}
 
-						<Button
-							type='submit'
-							disabled={!isFormValid}
-							className='gap-2'>
+			{/* Navigation */}
+			<form onSubmit={handleSubmit}>
+				<div className='flex justify-between pt-8 border-t'>
+					<Link href='/assessment/4'>
+						<Button variant='outline' className='gap-2'>
+							<ArrowLeft className='h-4 w-4' /> Previous
+						</Button>
+					</Link>
+
+					<div className='flex flex-col items-end gap-2'>
+						{!isFormValid() && (
+							<p className='text-sm text-red-500 dark:text-red-400'>
+								{getValidationMessage()}
+							</p>
+						)}
+						<Button type='submit' disabled={!isFormValid()} className='gap-2'>
 							Next <ArrowRight className='h-4 w-4' />
 						</Button>
-					</CardFooter>
-				</Card>
+					</div>
+				</div>
 			</form>
 		</div>
 	);

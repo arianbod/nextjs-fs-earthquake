@@ -33,15 +33,21 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ResultPage = () => {
-	const { userInput } = useUserInput();
+	const { userInput, clearSavedData } = useUserInput();
 	const [safetyResult, setSafetyResult] = useState(null);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+	const [dataLoaded, setDataLoaded] = useState(false);
 
 	useEffect(() => {
 		try {
 			setLoading(true);
+			
+			// Debug: Log the userInput to see what data we have
+			console.log('Result page - userInput:', userInput);
+			console.log('Result page - userInput keys:', Object.keys(userInput));
+			
 			const calculator = new SafetyCalculator();
 			const result = calculator.calculateSafety(userInput);
 			setSafetyResult(result);
@@ -54,14 +60,40 @@ const ResultPage = () => {
 					setShowSuccessAnimation(true);
 				}, 500); // Delay to let the page load first
 			}
+
+			// Clear saved data AFTER calculation is complete and successful
+			setTimeout(() => {
+				clearSavedData();
+			}, 1000); // Give time for everything to process
+			
 		} catch (err) {
 			console.error('Error calculating safety score:', err);
 			setError('An error occurred while calculating the safety score.');
 			setLoading(false);
 		}
-	}, [userInput]);
+	}, [userInput, clearSavedData]);
 
-	if (!userInput || Object.keys(userInput).length === 0) {
+	// Wait a moment for localStorage to restore data
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDataLoaded(true);
+		}, 200);
+		return () => clearTimeout(timer);
+	}, []);
+
+	if (!dataLoaded) {
+		return (
+			<div className='max-w-md mx-auto my-16 p-6 text-center'>
+				<div className="animate-pulse">
+					<div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+					<div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+				</div>
+				<p className='text-gray-600 dark:text-gray-400 mt-4'>Loading your results...</p>
+			</div>
+		);
+	}
+
+	if (!userInput || Object.keys(userInput).length === 0 || !userInput.numberOfStories) {
 		return (
 			<div className='max-w-md mx-auto my-16 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center'>
 				<AlertTriangle className='h-16 w-16 text-yellow-500 mx-auto mb-4' />

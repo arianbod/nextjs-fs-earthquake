@@ -71,11 +71,11 @@ export function MyMapComponent({
 		drawingControl: enableDrawing,
 		drawingControlOptions: {
 			position: window.google?.maps?.ControlPosition?.TOP_CENTER,
-			drawingModes: [
-				window.google?.maps?.drawing?.OverlayType?.CIRCLE,
-				window.google?.maps?.drawing?.OverlayType?.POLYGON,
-				window.google?.maps?.drawing?.OverlayType?.RECTANGLE,
-			],
+			drawingModes: window.google?.maps?.drawing ? [
+				window.google.maps.drawing.OverlayType.CIRCLE,
+				window.google.maps.drawing.OverlayType.POLYGON,
+				window.google.maps.drawing.OverlayType.RECTANGLE,
+			] : [],
 		},
 		circleOptions: {
 			fillColor: 'rgba(255, 0, 0, 0.1)',
@@ -113,7 +113,7 @@ export function MyMapComponent({
 
 	// Load nearby places
 	const loadNearbyPlaces = useCallback(async () => {
-		if (!map) return;
+		if (!map || !window.google?.maps?.places) return;
 
 		setIsLoading(true);
 		const service = new window.google.maps.places.PlacesService(map);
@@ -224,8 +224,10 @@ export function MyMapComponent({
 										<circle cx="15" cy="15" r="5" fill="#dc2626"/>
 									</svg>
 								`),
-								scaledSize: new window.google.maps.Size(30, 40),
-								anchor: new window.google.maps.Point(15, 40)
+								...(window.google?.maps && {
+									scaledSize: new window.google.maps.Size(30, 40),
+									anchor: new window.google.maps.Point(15, 40)
+								})
 							}}
 						>
 							{showInfo && (
@@ -277,7 +279,9 @@ export function MyMapComponent({
 								position={place.geometry.location}
 								icon={{
 									url: getPlaceIcon(place.types[0]),
-									scaledSize: new window.google.maps.Size(20, 20)
+									...(window.google?.maps && {
+										scaledSize: new window.google.maps.Size(20, 20)
+									})
 								}}
 								title={place.name}
 							/>
