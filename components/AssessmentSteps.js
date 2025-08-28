@@ -1,4 +1,5 @@
 import LocationStep from './steps/LocationStep';
+import AIPhotoStep from './steps/AIPhotoStep';
 import BuildingInfoStep from './steps/BuildingInfoStep';
 import StructuralSystemStep from './steps/StructuralSystemStep';
 import IrregularityStep from './steps/IrregularityStep';
@@ -10,6 +11,7 @@ import NeighborBuildingsStep from './steps/NeighborBuildingsStep';
 
 const AssessmentSteps = [
     { component: LocationStep, title: "Location" },
+    { component: AIPhotoStep, title: "AI Photo Analysis" },
     { component: BuildingInfoStep, title: "Building Information" },
     { component: StructuralSystemStep, title: "Structural System" },
     { component: IrregularityStep, title: "Irregularity" },

@@ -8,7 +8,6 @@ import { useUserInput } from '@/context/UserInputContext';
 import { getZoneByCoordinates, getZoneColor, getZoneDefinition } from '@/utils/turkeySeismicData';
 import { googlePlacesService } from '@/services/googlePlacesService';
 import { streetViewService } from '@/services/streetViewService';
-import BuildingPhotoAnalysis from '@/components/BuildingPhotoAnalysis';
 import {
 	MapPin,
 	AlertTriangle,
@@ -51,7 +50,6 @@ const LocationStep = ({ onNext }) => {
 	const [streetViewData, setStreetViewData] = useState(null);
 	const [autoDataLoading, setAutoDataLoading] = useState(false);
 	const [activeTab, setActiveTab] = useState('location');
-	const [photoAnalysisResults, setPhotoAnalysisResults] = useState(null);
 
 	// Enhanced automatic data collection
 	const collectEnhancedData = async (latitude, longitude) => {
@@ -193,18 +191,7 @@ const LocationStep = ({ onNext }) => {
 		}, 2000);
 	};
 
-	// Handle photo analysis results
-	const handlePhotoAnalysis = (analysisResults) => {
-		setPhotoAnalysisResults(analysisResults);
-		
-		// Auto-populate building data from photo analysis
-		if (analysisResults && analysisResults.detectedFeatures) {
-			const features = analysisResults.detectedFeatures;
-			
-			updateUserInput(prev => ({
-				...prev,
-				numberOfStories: features.estimatedStories || prev.numberOfStories,
-				structuralSystem: features.structuralSystem || prev.structuralSystem,
+	// Photo analysis has been moved to dedicated AI Photo Step
 				designRegulation: features.constructionPeriod || prev.designRegulation,
 				buildingCondition: features.materialCondition || prev.buildingCondition,
 				// Add AI insights
@@ -385,7 +372,7 @@ const LocationStep = ({ onNext }) => {
 
 							{/* Tabbed Interface for Enhanced Data */}
 							<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-								<TabsList className="grid w-full grid-cols-4">
+								<TabsList className="grid w-full grid-cols-3">
 									<TabsTrigger value="location" className="gap-2">
 										<MapPin className="h-4 w-4" />
 										Location
@@ -397,10 +384,6 @@ const LocationStep = ({ onNext }) => {
 									<TabsTrigger value="street-view" className="gap-2">
 										<Camera className="h-4 w-4" />
 										Street View
-									</TabsTrigger>
-									<TabsTrigger value="photos" className="gap-2">
-										<Eye className="h-4 w-4" />
-										Photo AI
 									</TabsTrigger>
 								</TabsList>
 
@@ -555,13 +538,6 @@ const LocationStep = ({ onNext }) => {
 											</CardContent>
 										</Card>
 									)}
-								</TabsContent>
-
-								<TabsContent value="photos" className="space-y-4">
-									<BuildingPhotoAnalysis 
-										onAnalysisComplete={handlePhotoAnalysis}
-										existingData={userInput}
-									/>
 								</TabsContent>
 							</Tabs>
 

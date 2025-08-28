@@ -28,6 +28,8 @@ import {
 	Layers,
 	HelpCircle,
 	Info,
+	Sparkles,
+	CheckCircle2,
 } from 'lucide-react';
 import {
 	Tooltip,
@@ -38,6 +40,10 @@ import {
 
 const BuildingInfoStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
+	
+	// Check if we have AI analysis data
+	const hasAIData = userInput.aiAnalysisComplete;
+	const aiData = userInput.aiAnalysisData || {};
 
 	const handleChange = (name, value) => {
 		updateUserInput({ [name]: value });
@@ -102,7 +108,8 @@ const BuildingInfoStep = ({ onNext }) => {
 			icon: "stories",
 			info: "Include all floors above ground level. Basement levels are counted separately.",
 			min: 1,
-			max: 50
+			max: 50,
+			aiDetectable: true
 		},
 		{
 			label: "Year of Construction",
@@ -131,24 +138,49 @@ const BuildingInfoStep = ({ onNext }) => {
 					Building Information
 				</h1>
 				<p className='text-lg text-gray-600 dark:text-gray-300'>
-					Provide details about your building's characteristics and construction
+					{hasAIData 
+						? 'Review and complete the building information extracted by AI'
+						: 'Provide details about your building\'s characteristics and construction'
+					}
 				</p>
-				<div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-					<p className='text-sm text-blue-700 dark:text-blue-300'>
-						<Info className='inline h-4 w-4 mr-1' />
-						All information is based on Turkish Building Earthquake Code (TBDY) standards
-					</p>
-				</div>
+				{hasAIData ? (
+					<div className='mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg'>
+						<p className='text-sm text-purple-700 dark:text-purple-300 flex items-center gap-2'>
+							<Sparkles className='h-4 w-4' />
+							AI has pre-filled some fields based on your photos. Please review and complete any missing information.
+						</p>
+					</div>
+				) : (
+					<div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
+						<p className='text-sm text-blue-700 dark:text-blue-300'>
+							<Info className='inline h-4 w-4 mr-1' />
+							All information is based on Turkish Building Earthquake Code (TBDY) standards
+						</p>
+					</div>
+				)}
 			</div>
 
 			<form onSubmit={handleSubmit} className='space-y-6'>
 				<div className='grid lg:grid-cols-2 gap-6'>
 					{formFields.map((field, index) => (
-						<Card key={field.name} className='shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow'>
+						<Card 
+							key={field.name} 
+							className={`shadow-sm border hover:shadow-md transition-shadow ${
+								hasAIData && userInput[field.name] && field.aiDetectable
+									? 'border-purple-200 dark:border-purple-700 bg-purple-50/50 dark:bg-purple-900/10'
+									: 'border-gray-200 dark:border-gray-700'
+							}`}
+						>
 							<CardHeader className='pb-3'>
 								<CardTitle className='text-lg flex items-center gap-2'>
 									{getEnhancedInputIcon(field.icon)}
 									{field.label}
+									{hasAIData && userInput[field.name] && field.aiDetectable && (
+										<Badge variant='outline' className='ml-auto mr-2 text-xs gap-1'>
+											<Sparkles className='h-3 w-3' />
+											AI Detected
+										</Badge>
+									)}
 									
 									<TooltipProvider>
 										<Tooltip>
@@ -232,7 +264,7 @@ const BuildingInfoStep = ({ onNext }) => {
 				)}
 
 				<div className='flex justify-between pt-4'>
-					<Link href='/assessment/1'>
+					<Link href='/assessment/2'>
 						<Button
 							variant='outline'
 							className='gap-2'>
