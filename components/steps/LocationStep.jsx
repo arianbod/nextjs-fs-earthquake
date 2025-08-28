@@ -192,13 +192,6 @@ const LocationStep = ({ onNext }) => {
 	};
 
 	// Photo analysis has been moved to dedicated AI Photo Step
-				designRegulation: features.constructionPeriod || prev.designRegulation,
-				buildingCondition: features.materialCondition || prev.buildingCondition,
-				// Add AI insights
-				aiInsights: analysisResults.aiInsights || prev.aiInsights
-			}));
-		}
-	};
 
 	// Handle location change from map
 	const handleLocationChange = (lat, lng) => {
@@ -410,23 +403,54 @@ const LocationStep = ({ onNext }) => {
 											<CardContent className="space-y-4">
 												{/* Building Characteristics */}
 												<div>
-													<h4 className="font-medium mb-2">Inferred Building Characteristics</h4>
+													<h4 className="font-medium mb-2 flex items-center gap-2">
+														Neighborhood-Based Estimates
+														<Badge variant="warning" className="text-xs">Not Actual Data</Badge>
+													</h4>
+													{enhancedData.buildingInfo.disclaimer && (
+														<div className="mb-3 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+															<div className="flex items-start gap-2 text-xs text-amber-700 dark:text-amber-300">
+																<AlertTriangle className="h-3 w-3 mt-0.5 flex-shrink-0" />
+																<span>{enhancedData.buildingInfo.disclaimer}</span>
+															</div>
+														</div>
+													)}
 													<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400">Building Type</div>
-															<div className="font-medium">{enhancedData.buildingInfo.likelyBuildingType}</div>
+														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
+																<span>Building Type</span>
+																<Badge variant="outline" className="text-xs">Guess</Badge>
+															</div>
+															<div className="font-medium">
+																{enhancedData.buildingInfo.likelyBuildingType?.value || enhancedData.buildingInfo.likelyBuildingType}
+															</div>
 														</div>
-														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400">Estimated Stories</div>
-															<div className="font-medium">{enhancedData.buildingInfo.estimatedStories}</div>
+														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
+																<span>Estimated Stories</span>
+																<Badge variant="outline" className="text-xs">Guess</Badge>
+															</div>
+															<div className="font-medium">
+																{enhancedData.buildingInfo.estimatedStories?.value || enhancedData.buildingInfo.estimatedStories}
+															</div>
 														</div>
-														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400">Construction Period</div>
-															<div className="font-medium">{enhancedData.buildingInfo.estimatedConstructionPeriod}</div>
+														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
+																<span>Construction Period</span>
+																<Badge variant="outline" className="text-xs">Guess</Badge>
+															</div>
+															<div className="font-medium">
+																{enhancedData.buildingInfo.estimatedConstructionPeriod?.value || enhancedData.buildingInfo.estimatedConstructionPeriod}
+															</div>
 														</div>
-														<div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400">Suggested Soil Type</div>
-															<div className="font-medium">{enhancedData.buildingInfo.suggestedSoilType}</div>
+														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
+															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
+																<span>Suggested Soil Type</span>
+																<Badge variant="outline" className="text-xs">Guess</Badge>
+															</div>
+															<div className="font-medium">
+																{enhancedData.buildingInfo.suggestedSoilType?.value || enhancedData.buildingInfo.suggestedSoilType}
+															</div>
 														</div>
 													</div>
 												</div>

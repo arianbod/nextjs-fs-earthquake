@@ -214,26 +214,51 @@ export class GooglePlacesService {
 		const estimatedAge = this.estimateBuildingAge(geocodeResults, nearbyPlaces);
 
 		return {
+			// IMPORTANT: These are ESTIMATES based on neighborhood analysis, not actual building data
+			dataSource: 'NEIGHBORHOOD_ANALYSIS_ESTIMATE',
+			disclaimer: 'These values are estimated based on neighborhood patterns, not actual building records',
+			
 			// Inferred building type based on neighborhood analysis
-			likelyBuildingType: this.inferBuildingType(buildingTypes, neighborhoodDensity),
+			likelyBuildingType: {
+				value: this.inferBuildingType(buildingTypes, neighborhoodDensity),
+				isEstimate: true,
+				method: 'Inferred from neighborhood density and nearby building types'
+			},
 			
 			// Estimated construction period
-			estimatedConstructionPeriod: estimatedAge,
+			estimatedConstructionPeriod: {
+				value: estimatedAge,
+				isEstimate: true,
+				method: 'Guessed based on area development patterns'
+			},
 			
 			// Neighborhood characteristics that affect seismic risk
-			neighborhoodDensity: neighborhoodDensity,
+			neighborhoodDensity: {
+				value: neighborhoodDensity,
+				isRealData: true,
+				method: 'Actual count of nearby establishments from Google Places'
+			},
 			
 			// Building height estimation based on area characteristics
-			estimatedStories: this.estimateStoryCount(buildingTypes, neighborhoodDensity),
+			estimatedStories: {
+				value: this.estimateStoryCount(buildingTypes, neighborhoodDensity),
+				isEstimate: true,
+				method: 'Statistical guess based on neighborhood density'
+			},
 			
 			// Suggested soil type based on geographic area
-			suggestedSoilType: this.inferSoilType(geocodeResults),
+			suggestedSoilType: {
+				value: this.inferSoilType(geocodeResults),
+				isEstimate: true,
+				method: 'Geographic pattern analysis - NOT actual geological survey data'
+			},
 			
 			// Confidence metrics
 			confidence: {
 				buildingType: this.calculateConfidence(buildingTypes, nearbyPlaces),
 				neighborhood: neighborhoodDensity > 5 ? 'high' : 'medium',
-				overall: 'medium'
+				overall: 'low',
+				note: 'Low confidence - using neighborhood patterns, not building-specific data'
 			}
 		};
 	}
@@ -303,39 +328,43 @@ export class GooglePlacesService {
 	}
 
 	estimateBuildingAge(geocodeResults, nearbyPlaces) {
-		// Basic estimation based on neighborhood development patterns
+		// WARNING: This is a rough guess based on neighborhood landmarks
+		// NOT actual construction year data
 		const currentYear = new Date().getFullYear();
 		
-		// Simplified logic - can be enhanced with more sophisticated analysis
+		// This is a very rough heuristic - NOT reliable
 		if (nearbyPlaces.some(p => p.types.includes('shopping_mall'))) {
-			return '1990-2010'; // Modern commercial areas
+			return '1990-2010 (ESTIMATED)'; // Modern commercial areas
 		} else if (nearbyPlaces.some(p => p.types.includes('university'))) {
-			return '1970-1990'; // Educational districts
+			return '1970-1990 (ESTIMATED)'; // Educational districts
 		} else {
-			return '1980-2000'; // General estimation
+			return '1980-2000 (ESTIMATED)'; // Default guess
 		}
 	}
 
 	estimateStoryCount(buildingTypes, density) {
-		if (density > 20) return '5-10';
-		if (density > 10) return '3-5';
-		if (density > 5) return '2-4';
-		return '1-3';
+		// WARNING: This is a statistical guess based on area density
+		// NOT actual building height data
+		if (density > 20) return '5-10 floors (ESTIMATED)';
+		if (density > 10) return '3-5 floors (ESTIMATED)';
+		if (density > 5) return '2-4 floors (ESTIMATED)';
+		return '1-3 floors (ESTIMATED)';
 	}
 
 	inferSoilType(geocodeResults) {
-		// Basic soil type inference based on geographic patterns
-		// This is a simplified approach - real implementation would use geological data
-		if (!geocodeResults || geocodeResults.length === 0) return 'ZC';
+		// WARNING: This is NOT real geological data!
+		// This is a very rough guess based on location names
+		// Actual soil analysis requires geological surveys
+		if (!geocodeResults || geocodeResults.length === 0) return 'ZC (DEFAULT - No actual data)';
 
 		const address = geocodeResults[0].formatted_address.toLowerCase();
 		
 		if (address.includes('coast') || address.includes('beach')) {
-			return 'ZD'; // Coastal areas often have softer soils
+			return 'ZD (GUESSED - coastal area)'; // Coastal assumption
 		} else if (address.includes('hill') || address.includes('mountain')) {
-			return 'ZB'; // Hilly areas often have firmer soils
+			return 'ZB (GUESSED - hillside area)'; // Hillside assumption
 		} else {
-			return 'ZC'; // Default for most urban areas
+			return 'ZC (DEFAULT - no geological data)'; // Default guess
 		}
 	}
 
