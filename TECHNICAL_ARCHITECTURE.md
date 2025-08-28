@@ -7,7 +7,7 @@ QuakeWise is an advanced earthquake safety assessment platform that combines art
 
 ## 📊 Data Collection & Observation Layer
 
-### 1. **AI Computer Vision Analysis (Claude 3.5 Sonnet)**
+### 1. **AI Computer Vision Analysis (Claude Sonnet 4)**
 
 #### **Data Sources:**
 - User-uploaded building photographs (multiple angles)
@@ -521,6 +521,10 @@ graph TD
 5. **Emergency Services**: Direct alert system integration
 
 ### **AI Model Evolution:**
+- **Claude Sonnet 4 (May 2025)**: Cost-effective with excellent performance
+- **1M Token Context**: 5x increase in context window for comprehensive analysis  
+- **Hybrid Reasoning**: Near-instant responses + extended thinking modes
+- **Price Advantage**: 5x cheaper than Opus while maintaining high accuracy
 - **Vision Transformer Models**: Enhanced image understanding
 - **3D Reconstruction**: Structure from motion algorithms
 - **Predictive Maintenance**: Deterioration forecasting
@@ -532,7 +536,7 @@ graph TD
 
 QuakeWise represents a paradigm shift in seismic safety assessment, transforming a traditionally manual, expert-dependent process into an accessible, data-driven, AI-powered system. By combining:
 
-1. **State-of-art AI** (Claude 3.5) for visual understanding
+1. **State-of-art AI** (Claude Sonnet 4 - May 2025) for visual understanding
 2. **Comprehensive geospatial data** (Google Maps Platform)
 3. **Environmental factors** (Weather, elevation, soil)
 4. **Rigorous engineering principles** (TBDY-2018, Eurocode 8)
@@ -549,6 +553,8 @@ This technical architecture ensures QuakeWise delivers scientifically valid, eng
 
 ---
 
-*Document Version: 1.0*  
-*Last Updated: 2024*  
-*Classification: Technical Documentation*
+*Document Version: 1.2*  
+*Last Updated: August 2025*  
+*Classification: Technical Documentation*  
+*AI Model: Claude Sonnet 4 (claude-sonnet-4-20250514)*  
+*Cost Optimization: $3/$15 per million tokens (5x cheaper than Opus)*

@@ -140,52 +140,81 @@ export async function POST(request) {
       }
     }
 
-    // Prepare the prompt based on analysis type
+    // Define tool schema for structured output (latest Claude approach)
+    const buildingAnalysisTool = {
+      name: "analyze_building",
+      description: "Extract and return structured building analysis data",
+      input_schema: {
+        type: "object",
+        properties: {
+          buildingLength: { type: ["number", "null"], description: "Estimated length in meters" },
+          buildingWidth: { type: ["number", "null"], description: "Estimated width in meters" },
+          buildingHeight: { type: ["number", "null"], description: "Estimated height in meters" },
+          numberOfStories: { type: ["integer", "null"], description: "Number of floors" },
+          structuralSystem: { type: "string", description: "Type of structural system" },
+          constructionPeriod: { type: "string", description: "Estimated construction decade" },
+          materialCondition: { 
+            type: "string", 
+            enum: ["excellent", "good", "fair", "poor", "unknown"],
+            description: "Overall material condition" 
+          },
+          irregularities: {
+            type: "object",
+            properties: {
+              plan: { type: "string", enum: ["regular", "irregular", "unknown"] },
+              vertical: { type: "string", enum: ["regular", "irregular", "unknown"] },
+              mass: { type: "string", enum: ["regular", "irregular", "unknown"] }
+            },
+            required: ["plan", "vertical", "mass"]
+          },
+          riskFactors: {
+            type: "object",
+            properties: {
+              softStory: { type: "string", enum: ["detected", "not detected", "unknown"] },
+              heavyOverhang: { type: "string", enum: ["detected", "not detected", "unknown"] },
+              adjacentBuilding: { type: "string", enum: ["close", "moderate", "far", "none"] },
+              foundation: { type: "string", enum: ["visible", "not visible", "unknown"] }
+            },
+            required: ["softStory", "heavyOverhang", "adjacentBuilding", "foundation"]
+          },
+          specialFeatures: {
+            type: "object",
+            properties: {
+              balconies: { type: "string", description: "Description of balconies" },
+              cantilevers: { type: "string", description: "Description of cantilevers" },
+              setbacks: { type: "string", description: "Description of setbacks" }
+            }
+          },
+          confidence: { 
+            type: "string", 
+            enum: ["high", "medium", "low"],
+            description: "Confidence level of analysis" 
+          },
+          recommendations: {
+            type: "array",
+            items: { type: "string" },
+            description: "List of safety recommendations"
+          }
+        },
+        required: ["structuralSystem", "materialCondition", "irregularities", "riskFactors", "confidence"]
+      }
+    };
+
+    // Simplified prompts when using tool schemas
     const prompts = {
-      building: `Analyze these building photos and provide detailed structural information.
+      building: `You are an expert structural engineer analyzing building photos for earthquake safety assessment.
+      
+Please carefully examine these building photos and extract:
+- Building dimensions (estimate in meters)
+- Number of stories/floors
+- Structural system type (concrete frame, steel frame, masonry, timber, etc.)
+- Construction period (estimate decade)
+- Material condition
+- Structural irregularities (plan, vertical, mass)
+- Risk factors (soft story, overhangs, adjacent buildings, foundation)
+- Special features (balconies, cantilevers, setbacks)
 
-IMPORTANT: You MUST return your analysis as valid JSON in the following exact format:
-
-{
-  "buildingLength": <number or null>,
-  "buildingWidth": <number or null>, 
-  "buildingHeight": <number or null>,
-  "numberOfStories": <number or null>,
-  "structuralSystem": "<string>",
-  "constructionPeriod": "<string>",
-  "materialCondition": "<string>",
-  "irregularities": {
-    "plan": "<regular/irregular>",
-    "vertical": "<regular/irregular>",
-    "mass": "<regular/irregular>"
-  },
-  "riskFactors": {
-    "softStory": "<detected/not detected>",
-    "heavyOverhang": "<detected/not detected>",
-    "adjacentBuilding": "<close/moderate/far>",
-    "foundation": "<visible/not visible>"
-  },
-  "specialFeatures": {
-    "balconies": "<description or none>",
-    "cantilevers": "<description or none>",
-    "setbacks": "<description or none>"
-  },
-  "confidence": "<high/medium/low>",
-  "recommendations": ["<recommendation 1>", "<recommendation 2>"]
-}
-
-Extract:
-1. Building dimensions in meters (estimate if needed)
-2. Number of stories/floors (count visible floors)
-3. Structural system type (concrete frame, steel frame, masonry, timber, etc.)
-4. Construction period estimate (decade like "1990s" or "2000s")
-5. Material condition (excellent/good/fair/poor)
-6. Structural irregularities
-7. Risk factors for seismic vulnerability
-8. Special features
-
-If you cannot determine a value, use null for numbers or "Unknown" for strings.
-ONLY return the JSON object, no other text.`,
+Use the analyze_building tool to return your analysis.`,
       
       floorPlan: `Analyze this architectural floor plan/drawing and extract precise measurements and structural details:
         1. Building dimensions (length x width in meters - look for dimension lines and measurements)
@@ -239,13 +268,16 @@ ONLY return the JSON object, no other text.`,
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      console.log('Calling Claude API with model: claude-3-5-sonnet-20241022');
+      console.log('Calling Claude API with model: claude-sonnet-4-20250514');
       const startTime = Date.now();
       
+      // Use tool-based approach for structured output (latest Claude best practice)
       response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1500,
-        temperature: 0.2,
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        temperature: 0.1, // Lower temperature for more consistent structured output
+        tools: analysisType === 'building' ? [buildingAnalysisTool] : undefined,
+        tool_choice: analysisType === 'building' ? { type: 'tool', name: 'analyze_building' } : undefined,
         messages: [
           {
             role: 'user',
@@ -298,63 +330,82 @@ ONLY return the JSON object, no other text.`,
       );
     }
 
-    // Parse Claude's response - add safety checks
-    if (!response || !response.content || !response.content[0]) {
-      console.error('ERROR: Invalid response structure from Claude');
-      console.error('Response object:', JSON.stringify(response, null, 2));
-      throw new Error('Invalid response from AI service');
-    }
-    
-    const analysisText = response.content[0].text || '';
-    console.log('Claude response text length:', analysisText.length);
-    console.log('First 500 chars of response:', analysisText.substring(0, 500));
-    
-    // Try to extract JSON from the response
+    // Parse Claude's response based on whether we used tools or not
     let analysisResult;
-    try {
-      console.log('Attempting to extract JSON from response...');
-      // Look for JSON in the response
-      const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        console.log('JSON found in response, parsing...');
-        analysisResult = JSON.parse(jsonMatch[0]);
-        console.log('JSON parsed successfully:', Object.keys(analysisResult));
+    
+    if (analysisType === 'building' && response.content) {
+      // Tool-based response parsing
+      console.log('Parsing tool-based response');
+      
+      // Find tool_use content block
+      const toolUseBlock = response.content.find(block => block.type === 'tool_use');
+      
+      if (toolUseBlock && toolUseBlock.input) {
+        console.log('Successfully extracted structured data from tool response');
+        analysisResult = toolUseBlock.input;
+        console.log('Tool response keys:', Object.keys(analysisResult));
       } else {
-        console.log('No JSON found in response, using raw text');
-        console.log('Raw text from Claude:', analysisText.substring(0, 500));
-        // If no JSON found, create a default structure with the raw text
-        analysisResult = { 
-          buildingLength: null,
-          buildingWidth: null,
-          buildingHeight: null,
-          numberOfStories: null,
-          structuralSystem: 'Unable to analyze - see raw response',
-          constructionPeriod: 'Unable to analyze',
-          materialCondition: 'Unable to analyze',
-          irregularities: {
-            plan: 'Unknown',
-            vertical: 'Unknown',
-            mass: 'Unknown'
-          },
-          riskFactors: {
-            softStory: 'Not analyzed',
-            heavyOverhang: 'Not analyzed',
-            adjacentBuilding: 'Unknown',
-            foundation: 'Unknown'
-          },
-          specialFeatures: {},
-          confidence: 'low',
-          recommendations: ['Manual analysis required - AI could not parse the image properly'],
-          rawAnalysis: analysisText,
-          needsManualReview: true,
-          debug: {
-            reason: 'No JSON structure found in Claude response',
-            textReceived: true,
-            textLength: analysisText.length
-          }
-        };
+        console.error('ERROR: No tool_use block found in response');
+        console.error('Response content:', JSON.stringify(response.content, null, 2));
+        throw new Error('Invalid tool response from AI service');
       }
-    } catch (parseError) {
+    } else {
+      // Fallback to text-based parsing for non-building analysis
+      if (!response || !response.content || !response.content[0]) {
+        console.error('ERROR: Invalid response structure from Claude');
+        console.error('Response object:', JSON.stringify(response, null, 2));
+        throw new Error('Invalid response from AI service');
+      }
+      
+      const analysisText = response.content[0].text || '';
+      console.log('Claude response text length:', analysisText.length);
+      console.log('First 500 chars of response:', analysisText.substring(0, 500));
+    
+      // Try to extract JSON from the response
+      try {
+        console.log('Attempting to extract JSON from response...');
+        // Look for JSON in the response
+        const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          console.log('JSON found in response, parsing...');
+          analysisResult = JSON.parse(jsonMatch[0]);
+          console.log('JSON parsed successfully:', Object.keys(analysisResult));
+        } else {
+          console.log('No JSON found in response, using raw text');
+          console.log('Raw text from Claude:', analysisText.substring(0, 500));
+          // If no JSON found, create a default structure with the raw text
+          analysisResult = { 
+            buildingLength: null,
+            buildingWidth: null,
+            buildingHeight: null,
+            numberOfStories: null,
+            structuralSystem: 'Unable to analyze - see raw response',
+            constructionPeriod: 'Unable to analyze',
+            materialCondition: 'Unable to analyze',
+            irregularities: {
+              plan: 'Unknown',
+              vertical: 'Unknown',
+              mass: 'Unknown'
+            },
+            riskFactors: {
+              softStory: 'Not analyzed',
+              heavyOverhang: 'Not analyzed',
+              adjacentBuilding: 'Unknown',
+              foundation: 'Unknown'
+            },
+            specialFeatures: {},
+            confidence: 'low',
+            recommendations: ['Manual analysis required - AI could not parse the image properly'],
+            rawAnalysis: analysisText,
+            needsManualReview: true,
+            debug: {
+              reason: 'No JSON structure found in Claude response',
+              textReceived: true,
+              textLength: analysisText.length
+            }
+          };
+        }
+      } catch (parseError) {
       console.error('JSON parsing error:', parseError);
       console.log('Failed JSON string:', jsonMatch ? jsonMatch[0].substring(0, 200) : 'No match');
       analysisResult = { 
@@ -402,7 +453,7 @@ ONLY return the JSON object, no other text.`,
         timestamp: new Date().toISOString(),
         processingTime: Date.now() - Date.parse(request.headers.get('date') || new Date().toISOString()),
         analysisType: analysisType,
-        claudeModel: 'claude-3-5-sonnet-20241022',
+        claudeModel: 'claude-sonnet-4-20250514',
         rawResponseAvailable: !!analysisText,
         jsonExtracted: !analysisResult.needsManualReview,
         apiKeyPresent: !!process.env.ANTHROPIC_API_KEY
