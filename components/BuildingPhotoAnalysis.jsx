@@ -107,9 +107,33 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 			clearInterval(progressInterval);
 			setAnalysisProgress(100);
 
+			// Log the raw result to understand what we're getting
+			console.log('Raw API result:', result);
+			console.log('Raw analysis object:', result.analysis);
+			
+			// Store debug info if available
+			if (result.debug) {
+				setDebugInfo(result.debug);
+				console.log('Debug info from API:', result.debug);
+			}
+
 			// Process the results
 			const processedResults = processBuildingPhotoAnalysis(result);
+			
+			// Store raw analysis data - check different possible locations
+			if (result.analysis) {
+				if (result.analysis.rawData) {
+					processedResults.rawAIResponse = result.analysis.rawData;
+					console.log('Found rawData in analysis.rawData:', result.analysis.rawData);
+				} else {
+					// Store the entire analysis object if no rawData field
+					processedResults.rawAIResponse = result.analysis;
+					console.log('Storing entire analysis object as raw response');
+				}
+			}
+			
 			setAnalysisResults(processedResults);
+			console.log('Processed results:', processedResults);
 
 			// Mark images as analyzed
 			setUploadedImages(prev => 

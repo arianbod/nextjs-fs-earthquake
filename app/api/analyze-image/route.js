@@ -142,23 +142,50 @@ export async function POST(request) {
 
     // Prepare the prompt based on analysis type
     const prompts = {
-      building: `Analyze these building photos and provide detailed structural information. Extract:
-        1. Building dimensions (estimate length, width, height in meters)
-        2. Number of stories/floors
-        3. Structural system type (concrete frame, steel frame, masonry, timber, etc.)
-        4. Construction period estimate (decade)
-        5. Material condition (excellent/good/fair/poor)
-        6. Structural irregularities:
-           - Plan irregularity (regular/irregular)
-           - Vertical irregularity (regular/irregular)
-           - Mass irregularity (regular/irregular)
-        7. Risk factors:
-           - Soft story presence
-           - Heavy overhangs
-           - Foundation visibility and condition
-        8. Special features (balconies, cantilevers, setbacks, etc.)
-        
-        Return as JSON with confidence levels for each assessment.`,
+      building: `Analyze these building photos and provide detailed structural information.
+
+IMPORTANT: You MUST return your analysis as valid JSON in the following exact format:
+
+{
+  "buildingLength": <number or null>,
+  "buildingWidth": <number or null>, 
+  "buildingHeight": <number or null>,
+  "numberOfStories": <number or null>,
+  "structuralSystem": "<string>",
+  "constructionPeriod": "<string>",
+  "materialCondition": "<string>",
+  "irregularities": {
+    "plan": "<regular/irregular>",
+    "vertical": "<regular/irregular>",
+    "mass": "<regular/irregular>"
+  },
+  "riskFactors": {
+    "softStory": "<detected/not detected>",
+    "heavyOverhang": "<detected/not detected>",
+    "adjacentBuilding": "<close/moderate/far>",
+    "foundation": "<visible/not visible>"
+  },
+  "specialFeatures": {
+    "balconies": "<description or none>",
+    "cantilevers": "<description or none>",
+    "setbacks": "<description or none>"
+  },
+  "confidence": "<high/medium/low>",
+  "recommendations": ["<recommendation 1>", "<recommendation 2>"]
+}
+
+Extract:
+1. Building dimensions in meters (estimate if needed)
+2. Number of stories/floors (count visible floors)
+3. Structural system type (concrete frame, steel frame, masonry, timber, etc.)
+4. Construction period estimate (decade like "1990s" or "2000s")
+5. Material condition (excellent/good/fair/poor)
+6. Structural irregularities
+7. Risk factors for seismic vulnerability
+8. Special features
+
+If you cannot determine a value, use null for numbers or "Unknown" for strings.
+ONLY return the JSON object, no other text.`,
       
       floorPlan: `Analyze this architectural floor plan/drawing and extract precise measurements and structural details:
         1. Building dimensions (length x width in meters - look for dimension lines and measurements)
@@ -294,10 +321,31 @@ export async function POST(request) {
         console.log('JSON parsed successfully:', Object.keys(analysisResult));
       } else {
         console.log('No JSON found in response, using raw text');
-        // If no JSON found, structure the text response
+        console.log('Raw text from Claude:', analysisText.substring(0, 500));
+        // If no JSON found, create a default structure with the raw text
         analysisResult = { 
+          buildingLength: null,
+          buildingWidth: null,
+          buildingHeight: null,
+          numberOfStories: null,
+          structuralSystem: 'Unable to analyze - see raw response',
+          constructionPeriod: 'Unable to analyze',
+          materialCondition: 'Unable to analyze',
+          irregularities: {
+            plan: 'Unknown',
+            vertical: 'Unknown',
+            mass: 'Unknown'
+          },
+          riskFactors: {
+            softStory: 'Not analyzed',
+            heavyOverhang: 'Not analyzed',
+            adjacentBuilding: 'Unknown',
+            foundation: 'Unknown'
+          },
+          specialFeatures: {},
+          confidence: 'low',
+          recommendations: ['Manual analysis required - AI could not parse the image properly'],
           rawAnalysis: analysisText,
-          confidence: 'medium',
           needsManualReview: true,
           debug: {
             reason: 'No JSON structure found in Claude response',
@@ -310,8 +358,28 @@ export async function POST(request) {
       console.error('JSON parsing error:', parseError);
       console.log('Failed JSON string:', jsonMatch ? jsonMatch[0].substring(0, 200) : 'No match');
       analysisResult = { 
-        rawAnalysis: analysisText,
+        buildingLength: null,
+        buildingWidth: null,
+        buildingHeight: null,
+        numberOfStories: null,
+        structuralSystem: 'JSON parse error - see raw response',
+        constructionPeriod: 'Unable to analyze',
+        materialCondition: 'Unable to analyze',
+        irregularities: {
+          plan: 'Unknown',
+          vertical: 'Unknown',
+          mass: 'Unknown'
+        },
+        riskFactors: {
+          softStory: 'Not analyzed',
+          heavyOverhang: 'Not analyzed',
+          adjacentBuilding: 'Unknown',
+          foundation: 'Unknown'
+        },
+        specialFeatures: {},
         confidence: 'low',
+        recommendations: ['JSON parsing failed - check raw response for details'],
+        rawAnalysis: analysisText,
         needsManualReview: true,
         debug: {
           parseError: parseError.message,
