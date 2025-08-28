@@ -7,6 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import {
+	analyzeImagesWithAI,
+	processBuildingPhotoAnalysis,
+	prepareImageForAnalysis,
+} from '@/lib/imageAnalysis';
+import {
 	Upload,
 	Camera,
 	X,
@@ -83,25 +88,28 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 
 		setIsAnalyzing(true);
 		setAnalysisProgress(0);
+		setAnalysisResults(null);
 
 		try {
-			// Simulate AI analysis progress
-			const progressSteps = [
-				{ step: 'Processing images...', progress: 20 },
-				{ step: 'Detecting building features...', progress: 40 },
-				{ step: 'Analyzing structural elements...', progress: 60 },
-				{ step: 'Estimating building characteristics...', progress: 80 },
-				{ step: 'Generating recommendations...', progress: 100 }
-			];
+			// Progress tracking
+			const progressInterval = setInterval(() => {
+				setAnalysisProgress(prev => Math.min(prev + 10, 90));
+			}, 500);
 
-			for (let i = 0; i < progressSteps.length; i++) {
-				await new Promise(resolve => setTimeout(resolve, 800));
-				setAnalysisProgress(progressSteps[i].progress);
-			}
+			// Prepare images for analysis
+			const preparedImages = await Promise.all(
+				uploadedImages.map(img => prepareImageForAnalysis(img.file))
+			);
 
-			// Simulated AI analysis results
-			const results = await simulateAIAnalysis(uploadedImages);
-			setAnalysisResults(results);
+			// Send to AI for building photo analysis
+			const result = await analyzeImagesWithAI(preparedImages, 'building');
+			
+			clearInterval(progressInterval);
+			setAnalysisProgress(100);
+
+			// Process the results
+			const processedResults = processBuildingPhotoAnalysis(result);
+			setAnalysisResults(processedResults);
 
 			// Mark images as analyzed
 			setUploadedImages(prev => 
@@ -110,54 +118,20 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 
 			// Pass results to parent component
 			if (onAnalysisComplete) {
-				onAnalysisComplete(results);
+				onAnalysisComplete(processedResults);
 			}
 
 		} catch (error) {
 			console.error('Analysis error:', error);
+			setAnalysisResults({
+				error: true,
+				message: error.message || 'Failed to analyze images. Please try again.'
+			});
 		} finally {
 			setIsAnalyzing(false);
 		}
 	};
 
-	// Simulate AI analysis (placeholder for real AI integration)
-	const simulateAIAnalysis = async (images) => {
-		// This would be replaced with actual AI service calls
-		return {
-			confidence: 'high',
-			imagesAnalyzed: images.length,
-			detectedFeatures: {
-				buildingType: 'Reinforced Concrete Frame',
-				estimatedStories: '3-4 floors',
-				constructionPeriod: '1990-2005',
-				structuralSystem: 'RC Moment Frame',
-				materialCondition: 'Good',
-				irregularities: {
-					plan: 'Regular',
-					vertical: 'Regular',
-					mass: 'Regular'
-				}
-			},
-			recommendations: [
-				'Building appears to be modern RC construction',
-				'No obvious structural irregularities detected',
-				'Material condition appears satisfactory',
-				'Consider detailed structural inspection for precise assessment'
-			],
-			riskFactors: {
-				softStory: 'Not detected',
-				heavyOverhang: 'Not detected',
-				adjacentBuilding: 'Close proximity to neighboring buildings',
-				foundation: 'Appears adequate'
-			},
-			aiInsights: {
-				facade: 'Modern concrete facade with regular window pattern',
-				roofType: 'Flat concrete roof',
-				balconies: 'Cantilevered balconies present',
-				groundFloor: 'Standard height ground floor'
-			}
-		};
-	};
 
 	return (
 		<div className="space-y-6">
@@ -314,8 +288,35 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 				</Card>
 			)}
 
+			{/* Analysis Error */}
+			{analysisResults && analysisResults.error && (
+				<Card className="border-red-200 dark:border-red-800">
+					<CardContent className="pt-6">
+						<div className="flex items-start gap-3">
+							<AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+							<div>
+								<h4 className="font-medium text-red-800 dark:text-red-200">
+									Analysis Failed
+								</h4>
+								<p className="text-sm text-red-600 dark:text-red-400 mt-1">
+									{analysisResults.message}
+								</p>
+								<Button 
+									onClick={analyzeImages} 
+									variant="outline" 
+									size="sm" 
+									className="mt-3"
+								>
+									Try Again
+								</Button>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			)}
+
 			{/* Analysis Results */}
-			{analysisResults && (
+			{analysisResults && !analysisResults.error && (
 				<Card className="border-green-200 dark:border-green-800">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
@@ -323,7 +324,8 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 							AI Analysis Complete
 						</CardTitle>
 						<p className="text-sm text-green-600 dark:text-green-400">
-							Confidence Level: {analysisResults.confidence.toUpperCase()} • {analysisResults.imagesAnalyzed} images analyzed
+							Confidence Level: {analysisResults.confidence?.toUpperCase() || 'MEDIUM'} • 
+							{analysisResults.metadata?.imagesAnalyzed || uploadedImages.length} images analyzed
 						</p>
 					</CardHeader>
 					<CardContent className="space-y-6">
@@ -337,80 +339,86 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 								<div className="space-y-2">
 									<div className="flex justify-between">
 										<span className="text-sm text-gray-600">Building Type:</span>
-										<Badge variant="outline">{analysisResults.detectedFeatures.buildingType}</Badge>
+										<Badge variant="outline">{analysisResults.buildingCharacteristics?.type || 'Unknown'}</Badge>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-sm text-gray-600">Stories:</span>
-										<span className="text-sm font-medium">{analysisResults.detectedFeatures.estimatedStories}</span>
+										<span className="text-sm font-medium">{analysisResults.buildingCharacteristics?.stories || 'Unknown'}</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-sm text-gray-600">Construction Period:</span>
-										<span className="text-sm font-medium">{analysisResults.detectedFeatures.constructionPeriod}</span>
+										<span className="text-sm font-medium">{analysisResults.buildingCharacteristics?.constructionPeriod || 'Unknown'}</span>
 									</div>
 								</div>
 								<div className="space-y-2">
 									<div className="flex justify-between">
 										<span className="text-sm text-gray-600">Structural System:</span>
-										<span className="text-sm font-medium">{analysisResults.detectedFeatures.structuralSystem}</span>
+										<span className="text-sm font-medium">{analysisResults.buildingCharacteristics?.structuralSystem || 'Unknown'}</span>
 									</div>
 									<div className="flex justify-between">
 										<span className="text-sm text-gray-600">Material Condition:</span>
-										<Badge variant="success">{analysisResults.detectedFeatures.materialCondition}</Badge>
+										<Badge variant="success">{analysisResults.buildingCharacteristics?.materialCondition || 'Unknown'}</Badge>
 									</div>
 								</div>
 							</div>
 						</div>
 
 						{/* Irregularities */}
-						<div>
-							<h4 className="font-medium mb-3">Structural Irregularities</h4>
-							<div className="grid grid-cols-3 gap-4">
-								{Object.entries(analysisResults.detectedFeatures.irregularities).map(([type, status]) => (
-									<div key={type} className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-										<div className="text-sm font-medium capitalize">{type}</div>
-										<Badge 
-											variant={status === 'Regular' ? 'success' : 'warning'}
-											className="mt-1"
-										>
-											{status}
-										</Badge>
-									</div>
-								))}
+						{analysisResults.structuralIrregularities && (
+							<div>
+								<h4 className="font-medium mb-3">Structural Irregularities</h4>
+								<div className="grid grid-cols-3 gap-4">
+									{Object.entries(analysisResults.structuralIrregularities).map(([type, status]) => (
+										<div key={type} className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+											<div className="text-sm font-medium capitalize">{type}</div>
+											<Badge 
+												variant={status === 'Regular' || status === 'Unknown' ? 'success' : 'warning'}
+												className="mt-1"
+											>
+												{status}
+											</Badge>
+										</div>
+									))}
+								</div>
 							</div>
-						</div>
+						)}
 
 						{/* AI Insights */}
-						<div>
-							<h4 className="font-medium mb-3 flex items-center gap-2">
-								<Eye className="h-4 w-4" />
-								AI Visual Insights
-							</h4>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-								{Object.entries(analysisResults.aiInsights).map(([feature, description]) => (
-									<div key={feature} className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-										<div className="font-medium capitalize text-blue-900 dark:text-blue-200">
-											{feature.replace(/([A-Z])/g, ' $1').trim()}:
+						{analysisResults.aiInsights && Object.keys(analysisResults.aiInsights).length > 0 && (
+							<div>
+								<h4 className="font-medium mb-3 flex items-center gap-2">
+									<Eye className="h-4 w-4" />
+									AI Visual Insights
+								</h4>
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+									{Object.entries(analysisResults.aiInsights).map(([feature, description]) => (
+										<div key={feature} className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+											<div className="font-medium capitalize text-blue-900 dark:text-blue-200">
+												{feature.replace(/([A-Z])/g, ' $1').trim()}:
+											</div>
+											<div className="text-blue-700 dark:text-blue-300 mt-1">
+												{description}
+											</div>
 										</div>
-										<div className="text-blue-700 dark:text-blue-300 mt-1">
-											{description}
-										</div>
-									</div>
-								))}
+									))}
+								</div>
 							</div>
-						</div>
+						)}
 
 						{/* Recommendations */}
-						<div>
-							<h4 className="font-medium mb-3">Recommendations</h4>
-							<div className="space-y-2">
-								{analysisResults.recommendations.map((rec, index) => (
-									<div key={index} className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-										<AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-										<span className="text-sm text-amber-800 dark:text-amber-200">{rec}</span>
-									</div>
-								))}
+						{analysisResults.recommendations && analysisResults.recommendations.length > 0 && (
+							<div>
+								<h4 className="font-medium mb-3">Recommendations</h4>
+								<div className="space-y-2">
+									{analysisResults.recommendations.map((rec, index) => (
+										<div key={index} className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+											<AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+											<span className="text-sm text-amber-800 dark:text-amber-200">{rec}</span>
+										</div>
+									))}
+								</div>
 							</div>
-						</div>
+						)}
 					</CardContent>
 				</Card>
 			)}

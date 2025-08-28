@@ -7,6 +7,12 @@ import { Input } from '@/components/ui/input';
 import { useUserInput } from '@/context/UserInputContext';
 import { MyMapComponent } from '@/components/MyMapComponent';
 import {
+	analyzeImagesWithAI,
+	processFloorPlanAnalysis,
+	prepareImageForAnalysis,
+	validateAnalysisResults,
+} from '@/lib/imageAnalysis';
+import {
 	ArrowLeft,
 	ArrowRight,
 	MapPin,
@@ -18,6 +24,7 @@ import {
 	CheckCircle,
 	AlertCircle,
 	Save,
+	Loader2,
 } from 'lucide-react';
 import {
 	Card,
@@ -86,29 +93,55 @@ const PlanDefinitionStep = ({ onNext }) => {
 	};
 
 	// Handle image upload and AI analysis
-	const handleImageUpload = (file) => {
-		setUploadedImage(file);
-		// Simulate AI analysis
-		setTimeout(() => {
+	const handleImageUpload = async (file) => {
+		try {
+			setUploadedImage(file);
+			setAnalysisResult(null);
+			
+			// Show loading state
+			setAnalysisResult({ loading: true });
+			
+			// Prepare image for analysis
+			const preparedImage = await prepareImageForAnalysis(file);
+			
+			// Send to AI for floor plan analysis
+			const result = await analyzeImagesWithAI([preparedImage], 'floorPlan');
+			
+			// Process the results
+			const processedData = processFloorPlanAnalysis(result);
+			
+			// Validate results
+			if (validateAnalysisResults(processedData)) {
+				setAnalysisResult({
+					...processedData,
+					confidence: processedData.confidence,
+					extractedElements: Object.keys(processedData).filter(k => processedData[k] !== null),
+				});
+				
+				// Update user input with extracted data
+				updateUserInput({
+					buildingLength: processedData.buildingLength,
+					buildingWidth: processedData.buildingWidth,
+					numberOfStories: processedData.numberOfStories,
+					columnSpacing: processedData.columnSpacing,
+					structuralSystem: processedData.structuralSystem,
+					foundationType: processedData.foundationType,
+					dataSource: 'ai-floorplan-analysis',
+				});
+			} else {
+				// Show error if validation fails
+				setAnalysisResult({
+					error: true,
+					message: 'Could not extract sufficient information from the image. Please try a clearer image or enter details manually.',
+				});
+			}
+		} catch (error) {
+			console.error('Error analyzing floor plan:', error);
 			setAnalysisResult({
-				buildingLength: 28.5,
-				buildingWidth: 18.2,
-				numberOfStories: 4,
-				columnSpacing: 6.0,
-				structuralSystem: 'Reinforced Concrete Frame',
-				foundationType: 'Spread Footings',
-				confidence: 0.92,
-				extractedElements: ['dimensions', 'columns', 'structural elements', 'grid lines']
+				error: true,
+				message: error.message || 'Failed to analyze the floor plan. Please try again.',
 			});
-			updateUserInput({
-				buildingLength: 28.5,
-				buildingWidth: 18.2,
-				numberOfStories: 4,
-				columnSpacing: 6.0,
-				structuralSystem: 'Reinforced Concrete Frame',
-				dataSource: 'ai-analysis'
-			});
-		}, 2000);
+		}
 	};
 
 	// Structural building types for manual input
@@ -301,19 +334,63 @@ const PlanDefinitionStep = ({ onNext }) => {
 							</div>
 							
 							{analysisResult && (
-								<div className="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-									<div className="flex items-center gap-2 mb-3">
-										<CheckCircle className="h-4 w-4 text-purple-600" />
-										<span className="font-medium">AI Analysis Complete!</span>
-										<span className="text-xs bg-purple-100 px-2 py-1 rounded">
-											{Math.round(analysisResult.confidence * 100)}% confidence
-										</span>
-									</div>
-									<div className="grid grid-cols-3 gap-3 text-sm">
-										<div><strong>Length:</strong> {analysisResult.buildingLength}m</div>
-										<div><strong>Width:</strong> {analysisResult.buildingWidth}m</div>
-										<div><strong>Stories:</strong> {analysisResult.numberOfStories}</div>
-									</div>
+								<div className="mt-4">
+									{analysisResult.loading && (
+										<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+											<div className="flex items-center gap-2">
+												<Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+												<span className="font-medium">Analyzing floor plan with AI...</span>
+											</div>
+											<p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+												Extracting dimensions and structural information from your plan
+											</p>
+										</div>
+									)}
+									
+									{analysisResult.error && (
+										<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+											<div className="flex items-center gap-2 mb-2">
+												<AlertCircle className="h-4 w-4 text-red-600" />
+												<span className="font-medium text-red-800 dark:text-red-200">Analysis Error</span>
+											</div>
+											<p className="text-sm text-red-700 dark:text-red-300">
+												{analysisResult.message}
+											</p>
+										</div>
+									)}
+									
+									{!analysisResult.loading && !analysisResult.error && analysisResult.buildingLength && (
+										<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+											<div className="flex items-center gap-2 mb-3">
+												<CheckCircle className="h-4 w-4 text-purple-600" />
+												<span className="font-medium">AI Analysis Complete!</span>
+												<span className="text-xs bg-purple-100 dark:bg-purple-800 px-2 py-1 rounded">
+													{analysisResult.confidence?.toUpperCase()} confidence
+												</span>
+											</div>
+											<div className="grid grid-cols-3 gap-3 text-sm">
+												{analysisResult.buildingLength && (
+													<div><strong>Length:</strong> {analysisResult.buildingLength}m</div>
+												)}
+												{analysisResult.buildingWidth && (
+													<div><strong>Width:</strong> {analysisResult.buildingWidth}m</div>
+												)}
+												{analysisResult.numberOfStories && (
+													<div><strong>Stories:</strong> {analysisResult.numberOfStories}</div>
+												)}
+											</div>
+											{analysisResult.columnSpacing && (
+												<div className="mt-2 text-sm">
+													<strong>Column Spacing:</strong> {analysisResult.columnSpacing}m
+												</div>
+											)}
+											{analysisResult.structuralSystem && (
+												<div className="mt-1 text-sm">
+													<strong>Structure:</strong> {analysisResult.structuralSystem}
+												</div>
+											)}
+										</div>
+									)}
 								</div>
 							)}
 
