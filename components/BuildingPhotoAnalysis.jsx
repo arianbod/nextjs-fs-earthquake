@@ -419,6 +419,64 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 								</div>
 							</div>
 						)}
+						
+						{/* Raw AI Response Data */}
+						{showRawData && (
+							<div className="mt-6">
+								<h4 className="font-medium mb-3 flex items-center gap-2">
+									<Eye className="h-4 w-4" />
+									Complete AI Response
+								</h4>
+								<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 max-h-96 overflow-y-auto">
+									{analysisResults.rawAIResponse ? (
+										typeof analysisResults.rawAIResponse === 'string' ? (
+											<pre className="text-xs font-mono whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+												{analysisResults.rawAIResponse}
+											</pre>
+										) : (
+											<pre className="text-xs font-mono whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+												{JSON.stringify(analysisResults.rawAIResponse, null, 2)}
+											</pre>
+										)
+									) : (
+										<div className="text-sm text-gray-500">
+											No raw response data available
+										</div>
+									)}
+								</div>
+							</div>
+						)}
+						
+						{/* Debug Information */}
+						{debugInfo && (
+							<div className="mt-4 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+								<details>
+									<summary className="cursor-pointer font-medium text-purple-900 dark:text-purple-200">
+										🔧 Debug Information
+									</summary>
+									<div className="mt-3 space-y-2 text-xs font-mono">
+										<div className="text-purple-700 dark:text-purple-300">
+											<strong>Timestamp:</strong> {debugInfo.timestamp}
+										</div>
+										<div className="text-purple-700 dark:text-purple-300">
+											<strong>Processing Time:</strong> {debugInfo.processingTime}ms
+										</div>
+										<div className="text-purple-700 dark:text-purple-300">
+											<strong>Analysis Type:</strong> {debugInfo.analysisType}
+										</div>
+										<div className="text-purple-700 dark:text-purple-300">
+											<strong>Model:</strong> {debugInfo.claudeModel}
+										</div>
+										<div className="text-purple-700 dark:text-purple-300">
+											<strong>JSON Extracted:</strong> {debugInfo.jsonExtracted ? 'Yes' : 'No'}
+										</div>
+										<div className="text-purple-700 dark:text-purple-300">
+											<strong>API Key Present:</strong> {debugInfo.apiKeyPresent ? 'Yes' : 'No'}
+										</div>
+									</div>
+								</details>
+							</div>
+						)}
 					</CardContent>
 				</Card>
 			)}
