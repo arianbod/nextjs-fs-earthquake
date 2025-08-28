@@ -199,15 +199,35 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 				prev.map(img => ({ ...img, analyzed: true }))
 			);
 
-			// Save to user context
+			// Save to user context with proper field mapping
 			if (processedResults) {
-				updateUserInput({
+				// Parse number of stories if it's a string
+				let stories = processedResults.buildingCharacteristics?.stories;
+				if (typeof stories === 'string' && !isNaN(parseInt(stories))) {
+					stories = parseInt(stories);
+				}
+				
+				// Map AI data to form fields
+				const mappedData = {
 					aiAnalysisData: processedResults,
 					aiAnalysisComplete: true,
-					buildingType: processedResults.buildingCharacteristics?.type,
-					numberOfStories: processedResults.buildingCharacteristics?.stories,
-					structuralSystem: processedResults.buildingCharacteristics?.structuralSystem,
-				});
+					// Building Info fields
+					numberOfStories: stories || null,
+					// Structural System fields (for later steps)
+					structuralSystem: processedResults.buildingCharacteristics?.structuralSystem || null,
+					buildingType: processedResults.buildingCharacteristics?.type || null,
+					// Dimensions
+					buildingLength: processedResults.dimensions?.length || null,
+					buildingWidth: processedResults.dimensions?.width || null,
+					buildingHeight: processedResults.dimensions?.height || null,
+					// Material condition
+					materialCondition: processedResults.buildingCharacteristics?.materialCondition || null,
+					// Construction period (try to extract year)
+					constructionPeriod: processedResults.buildingCharacteristics?.constructionPeriod || null,
+				};
+				
+				console.log('Updating user input with AI data:', mappedData);
+				updateUserInput(mappedData);
 			}
 
 		} catch (error) {
