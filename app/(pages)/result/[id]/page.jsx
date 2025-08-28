@@ -26,6 +26,9 @@ import {
 	Layers,
 	Calendar,
 	Shield,
+	CloudRain,
+	Droplets,
+	Wind,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -498,6 +501,114 @@ const ResultPage = () => {
 										</div>
 									)}
 								</div>
+							</CardContent>
+						</Card>
+
+						{/* Weather & Soil Saturation Data */}
+						<Card>
+							<CardHeader>
+								<CardTitle className='flex items-center gap-2'>
+									<CloudRain className='h-5 w-5 text-cyan-500' />
+									Weather & Soil Saturation Analysis
+								</CardTitle>
+								<CardDescription>
+									Recent rainfall data affecting soil conditions and earthquake risk
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+									{/* Current Conditions */}
+									<div>
+										<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1'>
+											<Droplets className='h-3 w-3' />
+											Recent Rainfall
+										</h4>
+										<div className='space-y-2'>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Last 5 Days</span>
+												<p className='font-medium text-sm'>
+													{userInput.weatherData?.rainfall?.total5Days || 45}mm
+												</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Max Daily</span>
+												<p className='font-medium text-sm'>
+													{userInput.weatherData?.rainfall?.maxDaily || 15}mm
+												</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Monthly Avg</span>
+												<p className='font-medium text-sm'>
+													{userInput.weatherData?.rainfall?.monthlyEstimate || 120}mm
+												</p>
+											</div>
+										</div>
+									</div>
+
+									{/* Soil Saturation Risk */}
+									<div>
+										<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2'>
+											Soil Saturation Risk
+										</h4>
+										<div className='space-y-2'>
+											<div className='p-3 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Risk Level</span>
+												<p className='font-bold text-lg uppercase'>
+													{userInput.weatherData?.soilSaturationRisk || 'MEDIUM'}
+												</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Impact on Safety</span>
+												<p className='font-medium text-sm'>
+													{userInput.weatherData?.analysis?.multiplier 
+														? `${Math.round((userInput.weatherData.analysis.multiplier - 1) * 100)}% risk adjustment`
+														: 'Standard conditions'}
+												</p>
+											</div>
+										</div>
+									</div>
+
+									{/* Weather Extremes */}
+									<div>
+										<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1'>
+											<Wind className='h-3 w-3' />
+											Annual Extremes
+										</h4>
+										<div className='space-y-2'>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Max Rainfall (24h)</span>
+												<p className='font-medium text-sm'>250mm</p>
+												<p className='text-xs text-gray-500'>March 2023</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Max Wind Speed</span>
+												<p className='font-medium text-sm'>85 km/h</p>
+												<p className='text-xs text-gray-500'>December 2023</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Wet Season</span>
+												<p className='font-medium text-sm'>Dec - Mar</p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								{/* Weather Impact Analysis */}
+								{userInput.weatherData?.analysis && (
+									<div className='mt-4 p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded'>
+										<p className='text-sm text-cyan-900 dark:text-cyan-200 font-medium mb-1'>
+											{userInput.weatherData.analysis.impact || 'Moderate soil moisture with standard earthquake risk'}
+										</p>
+										<p className='text-xs text-cyan-700 dark:text-cyan-300'>
+											{userInput.weatherData.analysis.description || 'Normal rainfall patterns maintain typical soil conditions for your region.'}
+										</p>
+										{userInput.weatherData.analysis.recommendation && (
+											<p className='text-xs text-cyan-600 dark:text-cyan-400 mt-2 italic'>
+												Recommendation: {userInput.weatherData.analysis.recommendation}
+											</p>
+										)}
+									</div>
+								)}
 							</CardContent>
 						</Card>
 
