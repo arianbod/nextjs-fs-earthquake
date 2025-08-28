@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 
+// Configure runtime for Vercel deployment
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Maximum function duration for Vercel
+
 // Initialize Anthropic client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -441,4 +446,29 @@ function formatAnalysisResult(raw, type) {
     recommendations: raw?.recommendations || [],
     rawData: raw?.rawAnalysis || raw,
   };
+}
+
+// Handle OPTIONS requests for CORS
+export async function OPTIONS(request) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
+// Handle GET requests for debugging
+export async function GET(request) {
+  console.log('GET request to analyze-image API');
+  return NextResponse.json({
+    status: 'API is running',
+    message: 'This endpoint only accepts POST requests with image data',
+    apiKeyConfigured: !!process.env.ANTHROPIC_API_KEY,
+    timestamp: new Date().toISOString(),
+    runtime: 'nodejs',
+    method: 'Use POST to submit images for analysis',
+  });
 }
