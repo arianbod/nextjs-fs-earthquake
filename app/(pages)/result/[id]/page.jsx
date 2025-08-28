@@ -19,6 +19,13 @@ import {
 	HomeIcon,
 	ListChecks,
 	FileText,
+	MapPin,
+	Camera,
+	Brain,
+	Building,
+	Layers,
+	Calendar,
+	Shield,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -195,11 +202,16 @@ const ResultPage = () => {
 			<Tabs
 				defaultValue='summary'
 				className='mb-8'>
-				<TabsList className='grid grid-cols-3 mb-8'>
+				<TabsList className='grid grid-cols-4 mb-8'>
 					<TabsTrigger
 						value='summary'
 						className='gap-1'>
 						<ListChecks className='h-4 w-4' /> Summary
+					</TabsTrigger>
+					<TabsTrigger
+						value='data'
+						className='gap-1'>
+						<Brain className='h-4 w-4' /> Input Data
 					</TabsTrigger>
 					<TabsTrigger
 						value='details'
@@ -340,6 +352,242 @@ const ResultPage = () => {
 					{/* Earthquake Performance Chart */}
 					<div className="mt-8">
 						<EarthquakePerformanceChart buildingData={safetyResult} />
+					</div>
+				</TabsContent>
+
+				{/* Input Data Tab - Shows all collected data */}
+				<TabsContent value='data'>
+					<div className='space-y-6'>
+						{/* AI Analysis Data */}
+						{userInput.aiAnalysisData && (
+							<Card>
+								<CardHeader>
+									<CardTitle className='flex items-center gap-2'>
+										<Brain className='h-5 w-5 text-purple-500' />
+										AI Photo Analysis Data
+									</CardTitle>
+									<CardDescription>
+										Data extracted from building photos using AI vision analysis
+									</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+										{/* Building Characteristics */}
+										<div className='space-y-3'>
+											<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300'>Building Characteristics</h4>
+											<div className='space-y-2'>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Building Type:</span>
+													<span className='font-medium text-sm'>{userInput.buildingType || 'N/A'}</span>
+												</div>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Stories:</span>
+													<span className='font-medium text-sm'>{userInput.numberOfStories || 'N/A'}</span>
+												</div>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Structural System:</span>
+													<span className='font-medium text-sm'>{userInput.structuralSystem || 'N/A'}</span>
+												</div>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Construction Period:</span>
+													<span className='font-medium text-sm'>{userInput.constructionPeriod || 'N/A'}</span>
+												</div>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Material Condition:</span>
+													<span className='font-medium text-sm'>{userInput.materialCondition || 'N/A'}</span>
+												</div>
+											</div>
+										</div>
+
+										{/* Dimensions */}
+										<div className='space-y-3'>
+											<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300'>Building Dimensions</h4>
+											<div className='space-y-2'>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Length:</span>
+													<span className='font-medium text-sm'>{userInput.buildingLength ? `${userInput.buildingLength}m` : 'N/A'}</span>
+												</div>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Width:</span>
+													<span className='font-medium text-sm'>{userInput.buildingWidth ? `${userInput.buildingWidth}m` : 'N/A'}</span>
+												</div>
+												<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+													<span className='text-sm'>Height:</span>
+													<span className='font-medium text-sm'>{userInput.buildingHeight ? `${userInput.buildingHeight}m` : 'N/A'}</span>
+												</div>
+											</div>
+											<div className='mt-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded'>
+												<p className='text-xs text-purple-700 dark:text-purple-300'>
+													<span className='font-medium'>AI Confidence:</span> {userInput.aiAnalysisData?.confidence || 'N/A'}
+												</p>
+											</div>
+										</div>
+									</div>
+
+									{/* AI Insights */}
+									{userInput.aiAnalysisData?.aiInsights && Object.keys(userInput.aiAnalysisData.aiInsights).length > 0 && (
+										<div className='mt-4'>
+											<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2'>AI Visual Insights</h4>
+											<div className='space-y-2'>
+												{Object.entries(userInput.aiAnalysisData.aiInsights).map(([key, value]) => (
+													<div key={key} className='p-2 bg-blue-50 dark:bg-blue-900/20 rounded'>
+														<span className='text-sm font-medium capitalize'>{key}: </span>
+														<span className='text-sm'>{value}</span>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+								</CardContent>
+							</Card>
+						)}
+
+						{/* Location Data with Google Maps */}
+						<Card>
+							<CardHeader>
+								<CardTitle className='flex items-center gap-2'>
+									<MapPin className='h-5 w-5 text-blue-500' />
+									Location & Site Information
+								</CardTitle>
+								<CardDescription>
+									Location data from Google Maps and seismic zone information
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+									{/* Location Details */}
+									<div className='space-y-2'>
+										<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+											<span className='text-sm'>Address:</span>
+											<span className='font-medium text-sm'>{userInput.address || 'N/A'}</span>
+										</div>
+										<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+											<span className='text-sm'>Earthquake Zone:</span>
+											<span className='font-medium text-sm'>{userInput.typeOfEarthquake || 'N/A'}</span>
+										</div>
+										<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+											<span className='text-sm'>Soil Type:</span>
+											<span className='font-medium text-sm'>{userInput.typeOfSoil || 'N/A'}</span>
+										</div>
+										<div className='flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+											<span className='text-sm'>Coordinates:</span>
+											<span className='font-medium text-sm text-xs'>
+												{userInput.latitude && userInput.longitude 
+													? `${parseFloat(userInput.latitude).toFixed(4)}, ${parseFloat(userInput.longitude).toFixed(4)}`
+													: 'N/A'}
+											</span>
+										</div>
+									</div>
+
+									{/* Google Street View Images */}
+									{userInput.location?.streetViewImages && userInput.location.streetViewImages.length > 0 && (
+										<div className='space-y-2'>
+											<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300'>Street View Images</h4>
+											<div className='grid grid-cols-2 gap-2'>
+												{userInput.location.streetViewImages.slice(0, 4).map((img, idx) => (
+													<div key={idx} className='aspect-square rounded overflow-hidden border'>
+														<img 
+															src={img.url} 
+															alt={`Street view ${img.heading}°`}
+															className='w-full h-full object-cover'
+														/>
+														<p className='text-xs text-center mt-1'>{img.heading}° view</p>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Building Form Data */}
+						<Card>
+							<CardHeader>
+								<CardTitle className='flex items-center gap-2'>
+									<Building className='h-5 w-5 text-green-500' />
+									Building Information
+								</CardTitle>
+								<CardDescription>
+									Detailed building characteristics and structural information
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+									<div>
+										<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2'>General Info</h4>
+										<div className='space-y-2'>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Year Built</span>
+												<p className='font-medium text-sm'>{userInput.yearOfConstruction || 'N/A'}</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Design Regulation</span>
+												<p className='font-medium text-sm'>{userInput.designRegulation || 'N/A'}</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Basement Floors</span>
+												<p className='font-medium text-sm'>{userInput.numberOfBasement || 'None'}</p>
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2'>Structural Details</h4>
+										<div className='space-y-2'>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Plan Shape</span>
+												<p className='font-medium text-sm'>{userInput.planShape || 'N/A'}</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Foundation Type</span>
+												<p className='font-medium text-sm'>{userInput.foundationType || 'N/A'}</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Roof Type</span>
+												<p className='font-medium text-sm'>{userInput.roofType || 'N/A'}</p>
+											</div>
+										</div>
+									</div>
+
+									<div>
+										<h4 className='font-medium text-sm text-gray-700 dark:text-gray-300 mb-2'>Irregularities</h4>
+										<div className='space-y-2'>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Plan Irregularity</span>
+												<p className='font-medium text-sm'>{userInput.planIrregularity || 'Regular'}</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Vertical Irregularity</span>
+												<p className='font-medium text-sm'>{userInput.verticalIrregularity || 'Regular'}</p>
+											</div>
+											<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded'>
+												<span className='text-xs text-gray-600 dark:text-gray-400'>Adjacent Buildings</span>
+												<p className='font-medium text-sm'>{userInput.adjacentBuildingRisk || 'None'}</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
+
+						{/* Data Sources Summary */}
+						<Card className='bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20'>
+							<CardContent className='pt-6'>
+								<div className='flex items-start gap-3'>
+									<Shield className='h-5 w-5 text-purple-600 mt-0.5' />
+									<div>
+										<h4 className='font-medium text-purple-900 dark:text-purple-200'>
+											Comprehensive Data Analysis
+										</h4>
+										<p className='text-sm text-purple-700 dark:text-purple-300 mt-1'>
+											This assessment used multiple data sources including AI vision analysis of {userInput.aiAnalysisData ? 'uploaded photos' : 'building data'}, 
+											Google Maps location verification, and Turkish seismic zone regulations to provide you with the most accurate safety evaluation possible.
+										</p>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
 					</div>
 				</TabsContent>
 
