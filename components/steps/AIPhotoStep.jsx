@@ -273,7 +273,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 					AI-Powered Building Analysis
 				</h1>
 				<p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
-					Upload photos of your building and let our AI extract structural information automatically
+					Our AI will analyze your photos combined with location and environmental data for comprehensive assessment
 				</p>
 				<div className='mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto'>
 					<div className='p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg'>
@@ -302,7 +302,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 						Upload Building Photos
 					</CardTitle>
 					<p className='text-sm text-gray-600 dark:text-gray-400'>
-						Upload multiple angles of your building for comprehensive analysis
+						Upload multiple angles of your building for comprehensive analysis. The more photos you provide, the more accurate our AI analysis will be.
 					</p>
 				</CardHeader>
 				<CardContent>
@@ -324,11 +324,22 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 							</div>
 							<div>
 								<h3 className='text-lg font-medium text-gray-900 dark:text-white'>
-									Drop photos here or click to upload
+									Upload photos from different angles
 								</h3>
 								<p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
 									Supports JPG, PNG, WEBP, HEIC formats • Maximum 10MB per file • Up to 10 photos
 								</p>
+								<div className='grid grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-xs text-gray-600 dark:text-gray-400'>
+									<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded flex items-center gap-1'>
+										<Building className='h-3 w-3' /> Front View
+									</div>
+									<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded flex items-center gap-1'>
+										<Building className='h-3 w-3' /> Side Views
+									</div>
+									<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded flex items-center gap-1'>
+										<Building className='h-3 w-3' /> Corner/Details
+									</div>
+								</div>
 							</div>
 							<div className='flex justify-center gap-3'>
 								<Button
@@ -610,14 +621,20 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 					<CardHeader className='bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'>
 						<CardTitle className='flex items-center gap-2 text-green-800 dark:text-green-200'>
 							<CheckCircle className='h-6 w-6' />
-							AI Analysis Complete
+							AI Analysis Complete - Review Extracted Information
 						</CardTitle>
 						<p className='text-sm text-green-600 dark:text-green-400'>
-							Successfully analyzed {uploadedImages.length} photo(s) • 
+							Successfully extracted building information from {uploadedImages.length} photo(s) • 
 							Confidence: <Badge variant='outline' className='ml-1'>
 								{analysisResults.confidence?.toUpperCase() || 'MEDIUM'}
 							</Badge>
 						</p>
+						<div className='mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>
+							<p className='text-sm text-blue-800 dark:text-blue-200 flex items-start gap-2'>
+								<Info className='h-4 w-4 mt-0.5 flex-shrink-0' />
+								The information below has been automatically extracted from your photos. You can review and modify this data in the following steps if needed.
+							</p>
+						</div>
 					</CardHeader>
 					<CardContent className='space-y-6 pt-6'>
 						{/* Detected Building Characteristics */}
@@ -728,18 +745,34 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 							</div>
 						)}
 
-						{/* Trust Indicator */}
+						{/* Data Summary for Next Steps */}
 						<div className='p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg'>
 							<div className='flex items-start gap-3'>
 								<Sparkles className='h-5 w-5 text-purple-600 mt-0.5' />
-								<div>
-									<h4 className='font-medium text-purple-900 dark:text-purple-200'>
-										AI-Powered Analysis Complete
+								<div className='w-full'>
+									<h4 className='font-medium text-purple-900 dark:text-purple-200 mb-3'>
+										Extracted Data Will Pre-fill Following Steps:
 									</h4>
-									<p className='text-sm text-purple-700 dark:text-purple-300 mt-1'>
-										We've extracted key building information from your photos. 
-										You can review and modify this data in the next steps if needed. 
-										This automated analysis helps ensure more accurate seismic safety assessment.
+									<div className='grid grid-cols-1 md:grid-cols-2 gap-2 text-sm'>
+										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
+											<CheckCircle2 className='h-3 w-3' />
+											Number of Stories: {analysisResults.buildingCharacteristics?.stories || 'To be confirmed'}
+										</div>
+										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
+											<CheckCircle2 className='h-3 w-3' />
+											Structural System: {analysisResults.buildingCharacteristics?.structuralSystem || 'To be confirmed'}
+										</div>
+										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
+											<CheckCircle2 className='h-3 w-3' />
+											Building Type: {analysisResults.buildingCharacteristics?.type || 'To be confirmed'}
+										</div>
+										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
+											<CheckCircle2 className='h-3 w-3' />
+											Material Condition: {analysisResults.buildingCharacteristics?.materialCondition || 'To be confirmed'}
+										</div>
+									</div>
+									<p className='text-xs text-purple-600 dark:text-purple-400 mt-3 italic'>
+										You can modify any of this information in the next steps if our AI made any mistakes.
 									</p>
 								</div>
 							</div>
@@ -750,9 +783,9 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 
 			{/* Navigation */}
 			<div className='flex justify-between pt-4'>
-				<Link href='/assessment/1'>
+				<Link href='/assessment/2'>
 					<Button variant='outline' className='gap-2'>
-						<ArrowLeft className='h-4 w-4' /> Previous
+						<ArrowLeft className='h-4 w-4' /> Back to Environmental Data
 					</Button>
 				</Link>
 

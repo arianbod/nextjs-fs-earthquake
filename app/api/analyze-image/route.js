@@ -55,9 +55,21 @@ export async function POST(request) {
 
     const images = formData.getAll('images');
     const analysisType = formData.get('analysisType') || 'building';
+    const additionalContextString = formData.get('additionalContext');
+    
+    let additionalContext = {};
+    if (additionalContextString) {
+      try {
+        additionalContext = JSON.parse(additionalContextString);
+        console.log('Additional context provided:', Object.keys(additionalContext));
+      } catch (e) {
+        console.error('Failed to parse additional context:', e);
+      }
+    }
     
     console.log('Images received:', images.length);
     console.log('Analysis type:', analysisType);
+    console.log('Has additional context:', !!additionalContextString);
     
     // Log image details
     images.forEach((img, idx) => {
@@ -200,6 +212,40 @@ export async function POST(request) {
       }
     };
 
+    // Build enhanced prompt with additional context
+    const buildContextualPrompt = (basePrompt, context) => {
+      if (!context || Object.keys(context).length === 0) return basePrompt;
+      
+      let enhancedPrompt = basePrompt;
+      
+      if (context.enhancedPrompt) {
+        enhancedPrompt = context.enhancedPrompt + '\n\n' + basePrompt;
+      }
+      
+      if (context.location) {
+        enhancedPrompt += `\n\nLocation Context:
+- City: ${context.location.city || 'Unknown'}
+- Coordinates: ${context.location.latitude}, ${context.location.longitude}
+- Address: ${context.location.address || 'Not provided'}`;
+      }
+      
+      if (context.seismic) {
+        enhancedPrompt += `\n\nSeismic Context:
+- Zone: ${context.seismic.zone || 'Unknown'}
+- Soil Type: ${context.seismic.soilType || 'Unknown'}
+- Zone Description: ${context.seismic.zoneDescription || 'Not provided'}`;
+      }
+      
+      if (context.weather) {
+        enhancedPrompt += `\n\nEnvironmental Context:
+- Climate: ${context.weather.current?.condition || 'Unknown'}
+- Average Temperature: ${context.weather.historical?.avgTemperature || 'Unknown'}°C
+- Annual Rainfall: ${context.weather.historical?.avgRainfall || 'Unknown'}mm`;
+      }
+      
+      return enhancedPrompt;
+    };
+    
     // Simplified prompts when using tool schemas
     const prompts = {
       building: `You are an expert structural engineer analyzing building photos for earthquake safety assessment.
@@ -239,7 +285,8 @@ Use the analyze_building tool to return your analysis.`,
         Return as JSON with confidence levels.`
     };
 
-    const prompt = prompts[analysisType] || prompts.building;
+    const basePrompt = prompts[analysisType] || prompts.building;
+    const prompt = buildContextualPrompt(basePrompt, additionalContext);
 
     // Check API key
     if (!process.env.ANTHROPIC_API_KEY) {

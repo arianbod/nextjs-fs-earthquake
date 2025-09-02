@@ -30,6 +30,7 @@ import {
 	Info,
 	Sparkles,
 	CheckCircle2,
+	MapPin,
 } from 'lucide-react';
 import {
 	Tooltip,
@@ -41,9 +42,59 @@ import {
 const BuildingInfoStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	
-	// Check if we have AI analysis data
+	// Check if we have AI analysis data and environmental data
 	const hasAIData = userInput.aiAnalysisComplete;
 	const aiData = userInput.aiAnalysisData || {};
+	const hasEnvironmentalData = userInput.environmentalDataReviewed;
+	const environmentalData = userInput.environmentalData || {};
+	
+	// Auto-fill from AI and environmental data
+	React.useEffect(() => {
+		if (hasAIData || hasEnvironmentalData) {
+			const autoFillData = {};
+			
+			// From environmental data (location-based)
+			if (environmentalData?.seismic) {
+				if (environmentalData.seismic.zone && !userInput.typeOfEarthquake) {
+					autoFillData.typeOfEarthquake = mapSeismicZone(environmentalData.seismic.zone);
+				}
+				if (environmentalData.seismic.soilType && !userInput.typeOfSoil) {
+					autoFillData.typeOfSoil = environmentalData.seismic.soilType;
+				}
+			}
+			
+			// From AI data (photo analysis)
+			if (aiData?.buildingCharacteristics) {
+				if (aiData.buildingCharacteristics.stories && !userInput.numberOfStories) {
+					autoFillData.numberOfStories = aiData.buildingCharacteristics.stories;
+				}
+				if (aiData.buildingCharacteristics.constructionPeriod && !userInput.yearOfConstruction) {
+					// Try to extract year from period string
+					const year = extractYearFromPeriod(aiData.buildingCharacteristics.constructionPeriod);
+					if (year) autoFillData.yearOfConstruction = year;
+				}
+			}
+			
+			if (Object.keys(autoFillData).length > 0) {
+				updateUserInput(autoFillData);
+			}
+		}
+	}, [hasAIData, hasEnvironmentalData]);
+	
+	const mapSeismicZone = (zone) => {
+		const zoneMap = {
+			'DD-1': 'Zone 4 (Very High)',
+			'DD-2': 'Zone 3 (High)',
+			'DD-3': 'Zone 2 (Moderate)',
+			'DD-4': 'Zone 1 (Low)'
+		};
+		return zoneMap[zone] || '';
+	};
+	
+	const extractYearFromPeriod = (period) => {
+		const match = period.match(/\d{4}/);
+		return match ? match[0] : null;
+	};
 
 	const handleChange = (name, value) => {
 		updateUserInput({ [name]: value });
@@ -138,26 +189,42 @@ const BuildingInfoStep = ({ onNext }) => {
 					Building Information
 				</h1>
 				<p className='text-lg text-gray-600 dark:text-gray-300'>
-					{hasAIData 
-						? 'Review and complete the building information extracted by AI'
-						: 'Provide details about your building\'s characteristics and construction'
-					}
+					Review and confirm the building information we've gathered
 				</p>
-				{hasAIData ? (
-					<div className='mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg'>
-						<p className='text-sm text-purple-700 dark:text-purple-300 flex items-center gap-2'>
-							<Sparkles className='h-4 w-4' />
-							AI has pre-filled some fields based on your photos. Please review and complete any missing information.
-						</p>
-					</div>
-				) : (
-					<div className='mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-						<p className='text-sm text-blue-700 dark:text-blue-300'>
-							<Info className='inline h-4 w-4 mr-1' />
-							All information is based on Turkish Building Earthquake Code (TBDY) standards
-						</p>
-					</div>
-				)}
+				
+				{/* Show data sources */}
+				<div className='mt-4 space-y-2'>
+					{(hasAIData || hasEnvironmentalData) && (
+						<div className='p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg'>
+							<p className='text-sm text-purple-700 dark:text-purple-300 font-medium mb-2'>
+								Data Automatically Gathered From:
+							</p>
+							<div className='grid grid-cols-1 md:grid-cols-3 gap-2 text-xs'>
+								{hasEnvironmentalData && (
+									<div className='flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 p-2 rounded'>
+										<CheckCircle2 className='h-3 w-3 text-green-600' />
+										<span>Location & Seismic Data</span>
+									</div>
+								)}
+								{hasAIData && (
+									<div className='flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 p-2 rounded'>
+										<CheckCircle2 className='h-3 w-3 text-green-600' />
+										<span>AI Photo Analysis</span>
+									</div>
+								)}
+								{userInput.latitude && (
+									<div className='flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 p-2 rounded'>
+										<CheckCircle2 className='h-3 w-3 text-green-600' />
+										<span>Google Maps Data</span>
+									</div>
+								)}
+							</div>
+							<p className='text-xs text-purple-600 dark:text-purple-400 mt-2 italic'>
+								Please verify and adjust any fields if needed. Your confirmation ensures accuracy.
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 
 			<form onSubmit={handleSubmit} className='space-y-6'>
@@ -175,10 +242,12 @@ const BuildingInfoStep = ({ onNext }) => {
 								<CardTitle className='text-lg flex items-center gap-2'>
 									{getEnhancedInputIcon(field.icon)}
 									{field.label}
-									{hasAIData && userInput[field.name] && field.aiDetectable && (
-										<Badge variant='outline' className='ml-auto mr-2 text-xs gap-1'>
-											<Sparkles className='h-3 w-3' />
-											AI Detected
+									{userInput[field.name] && (
+										<Badge 
+											variant='outline' 
+											className='ml-auto mr-2 text-xs gap-1'
+										>
+											{getDataSource(field, hasAIData, hasEnvironmentalData)}
 										</Badge>
 									)}
 									
@@ -248,36 +317,67 @@ const BuildingInfoStep = ({ onNext }) => {
 					))}
 				</div>
 
-				{!isFormValid && (
-					<div className='bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 flex items-start'>
-						<Info className='h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0' />
-						<div className='ml-3'>
-							<h3 className='text-sm font-medium text-amber-800 dark:text-amber-300'>
-								Complete all fields
-							</h3>
-							<p className='text-sm text-amber-700 dark:text-amber-400 mt-1'>
-								Please fill in all the building information fields to proceed to
-								the next step.
-							</p>
+				{/* Show completion status */}
+				<Card className='border-2 border-dashed'>
+					<CardContent className='pt-6'>
+						<div className='flex items-center justify-between mb-4'>
+							<h3 className='font-medium'>Data Completion Status</h3>
+							<Badge variant={isFormValid ? 'success' : 'warning'}>
+								{Math.round((formFields.filter(f => userInput[f.name]).length / formFields.length) * 100)}% Complete
+							</Badge>
 						</div>
-					</div>
-				)}
+						<div className='space-y-2'>
+							{formFields.map(field => (
+								<div key={field.name} className='flex items-center justify-between text-sm'>
+									<span className='text-gray-600 dark:text-gray-400'>{field.label}</span>
+									{userInput[field.name] ? (
+										<CheckCircle2 className='h-4 w-4 text-green-600' />
+									) : (
+										<div className='h-4 w-4 rounded-full border-2 border-gray-300' />
+									)}
+								</div>
+							))}
+						</div>
+						{!isFormValid && (
+							<p className='text-xs text-amber-600 dark:text-amber-400 mt-4'>
+								Please complete all fields to proceed.
+							</p>
+						)}
+					</CardContent>
+				</Card>
 
 				<div className='flex justify-between pt-4'>
-					<Link href='/assessment/2'>
+					<Link href='/assessment/3'>
 						<Button
 							variant='outline'
 							className='gap-2'>
-							<ArrowLeft className='h-4 w-4' /> Previous
+							<ArrowLeft className='h-4 w-4' /> Back to AI Analysis
 						</Button>
 					</Link>
 
-					<Button
-						type='submit'
-						disabled={!isFormValid}
-						className='gap-2'>
-						Next <ArrowRight className='h-4 w-4' />
-					</Button>
+					<div className='flex gap-2'>
+						{isFormValid && hasAIData && (
+							<Button
+								type='button'
+								variant='secondary'
+								onClick={() => {
+									// Skip to a later step if AI data is confident
+									if (confirm('AI has high confidence in the detected data. Skip to structural system?')) {
+										onNext();
+										onNext(); // Skip one more step
+									}
+								}}
+								className='gap-2'>
+								<Sparkles className='h-4 w-4' /> Skip (AI Confident)
+							</Button>
+						)}
+						<Button
+							type='submit'
+							disabled={!isFormValid}
+							className='gap-2'>
+							Confirm & Continue <ArrowRight className='h-4 w-4' />
+						</Button>
+					</div>
 				</div>
 			</form>
 		</div>
@@ -300,6 +400,35 @@ function getEnhancedInputIcon(iconType) {
 		default:
 			return <Info className='h-4 w-4 text-gray-500' />;
 	}
+}
+
+// Helper function to determine data source
+function getDataSource(field, hasAIData, hasEnvironmentalData) {
+	if (field.name === 'typeOfEarthquake' || field.name === 'typeOfSoil') {
+		if (hasEnvironmentalData) {
+			return (
+				<>
+					<MapPin className='h-3 w-3' />
+					Location-based
+				</>
+			);
+		}
+	} else if (field.name === 'numberOfStories' || field.name === 'yearOfConstruction') {
+		if (hasAIData) {
+			return (
+				<>
+					<Sparkles className='h-3 w-3' />
+					AI Detected
+				</>
+			);
+		}
+	}
+	return (
+		<>
+			<CheckCircle2 className='h-3 w-3' />
+			Auto-filled
+		</>
+	);
 }
 
 // Legacy helper function for backward compatibility
