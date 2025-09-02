@@ -11,6 +11,74 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Helper function for formatting analysis results
+function formatAnalysisResult(raw, type) {
+  // Ensure raw is an object
+  if (!raw || typeof raw !== 'object') {
+    raw = { rawAnalysis: raw };
+  }
+  
+  // Format the analysis result based on type
+  if (type === 'floorPlan') {
+    return {
+      buildingLength: raw?.buildingLength || raw?.length || null,
+      buildingWidth: raw?.buildingWidth || raw?.width || null,
+      numberOfStories: raw?.numberOfStories || raw?.floors || null,
+      columnSpacing: raw?.columnSpacing || null,
+      structuralSystem: raw?.structuralSystem || 'Unknown',
+      foundationType: raw?.foundationType || 'Unknown',
+      wallThickness: raw?.wallThickness || null,
+      confidence: raw?.confidence || 'medium',
+      extractedElements: raw?.extractedElements || [],
+      rawData: raw?.rawAnalysis || raw,
+    };
+  }
+  
+  if (type === 'satellite') {
+    return {
+      estimatedLength: raw?.length || raw?.estimatedLength || null,
+      estimatedWidth: raw?.width || raw?.estimatedWidth || null,
+      estimatedStories: raw?.stories || raw?.estimatedStories || null,
+      buildingShape: raw?.shape || raw?.buildingShape || 'Rectangular',
+      roofType: raw?.roofType || 'Flat',
+      adjacentBuildings: raw?.adjacentBuildings || 'Unknown',
+      confidence: raw?.confidence || 'medium',
+      rawData: raw?.rawAnalysis || raw,
+    };
+  }
+  
+  // Default building photo analysis
+  return {
+    confidence: raw?.confidence || 'high',
+    detectedFeatures: {
+      buildingType: raw?.structuralSystem || raw?.buildingType || 'Unknown',
+      estimatedStories: raw?.numberOfStories || raw?.stories || 'Unknown',
+      constructionPeriod: raw?.constructionPeriod || 'Unknown',
+      structuralSystem: raw?.structuralSystem || 'Unknown',
+      materialCondition: raw?.materialCondition || 'Unknown',
+      irregularities: raw?.irregularities || {
+        plan: 'Unknown',
+        vertical: 'Unknown',
+        mass: 'Unknown',
+      },
+    },
+    dimensions: {
+      estimatedLength: raw?.buildingLength || raw?.length || null,
+      estimatedWidth: raw?.buildingWidth || raw?.width || null,
+      estimatedHeight: raw?.buildingHeight || raw?.height || null,
+    },
+    riskFactors: raw?.riskFactors || {
+      softStory: 'Not detected',
+      heavyOverhang: 'Not detected',
+      adjacentBuilding: 'Unknown',
+      foundation: 'Unknown',
+    },
+    aiInsights: raw?.specialFeatures || raw?.aiInsights || {},
+    recommendations: raw?.recommendations || [],
+    rawData: raw?.rawAnalysis || raw,
+  };
+}
+
 export async function POST(request) {
   console.log('=== IMAGE ANALYSIS API CALLED ===');
   console.log('Request method:', request.method);
@@ -545,73 +613,6 @@ Use the analyze_building tool to return your analysis.`,
     
     return NextResponse.json(errorResponse, { status: statusCode });
   }
-}
-
-function formatAnalysisResult(raw, type) {
-  // Ensure raw is an object
-  if (!raw || typeof raw !== 'object') {
-    raw = { rawAnalysis: raw };
-  }
-  
-  // Format the analysis result based on type
-  if (type === 'floorPlan') {
-    return {
-      buildingLength: raw?.buildingLength || raw?.length || null,
-      buildingWidth: raw?.buildingWidth || raw?.width || null,
-      numberOfStories: raw?.numberOfStories || raw?.floors || null,
-      columnSpacing: raw?.columnSpacing || null,
-      structuralSystem: raw?.structuralSystem || 'Unknown',
-      foundationType: raw?.foundationType || 'Unknown',
-      wallThickness: raw?.wallThickness || null,
-      confidence: raw?.confidence || 'medium',
-      extractedElements: raw?.extractedElements || [],
-      rawData: raw?.rawAnalysis || raw,
-    };
-  }
-  
-  if (type === 'satellite') {
-    return {
-      estimatedLength: raw?.length || raw?.estimatedLength || null,
-      estimatedWidth: raw?.width || raw?.estimatedWidth || null,
-      estimatedStories: raw?.stories || raw?.estimatedStories || null,
-      buildingShape: raw?.shape || raw?.buildingShape || 'Rectangular',
-      roofType: raw?.roofType || 'Flat',
-      adjacentBuildings: raw?.adjacentBuildings || 'Unknown',
-      confidence: raw?.confidence || 'medium',
-      rawData: raw?.rawAnalysis || raw,
-    };
-  }
-  
-  // Default building photo analysis
-  return {
-    confidence: raw?.confidence || 'high',
-    detectedFeatures: {
-      buildingType: raw?.structuralSystem || raw?.buildingType || 'Unknown',
-      estimatedStories: raw?.numberOfStories || raw?.stories || 'Unknown',
-      constructionPeriod: raw?.constructionPeriod || 'Unknown',
-      structuralSystem: raw?.structuralSystem || 'Unknown',
-      materialCondition: raw?.materialCondition || 'Unknown',
-      irregularities: raw?.irregularities || {
-        plan: 'Unknown',
-        vertical: 'Unknown',
-        mass: 'Unknown',
-      },
-    },
-    dimensions: {
-      estimatedLength: raw?.buildingLength || raw?.length || null,
-      estimatedWidth: raw?.buildingWidth || raw?.width || null,
-      estimatedHeight: raw?.buildingHeight || raw?.height || null,
-    },
-    riskFactors: raw?.riskFactors || {
-      softStory: 'Not detected',
-      heavyOverhang: 'Not detected',
-      adjacentBuilding: 'Unknown',
-      foundation: 'Unknown',
-    },
-    aiInsights: raw?.specialFeatures || raw?.aiInsights || {},
-    recommendations: raw?.recommendations || [],
-    rawData: raw?.rawAnalysis || raw,
-  };
 }
 
 // Handle OPTIONS requests for CORS
