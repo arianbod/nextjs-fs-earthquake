@@ -25,6 +25,12 @@ import {
 	TrendingDown,
 	Waves,
 	Mountain,
+	Satellite,
+	Building,
+	Sparkles,
+	Zap,
+	Map,
+	Camera,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,6 +39,9 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 	const [seismicData, setSeismicData] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [showSatelliteReveal, setShowSatelliteReveal] = useState(false);
+	const [satelliteImageUrl, setSatelliteImageUrl] = useState(null);
+	const [revealStage, setRevealStage] = useState(0); // 0: weather, 1: surprise building view
 
 	// Simulate fetching weather and seismic data based on location
 	useEffect(() => {
@@ -117,6 +126,12 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				setWeatherData(mockWeatherData);
 				setSeismicData(mockSeismicData);
 
+				// Generate satellite image URL (Google Maps Static API simulation)
+				const lat = userInput.latitude || 41.0082;
+				const lng = userInput.longitude || 28.9784;
+				const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=YOUR_API_KEY`;
+				setSatelliteImageUrl(satelliteUrl);
+
 				// Save to user context
 				updateUserInput({
 					environmentalData: {
@@ -124,7 +139,16 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 						seismic: mockSeismicData,
 					},
 					environmentalDataReviewed: true,
+					satelliteImageUrl: satelliteUrl,
 				});
+
+				// Start progressive reveal after initial load
+				setTimeout(() => {
+					setRevealStage(1);
+					setTimeout(() => {
+						setShowSatelliteReveal(true);
+					}, 2000);
+				}, 1500);
 			} catch (err) {
 				console.error('Error fetching environmental data:', err);
 				setError('Failed to fetch environmental data. Please try again.');
@@ -223,11 +247,23 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					<Cloud className='h-10 w-10 text-blue-600 dark:text-blue-400' />
 				</div>
 				<h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-					Environmental Conditions
+					Environmental Insights
 				</h1>
 				<p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
-					We've analyzed the weather and seismic conditions at your location
+					<span className='inline-flex items-center gap-1'>
+						<Sparkles className='h-5 w-5 text-purple-500' />
+						Surprise! 
+					</span>
+					We've analyzed your location and have something amazing to show you...
 				</p>
+				{revealStage >= 1 && (
+					<div className='mt-4 animate-fade-in'>
+						<Badge variant='outline' className='bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 text-purple-700 gap-1'>
+							<Satellite className='h-3 w-3' />
+							Including satellite view of your building!
+						</Badge>
+					</div>
+				)}
 			</div>
 
 			{/* Location Summary */}
@@ -242,7 +278,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
 						<div>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>City</p>
-							<p className='font-medium'>{weatherData?.location.city}</p>
+							<p className='font-medium'>{weatherData?.location.city || userInput.city || 'Unknown'}</p>
 						</div>
 						<div>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>Coordinates</p>
@@ -257,6 +293,65 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					</div>
 				</CardContent>
 			</Card>
+
+			{/* SURPRISE: Street View and Satellite View */}
+			{userInput.streetViewUrl && (
+				<Card className='border-purple-200 dark:border-purple-800 overflow-hidden'>
+					<CardHeader className='bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20'>
+						<div className='flex items-center justify-between'>
+							<CardTitle className='flex items-center gap-2'>
+								<Camera className='h-5 w-5 text-purple-600' />
+								<span>Surprise! We Found Your Building</span>
+								<Badge className='bg-gradient-to-r from-purple-600 to-blue-600'>WOW</Badge>
+							</CardTitle>
+						</div>
+					</CardHeader>
+					<CardContent className='pt-6'>
+						<div className='grid md:grid-cols-2 gap-4'>
+							<div>
+								<h4 className='font-medium mb-2 flex items-center gap-2'>
+									<Eye className='h-4 w-4' />
+									Street View
+								</h4>
+								<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-purple-200 dark:border-purple-700'>
+									<img 
+										src={userInput.streetViewUrl} 
+										alt='Street view of your building'
+										className='w-full h-full object-cover'
+									/>
+									<div className='absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs'>
+										Google Street View
+									</div>
+								</div>
+							</div>
+							<div>
+								<h4 className='font-medium mb-2 flex items-center gap-2'>
+									<MapPin className='h-4 w-4' />
+									Satellite View
+								</h4>
+								<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700'>
+									{userInput.satelliteViewUrl && (
+										<img 
+											src={userInput.satelliteViewUrl} 
+											alt='Satellite view of your building'
+											className='w-full h-full object-cover'
+										/>
+									)}
+									<div className='absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs'>
+										Google Satellite
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className='mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg'>
+							<p className='text-sm text-purple-700 dark:text-purple-300 flex items-start gap-2'>
+								<Sparkles className='h-4 w-4 mt-0.5 flex-shrink-0' />
+								We've been gathering visual data about your building while you were selecting the location. This helps our AI provide more accurate assessments!
+							</p>
+						</div>
+					</CardContent>
+				</Card>
+			)}
 
 			{/* Current Weather - Visual Card */}
 			{weatherData && (

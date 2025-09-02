@@ -77,24 +77,28 @@ const LocationStep = ({ onNext }) => {
 					typeOfSoil: buildingInfo.suggestedSoilType || prev.typeOfSoil,
 					// Add address information
 					address: addressInfo?.formatted || prev.address,
-					neighborhood: addressInfo?.components?.neighborhood || prev.neighborhood
+					city: addressInfo?.components?.city || addressInfo?.components?.locality || 'Istanbul',
+					neighborhood: addressInfo?.components?.neighborhood || prev.neighborhood,
+					country: addressInfo?.components?.country || 'Turkey'
 				}));
 			}
 
-			// Process Street View data
+			// Process Street View data but save for later reveal
 			if (streetViewData.status === 'fulfilled' && streetViewData.value.success) {
 				setStreetViewData(streetViewData.value.data);
 				
-				// Auto-populate structural information from Street View analysis
+				// Save street view data for later wow moment
 				const analysis = streetViewData.value.data.analysis;
-				if (analysis && analysis.estimatedCharacteristics) {
-					updateUserInput(prev => ({
-						...prev,
-						// Update with Street View analysis
-						designRegulation: analysis.estimatedCharacteristics.ageEstimationContext || prev.designRegulation,
-						structuralNotes: `AI Analysis: ${analysis.estimatedCharacteristics.estimatedType}` || prev.structuralNotes
-					}));
-				}
+				updateUserInput(prev => ({
+					...prev,
+					// Save street view URLs for later reveal
+					streetViewUrl: streetViewData.value.data.streetViewUrl,
+					satelliteViewUrl: streetViewData.value.data.satelliteUrl,
+					streetViewData: streetViewData.value.data,
+					// Update with Street View analysis but don't reveal yet
+					designRegulation: analysis?.estimatedCharacteristics?.ageEstimationContext || prev.designRegulation,
+					structuralNotes: `AI Analysis: ${analysis?.estimatedCharacteristics?.estimatedType}` || prev.structuralNotes
+				}));
 			}
 
 		} catch (error) {
@@ -115,10 +119,10 @@ const LocationStep = ({ onNext }) => {
 		const loadingSteps = [
 			{ step: 'Requesting location access...', progress: 10 },
 			{ step: 'Accessing GPS coordinates...', progress: 25 },
-			{ step: 'Analyzing seismic data...', progress: 45 },
-			{ step: 'Collecting building data...', progress: 65 },
-			{ step: 'Processing Street View...', progress: 80 },
-			{ step: 'Finalizing assessment...', progress: 95 }
+			{ step: 'Analyzing your area...', progress: 45 },
+			{ step: 'Gathering location data...', progress: 65 },
+			{ step: 'Preparing insights...', progress: 80 },
+			{ step: 'Almost ready...', progress: 95 }
 		];
 
 		let stepIndex = 0;
@@ -148,14 +152,20 @@ const LocationStep = ({ onNext }) => {
 					
 					// Update basic location data
 					updateUserInput({
+						// Direct properties for compatibility with other steps
+						latitude: latitude,
+						longitude: longitude,
+						// Also keep nested format for backwards compatibility
 						location: {
 							latitude: latitude,
 							longitude: longitude,
 						},
 						// Auto-set earthquake zone based on location
 						typeOfEarthquake: zoneInfo.zone,
+						earthquakeZone: zoneInfo.zone, // Also save with this key
 						// Also set detected soil type if available
 						typeOfSoil: zoneInfo.soilType || userInput.typeOfSoil,
+						soilType: zoneInfo.soilType || userInput.typeOfSoil, // Also save with this key
 					});
 
 					// Collect enhanced data in background
@@ -199,12 +209,18 @@ const LocationStep = ({ onNext }) => {
 		const zoneInfo = getZoneByCoordinates(lat, lng);
 		setSeismicZoneInfo(zoneInfo);
 		
-		// Update user input
+		// Update user input with both formats
 		updateUserInput(prev => ({
 			...prev,
+			// Direct properties for compatibility
+			latitude: lat,
+			longitude: lng,
+			// Also keep nested format
 			location: { latitude: lat, longitude: lng },
 			typeOfEarthquake: zoneInfo.zone,
-			typeOfSoil: zoneInfo.soilType || prev.typeOfSoil
+			earthquakeZone: zoneInfo.zone,
+			typeOfSoil: zoneInfo.soilType || prev.typeOfSoil,
+			soilType: zoneInfo.soilType || prev.typeOfSoil
 		}));
 
 		// Collect enhanced data for new location
@@ -238,8 +254,7 @@ const LocationStep = ({ onNext }) => {
 						Building Location
 					</CardTitle>
 					<CardDescription>
-						We need to know your building's location to analyze local seismic
-						conditions
+						Just tell us where your building is located - we'll take care of the rest!
 					</CardDescription>
 				</CardHeader>
 
@@ -332,334 +347,27 @@ const LocationStep = ({ onNext }) => {
 						</div>
 					) : userInput.location ? (
 						<div className='space-y-4'>
-							{/* Auto-Collection Status */}
-							{autoDataLoading && (
-								<Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-									<CardContent className="pt-4">
-										<div className="flex items-center gap-3">
-											<Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-											<div>
-												<div className="font-medium text-blue-900 dark:text-blue-200">
-													🤖 Collecting Enhanced Building Data
-												</div>
-												<div className="text-sm text-blue-700 dark:text-blue-300">
-													Analyzing location with Google Places API and Street View...
-												</div>
-											</div>
-										</div>
-									</CardContent>
-								</Card>
-							)}
-
-							{/* Enhanced Map with new features */}
+							{/* Simple Map Display */}
 							<div className='rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 								<MyMapComponent
 									latitude={userInput.location.latitude}
 									longitude={userInput.location.longitude}
 									onLocationChange={handleLocationChange}
-									showSeismicData={true}
-									showStreetView={true}
-									seismicZoneInfo={seismicZoneInfo}
+									showSeismicData={false}
+									showStreetView={false}
+									seismicZoneInfo={null}
 								/>
 							</div>
-
-							{/* Tabbed Interface for Enhanced Data */}
-							<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-								<TabsList className="grid w-full grid-cols-3">
-									<TabsTrigger value="location" className="gap-2">
-										<MapPin className="h-4 w-4" />
-										Location
-									</TabsTrigger>
-									<TabsTrigger value="auto-data" className="gap-2">
-										<Zap className="h-4 w-4" />
-										Auto Data
-									</TabsTrigger>
-									<TabsTrigger value="street-view" className="gap-2">
-										<Camera className="h-4 w-4" />
-										Street View
-									</TabsTrigger>
-								</TabsList>
-
-								<TabsContent value="location" className="space-y-4">
-									<div className='flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400'>
-										<Info className='h-4 w-4 mt-0.5 flex-shrink-0' />
-										<p>{stepOneData.info}</p>
-									</div>
-									{/* Existing location details */}
-								</TabsContent>
-
-								<TabsContent value="auto-data" className="space-y-4">
-									{enhancedData ? (
-										<Card>
-											<CardHeader>
-												<CardTitle className="flex items-center gap-2">
-													<Sparkles className="h-5 w-5 text-purple-600" />
-													AI-Enhanced Building Data
-												</CardTitle>
-												<CardDescription>
-													Automatically collected from Google Places API
-												</CardDescription>
-											</CardHeader>
-											<CardContent className="space-y-4">
-												{/* Building Characteristics */}
-												<div>
-													<h4 className="font-medium mb-2 flex items-center gap-2">
-														Neighborhood-Based Estimates
-														<Badge variant="warning" className="text-xs">Not Actual Data</Badge>
-													</h4>
-													{enhancedData.buildingInfo.disclaimer && (
-														<div className="mb-3 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-															<div className="flex items-start gap-2 text-xs text-amber-700 dark:text-amber-300">
-																<AlertTriangle className="h-3 w-3 mt-0.5 flex-shrink-0" />
-																<span>{enhancedData.buildingInfo.disclaimer}</span>
-															</div>
-														</div>
-													)}
-													<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
-																<span>Building Type</span>
-																<Badge variant="outline" className="text-xs">Guess</Badge>
-															</div>
-															<div className="font-medium">
-																{enhancedData.buildingInfo.likelyBuildingType?.value || enhancedData.buildingInfo.likelyBuildingType}
-															</div>
-														</div>
-														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
-																<span>Estimated Stories</span>
-																<Badge variant="outline" className="text-xs">Guess</Badge>
-															</div>
-															<div className="font-medium">
-																{enhancedData.buildingInfo.estimatedStories?.value || enhancedData.buildingInfo.estimatedStories}
-															</div>
-														</div>
-														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
-																<span>Construction Period</span>
-																<Badge variant="outline" className="text-xs">Guess</Badge>
-															</div>
-															<div className="font-medium">
-																{enhancedData.buildingInfo.estimatedConstructionPeriod?.value || enhancedData.buildingInfo.estimatedConstructionPeriod}
-															</div>
-														</div>
-														<div className="p-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
-															<div className="text-sm text-gray-600 dark:text-gray-400 flex items-center justify-between">
-																<span>Suggested Soil Type</span>
-																<Badge variant="outline" className="text-xs">Guess</Badge>
-															</div>
-															<div className="font-medium">
-																{enhancedData.buildingInfo.suggestedSoilType?.value || enhancedData.buildingInfo.suggestedSoilType}
-															</div>
-														</div>
-													</div>
-												</div>
-
-												{/* Neighborhood Analysis */}
-												<div>
-													<h4 className="font-medium mb-2">Neighborhood Analysis</h4>
-													<div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-														<div className="text-sm text-blue-700 dark:text-blue-300">
-															Development Level: <Badge variant="outline">{enhancedData.neighborhood.developmentLevel}</Badge>
-														</div>
-														<div className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-															Safety Score: {enhancedData.neighborhood.safetyFactors.score}/5
-														</div>
-													</div>
-												</div>
-
-												{/* Confidence Metrics */}
-												<div>
-													<h4 className="font-medium mb-2">Data Confidence</h4>
-													<div className="flex gap-2">
-														<Badge variant={enhancedData.buildingInfo.confidence.overall === 'high' ? 'default' : 'secondary'}>
-															Overall: {enhancedData.buildingInfo.confidence.overall}
-														</Badge>
-														<Badge variant={enhancedData.buildingInfo.confidence.buildingType === 'high' ? 'default' : 'secondary'}>
-															Building: {enhancedData.buildingInfo.confidence.buildingType}
-														</Badge>
-													</div>
-												</div>
-											</CardContent>
-										</Card>
-									) : (
-										<Card>
-											<CardContent className="pt-6 text-center">
-												<Zap className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-												<p className="text-gray-600 dark:text-gray-400">
-													Enhanced data will appear here after location analysis
-												</p>
-											</CardContent>
-										</Card>
-									)}
-								</TabsContent>
-
-								<TabsContent value="street-view" className="space-y-4">
-									{streetViewData ? (
-										<Card>
-											<CardHeader>
-												<CardTitle className="flex items-center gap-2">
-													<Camera className="h-5 w-5 text-green-600" />
-													Street View Analysis
-												</CardTitle>
-												<CardDescription>
-													Building analysis from Google Street View imagery
-												</CardDescription>
-											</CardHeader>
-											<CardContent className="space-y-4">
-												{streetViewData.analysis.buildingVisible ? (
-													<>
-														<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-															<div>
-																<h4 className="font-medium mb-2">Visual Assessment</h4>
-																<div className="space-y-2 text-sm">
-																	<div>Views Available: {streetViewData.analysis.viewsAnalyzed}</div>
-																	<div>Confidence: <Badge>{streetViewData.analysis.confidence}</Badge></div>
-																</div>
-															</div>
-															<div>
-																<h4 className="font-medium mb-2">Structural Features</h4>
-																<div className="text-sm text-gray-600 dark:text-gray-400">
-																	{streetViewData.analysis.structuralObservations.irregularityAssessment.recommendation}
-																</div>
-															</div>
-														</div>
-														
-														{/* Street View Images */}
-														<div>
-															<h4 className="font-medium mb-2">Available Views</h4>
-															<div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-																{streetViewData.images.slice(0, 6).map((img, index) => (
-																	<div key={index} className="text-center">
-																		<img 
-																			src={img.url} 
-																			alt={img.description}
-																			className="w-full h-20 object-cover rounded border"
-																		/>
-																		<div className="text-xs text-gray-500 mt-1">{img.description}</div>
-																	</div>
-																))}
-															</div>
-														</div>
-													</>
-												) : (
-													<div className="text-center py-4">
-														<AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-2" />
-														<p className="text-amber-700 dark:text-amber-300">
-															{streetViewData.analysis.error || 'No Street View imagery available for this location'}
-														</p>
-													</div>
-												)}
-											</CardContent>
-										</Card>
-									) : (
-										<Card>
-											<CardContent className="pt-6 text-center">
-												<Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-												<p className="text-gray-600 dark:text-gray-400">
-													Street View analysis will appear here after location processing
-												</p>
-											</CardContent>
-										</Card>
-									)}
-								</TabsContent>
-							</Tabs>
-
-							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-								{/* Location Details */}
-								<div className='bg-gray-50 dark:bg-gray-800 p-4 rounded-lg'>
-									<div className='font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2'>
-										<MapPin className='h-4 w-4 text-blue-600' />
-										Location Details
-									</div>
-									<div className='grid grid-cols-2 gap-2 text-sm'>
-										<div className='text-gray-600 dark:text-gray-400'>
-											Latitude:
-										</div>
-										<div className='font-mono'>
-											{userInput.location.latitude.toFixed(6)}
-										</div>
-										<div className='text-gray-600 dark:text-gray-400'>
-											Longitude:
-										</div>
-										<div className='font-mono'>
-											{userInput.location.longitude.toFixed(6)}
-										</div>
-									</div>
-								</div>
-
-								{/* Seismic Zone Information */}
-								{seismicZoneInfo && (
-									<div className='bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg'>
-										<div className='font-medium text-blue-900 dark:text-blue-200 mb-3 flex items-center gap-2'>
-											<Activity className='h-4 w-4 text-blue-600' />
-											Detected Seismic Zone
-										</div>
-										<div className='space-y-2'>
-											<div className='flex items-center justify-between'>
-												<span className='text-sm text-blue-700 dark:text-blue-300'>Zone:</span>
-												<span 
-													className='px-2 py-1 rounded text-xs font-semibold text-white'
-													style={{ backgroundColor: getZoneColor(seismicZoneInfo.zone) }}
-												>
-													{seismicZoneInfo.zone}
-												</span>
-											</div>
-											<div className='flex items-center justify-between'>
-												<span className='text-sm text-blue-700 dark:text-blue-300'>Risk Level:</span>
-												<span className='text-sm font-medium text-blue-900 dark:text-blue-200'>
-													{seismicZoneInfo.riskLevel}
-												</span>
-											</div>
-											{seismicZoneInfo.name && (
-												<div className='flex items-center justify-between'>
-													<span className='text-sm text-blue-700 dark:text-blue-300'>Nearest City:</span>
-													<span className='text-sm font-medium text-blue-900 dark:text-blue-200'>
-														{seismicZoneInfo.name}
-													</span>
-												</div>
-											)}
-											<div className='text-xs text-blue-600 dark:text-blue-400 mt-2'>
-												{seismicZoneInfo.description}
-											</div>
-										</div>
-									</div>
-								)}
-							</div>
-
-							{/* Turkish Seismic Zones Information */}
-							<div className='mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg'>
-								<div className='flex items-start gap-2'>
-									<Shield className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
-									<div>
-										<h4 className='font-medium text-amber-800 dark:text-amber-300 mb-2'>
-											Turkish Seismic Zones Explained
-										</h4>
-										<div className='grid grid-cols-1 md:grid-cols-4 gap-3 text-xs'>
-											{Object.entries(getZoneDefinition('Zone 1')).map(([key, _]) => {
-												if (key === 'color') return null;
-												const zones = ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4'];
-												return zones.map(zone => {
-													const def = getZoneDefinition(zone);
-													if (key === 'description') {
-														return (
-															<div key={zone} className='text-center p-2 rounded' style={{ backgroundColor: `${def.color}20` }}>
-																<div className='font-semibold' style={{ color: def.color }}>
-																	{zone.replace('Zone ', '')}
-																</div>
-																<div className='text-amber-700 dark:text-amber-400 mt-1'>
-																	{def.description}
-																</div>
-															</div>
-														);
-													}
-													return null;
-												});
-											})}
-										</div>
-									</div>
+							
+							{/* Simple location confirmation with hint of more to come */}
+							<div className='flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400 p-4 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg'>
+								<Info className='h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600' />
+								<div>
+									<p className='mb-1'>Location confirmed! <span className='font-medium text-gray-900 dark:text-white'>We're analyzing your area in the background...</span></p>
+									<p className='text-xs text-blue-600 dark:text-blue-400'>✨ Next: We'll show you some amazing environmental insights about your location!</p>
 								</div>
 							</div>
+
 						</div>
 					) : (
 						<div className='bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 my-4 text-center'>
