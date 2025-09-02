@@ -89,11 +89,20 @@ const LocationStep = ({ onNext }) => {
 				
 				// Save street view data for later wow moment
 				const analysis = streetViewData.value.data.analysis;
+				const streetViewImages = streetViewData.value.data.images || [];
+				
+				// Get the main street view URL (first available image)
+				const mainStreetView = streetViewImages.find(img => img.available) || streetViewImages[0];
+				
+				// Generate Google Maps satellite view URL
+				const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x640&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
+				
 				updateUserInput(prev => ({
 					...prev,
 					// Save street view URLs for later reveal
-					streetViewUrl: streetViewData.value.data.streetViewUrl,
-					satelliteViewUrl: streetViewData.value.data.satelliteUrl,
+					streetViewUrl: mainStreetView?.url || null,
+					satelliteViewUrl: satelliteUrl,
+					streetViewImages: streetViewImages, // Save all images
 					streetViewData: streetViewData.value.data,
 					// Update with Street View analysis but don't reveal yet
 					designRegulation: analysis?.estimatedCharacteristics?.ageEstimationContext || prev.designRegulation,

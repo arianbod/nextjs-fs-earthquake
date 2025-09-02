@@ -294,59 +294,122 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				</CardContent>
 			</Card>
 
-			{/* SURPRISE: Street View and Satellite View */}
-			{userInput.streetViewUrl && (
-				<Card className='border-purple-200 dark:border-purple-800 overflow-hidden'>
-					<CardHeader className='bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20'>
+			{/* SURPRISE: Street View and Satellite View - Enhanced WOW moment */}
+			{(userInput.streetViewUrl || userInput.satelliteViewUrl) && (
+				<Card className='border-purple-200 dark:border-purple-800 overflow-hidden transform transition-all duration-700 hover:scale-[1.02] animate-fade-in-up'>
+					<CardHeader className='bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-blue-900/20'>
 						<div className='flex items-center justify-between'>
 							<CardTitle className='flex items-center gap-2'>
-								<Camera className='h-5 w-5 text-purple-600' />
-								<span>Surprise! We Found Your Building</span>
-								<Badge className='bg-gradient-to-r from-purple-600 to-blue-600'>WOW</Badge>
+								<Camera className='h-5 w-5 text-purple-600 animate-pulse' />
+								<span className='text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent'>
+									🎉 Surprise! We Found Your Building!
+								</span>
+								<Badge className='bg-gradient-to-r from-purple-600 to-pink-600 text-white animate-pulse'>✨ WOW</Badge>
 							</CardTitle>
 						</div>
 					</CardHeader>
 					<CardContent className='pt-6'>
-						<div className='grid md:grid-cols-2 gap-4'>
-							<div>
-								<h4 className='font-medium mb-2 flex items-center gap-2'>
-									<Eye className='h-4 w-4' />
-									Street View
-								</h4>
-								<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-purple-200 dark:border-purple-700'>
-									<img 
-										src={userInput.streetViewUrl} 
-										alt='Street view of your building'
-										className='w-full h-full object-cover'
-									/>
-									<div className='absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs'>
-										Google Street View
+						{/* Animation reveal effect */}
+						<div className='mb-4 text-center'>
+							<p className='text-sm text-gray-600 dark:text-gray-400 animate-fade-in'>
+								While you were setting up, we've been busy collecting visual data...
+							</p>
+						</div>
+						
+						<div className='grid md:grid-cols-2 gap-6'>
+							{userInput.streetViewUrl && (
+								<div className='transform transition-all duration-500 hover:scale-105'>
+									<h4 className='font-medium mb-2 flex items-center gap-2'>
+										<Eye className='h-4 w-4 animate-pulse' />
+										Street Level View
+										<Badge variant='outline' className='text-xs'>Live</Badge>
+									</h4>
+									<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-purple-200 dark:border-purple-700 shadow-lg'>
+										<img 
+											src={userInput.streetViewUrl} 
+											alt='Street view of your building'
+											className='w-full h-full object-cover'
+											onError={(e) => {
+												e.target.style.display = 'none';
+												const placeholder = e.target.parentElement.appendChild(document.createElement('div'));
+												placeholder.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800';
+												placeholder.innerHTML = '<p class="text-gray-500">Street view not available</p>';
+										}}
+										/>
+										<div className='absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center gap-1'>
+											<Camera className='h-3 w-3' />
+											Google Street View
+										</div>
+										<div className='absolute top-2 right-2'>
+											<Badge className='bg-green-500 text-white text-xs'>NEW</Badge>
+										</div>
 									</div>
 								</div>
-							</div>
-							<div>
-								<h4 className='font-medium mb-2 flex items-center gap-2'>
-									<MapPin className='h-4 w-4' />
-									Satellite View
-								</h4>
-								<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700'>
-									{userInput.satelliteViewUrl && (
+							)}
+							
+							{userInput.satelliteViewUrl && (
+								<div className='transform transition-all duration-500 hover:scale-105'>
+									<h4 className='font-medium mb-2 flex items-center gap-2'>
+										<Satellite className='h-4 w-4 animate-pulse' />
+										Aerial View
+										<Badge variant='outline' className='text-xs'>Satellite</Badge>
+									</h4>
+									<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-lg'>
 										<img 
 											src={userInput.satelliteViewUrl} 
 											alt='Satellite view of your building'
 											className='w-full h-full object-cover'
+											onError={(e) => {
+												e.target.style.display = 'none';
+												const placeholder = e.target.parentElement.appendChild(document.createElement('div'));
+												placeholder.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800';
+												placeholder.innerHTML = '<p class="text-gray-500">Satellite view loading...</p>';
+										}}
 										/>
-									)}
-									<div className='absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs'>
-										Google Satellite
+										<div className='absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center gap-1'>
+											<Map className='h-3 w-3' />
+											Google Satellite
+										</div>
+										<div className='absolute top-2 right-2'>
+											<Badge className='bg-blue-500 text-white text-xs'>HD</Badge>
+										</div>
 									</div>
 								</div>
-							</div>
+							)}
 						</div>
-						<div className='mt-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg'>
+						
+						{/* Multiple street view angles if available */}
+						{userInput.streetViewImages && userInput.streetViewImages.length > 1 && (
+							<div className='mt-6'>
+								<h4 className='font-medium mb-3 flex items-center gap-2'>
+									<Building className='h-4 w-4' />
+									Additional Angles
+									<Badge variant='outline'>{userInput.streetViewImages.length} views</Badge>
+								</h4>
+								<div className='grid grid-cols-3 md:grid-cols-4 gap-2'>
+									{userInput.streetViewImages.slice(1, 5).map((img, idx) => (
+										<div key={idx} className='relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
+											<img 
+												src={img.url} 
+												alt={img.description}
+												className='w-full h-full object-cover hover:scale-110 transition-transform duration-300'
+											/>
+											<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1'>
+												{img.description}
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
+						
+						<div className='mt-6 p-4 bg-gradient-to-r from-purple-50 via-pink-50 to-blue-50 dark:from-purple-900/20 dark:via-pink-900/20 dark:to-blue-900/20 rounded-lg'>
 							<p className='text-sm text-purple-700 dark:text-purple-300 flex items-start gap-2'>
-								<Sparkles className='h-4 w-4 mt-0.5 flex-shrink-0' />
-								We've been gathering visual data about your building while you were selecting the location. This helps our AI provide more accurate assessments!
+								<Sparkles className='h-4 w-4 mt-0.5 flex-shrink-0 animate-pulse' />
+								<span>
+									<strong>AI Magic at Work!</strong> We've automatically captured multiple angles of your building. 
+									Our AI will combine these with your photos in the next step for a comprehensive structural assessment.
+								</span>
 							</p>
 						</div>
 					</CardContent>
@@ -440,6 +503,26 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 							@keyframes sway {
 								0%, 100% { transform: rotate(-5deg); }
 								50% { transform: rotate(5deg); }
+							}
+							@keyframes fade-in-up {
+								from {
+									opacity: 0;
+									transform: translateY(20px);
+								}
+								to {
+									opacity: 1;
+									transform: translateY(0);
+								}
+							}
+							.animate-fade-in-up {
+								animation: fade-in-up 0.7s ease-out;
+							}
+							@keyframes fade-in {
+								from { opacity: 0; }
+								to { opacity: 1; }
+							}
+							.animate-fade-in {
+								animation: fade-in 0.5s ease-out;
 							}
 						`}</style>
 
