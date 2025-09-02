@@ -553,6 +553,14 @@ Use the analyze_building tool to return your analysis.`,
         }
       };
     }
+    } // Close the else block for non-building analysis
+    } // Close the try block for Claude API call
+    
+    // Ensure we have an analysis result
+    if (!analysisResult) {
+      console.error('ERROR: No analysis result obtained');
+      throw new Error('Failed to obtain analysis result from AI');
+    }
 
     // Format the response for the application
     console.log('Formatting analysis result for type:', analysisType);
