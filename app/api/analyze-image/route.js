@@ -553,8 +553,7 @@ Use the analyze_building tool to return your analysis.`,
         }
       };
     }
-    } // Close the else block for non-building analysis
-    } // Close the try block for Claude API call
+    }
     
     // Ensure we have an analysis result
     if (!analysisResult) {
