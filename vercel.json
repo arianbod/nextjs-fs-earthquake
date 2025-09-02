@@ -1,0 +1,23 @@
+{
+  "functions": {
+    "app/api/analyze-image/route.js": {
+      "maxDuration": 60
+    },
+    "app/api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "devCommand": "next dev",
+  "env": {
+    "NODE_VERSION": "22.x"
+  },
+  "build": {
+    "env": {
+      "NODE_VERSION": "22.x"
+    }
+  }
+}
