@@ -21,7 +21,8 @@ import {
 	Camera,
 	Building,
 	Eye,
-	Sparkles
+	Sparkles,
+	CheckCircle2
 } from 'lucide-react';
 import {
 	Card,
@@ -356,24 +357,153 @@ const LocationStep = ({ onNext }) => {
 						</div>
 					) : userInput.location ? (
 						<div className='space-y-4'>
-							{/* Simple Map Display */}
+							{/* Map Display */}
 							<div className='rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 								<MyMapComponent
 									latitude={userInput.location.latitude}
 									longitude={userInput.location.longitude}
 									onLocationChange={handleLocationChange}
-									showSeismicData={false}
+									showSeismicData={true}
 									showStreetView={false}
-									seismicZoneInfo={null}
+									seismicZoneInfo={seismicZoneInfo}
 								/>
 							</div>
+
+							{/* Google Street View and Satellite Images */}
+							{(userInput.streetViewUrl || userInput.satelliteViewUrl || autoDataLoading) && (
+								<Card className='border-blue-200 dark:border-blue-800'>
+									<CardHeader>
+										<CardTitle className='flex items-center gap-2'>
+											<Camera className='h-5 w-5 text-blue-600' />
+											Google Street View & Satellite Images
+											{autoDataLoading && (
+												<Badge variant='outline' className='ml-auto'>
+													<Loader2 className='h-3 w-3 mr-1 animate-spin' />
+													Loading...
+												</Badge>
+											)}
+										</CardTitle>
+										<CardDescription>
+											Automatically captured views of your building location
+										</CardDescription>
+									</CardHeader>
+									<CardContent>
+										{autoDataLoading ? (
+											<div className='grid md:grid-cols-2 gap-4'>
+												<Skeleton className='h-48 rounded-lg' />
+												<Skeleton className='h-48 rounded-lg' />
+											</div>
+										) : (
+											<div className='grid md:grid-cols-2 gap-4'>
+												{/* Street View */}
+												{userInput.streetViewUrl && (
+													<div>
+														<h4 className='text-sm font-medium mb-2 flex items-center gap-1'>
+															<Eye className='h-4 w-4' />
+															Street Level View
+														</h4>
+														<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
+															<img 
+																src={userInput.streetViewUrl} 
+																alt='Street view of building'
+																className='w-full h-full object-cover'
+																onError={(e) => {
+																	e.target.style.display = 'none';
+																	const placeholder = document.createElement('div');
+																	placeholder.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800 p-8';
+																	placeholder.innerHTML = '<p class="text-gray-500 text-center">Street view not available for this location</p>';
+																	e.target.parentElement.appendChild(placeholder);
+																}}
+															/>
+														</div>
+													</div>
+												)}
+												
+												{/* Satellite View */}
+												{userInput.satelliteViewUrl && (
+													<div>
+														<h4 className='text-sm font-medium mb-2 flex items-center gap-1'>
+															<Building className='h-4 w-4' />
+															Satellite View
+														</h4>
+														<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
+															<img 
+																src={userInput.satelliteViewUrl} 
+																alt='Satellite view of building'
+																className='w-full h-full object-cover'
+																onError={(e) => {
+																	e.target.style.display = 'none';
+																	const placeholder = document.createElement('div');
+																	placeholder.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800 p-8';
+																	placeholder.innerHTML = '<p class="text-gray-500 text-center">Satellite view loading...</p>';
+																	e.target.parentElement.appendChild(placeholder);
+																}}
+															/>
+														</div>
+													</div>
+												)}
+											</div>
+										)}
+										
+										{/* Multiple angles if available */}
+										{userInput.streetViewImages && userInput.streetViewImages.length > 1 && (
+											<div className='mt-4'>
+												<h4 className='text-sm font-medium mb-2'>Additional Angles</h4>
+												<div className='grid grid-cols-4 gap-2'>
+													{userInput.streetViewImages.slice(0, 4).map((img, idx) => (
+														<div key={idx} className='relative aspect-square rounded overflow-hidden border border-gray-200 dark:border-gray-700'>
+															<img 
+																src={img.url} 
+																alt={img.description}
+																className='w-full h-full object-cover'
+															/>
+															<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1'>
+																{img.description}
+															</div>
+														</div>
+													))}
+												</div>
+											</div>
+										)}
+									</CardContent>
+								</Card>
+							)}
+
+							{/* Seismic Zone Information */}
+							{seismicZoneInfo && (
+								<Card className='border-orange-200 dark:border-orange-800'>
+									<CardHeader>
+										<CardTitle className='flex items-center gap-2'>
+											<Activity className='h-5 w-5 text-orange-600' />
+											Seismic Zone Information
+										</CardTitle>
+									</CardHeader>
+									<CardContent>
+										<div className='grid grid-cols-2 gap-4'>
+											<div>
+												<p className='text-sm text-gray-600 dark:text-gray-400'>Zone</p>
+												<div className='flex items-center gap-2 mt-1'>
+													<Badge className={`${getZoneColor(seismicZoneInfo.zone)}`}>
+														{seismicZoneInfo.zone}
+													</Badge>
+													<span className='text-sm font-medium'>{seismicZoneInfo.definition}</span>
+												</div>
+											</div>
+											<div>
+												<p className='text-sm text-gray-600 dark:text-gray-400'>Soil Type</p>
+												<p className='font-medium mt-1'>{seismicZoneInfo.soilType || 'To be determined'}</p>
+											</div>
+										</div>
+									</CardContent>
+								</Card>
+							)}
 							
-							{/* Simple location confirmation with hint of more to come */}
+							{/* Location confirmation */}
 							<div className='flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400 p-4 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg'>
-								<Info className='h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600' />
+								<CheckCircle2 className='h-4 w-4 mt-0.5 flex-shrink-0 text-green-600' />
 								<div>
-									<p className='mb-1'>Location confirmed! <span className='font-medium text-gray-900 dark:text-white'>We're analyzing your area in the background...</span></p>
-									<p className='text-xs text-blue-600 dark:text-blue-400'>✨ Next: We'll show you some amazing environmental insights about your location!</p>
+									<p className='font-medium text-gray-900 dark:text-white'>Location data collected successfully!</p>
+									<p className='text-xs mt-1'>We've gathered location information, street view images, and seismic zone data.</p>
 								</div>
 							</div>
 
