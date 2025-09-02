@@ -383,12 +383,12 @@ Use the analyze_building tool to return your analysis.`,
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      console.log('Calling Claude API with model: claude-sonnet-4-20250514');
+      console.log('Calling Claude API with model: claude-3-5-sonnet-20241022');
       const startTime = Date.now();
       
       // Use tool-based approach for structured output (latest Claude best practice)
       response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-3-5-sonnet-20241022', // Use correct model name
         max_tokens: 2000,
         temperature: 0.1, // Lower temperature for more consistent structured output
         tools: analysisType === 'building' ? [buildingAnalysisTool] : undefined,
@@ -575,9 +575,9 @@ Use the analyze_building tool to return your analysis.`,
         timestamp: new Date().toISOString(),
         processingTime: Date.now() - Date.parse(request.headers.get('date') || new Date().toISOString()),
         analysisType: analysisType,
-        claudeModel: 'claude-sonnet-4-20250514',
-        rawResponseAvailable: !!analysisText,
-        jsonExtracted: !analysisResult.needsManualReview,
+        claudeModel: 'claude-3-5-sonnet-20241022',
+        rawResponseAvailable: !!formattedResult.rawData,
+        jsonExtracted: !(analysisResult && analysisResult.needsManualReview),
         apiKeyPresent: !!process.env.ANTHROPIC_API_KEY
       }
     };

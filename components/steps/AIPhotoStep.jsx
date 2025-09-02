@@ -606,7 +606,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 							<p className='text-sm text-center text-gray-600 dark:text-gray-400 mt-2'>
 								{analysisStage === 'upload' && 'Uploading your images securely...'}
 								{analysisStage === 'prepare' && 'Optimizing images for AI analysis...'}
-								{analysisStage === 'analyze' && 'AI is examining building characteristics...'}
+								{analysisStage === 'analyze' && 'AI is analyzing your photos + Google Street View + environmental data...'}
 								{analysisStage === 'process' && 'Processing and structuring results...'}
 								{analysisStage === 'complete' && 'Finalizing analysis results...'}
 							</p>
