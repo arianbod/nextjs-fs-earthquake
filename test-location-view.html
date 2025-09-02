@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Street View URLs</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        img { width: 100%; height: 400px; object-fit: cover; border: 2px solid #ddd; border-radius: 8px; }
+        h2 { color: #333; }
+        .info { background: #f0f0f0; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+        code { background: #fff; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ QuakeWise - Street View Test</h1>
+        
+        <div class="info">
+            <strong>Test Location:</strong> Istanbul, Turkey (41.0082, 28.9784)
+        </div>
+        
+        <div class="grid">
+            <div>
+                <h2>Street View</h2>
+                <p>URL Format: <code>https://maps.googleapis.com/maps/api/streetview?size=640x640&location=LAT,LNG&key=API_KEY</code></p>
+                <img src="https://maps.googleapis.com/maps/api/streetview?size=640x640&location=41.0082,28.9784&heading=0&pitch=0&key=YOUR_API_KEY" 
+                     alt="Street View" 
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgZmlsbD0iI2Y0ZjRmNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0Ij5TdHJlZXQgVmlldyBOb3QgQXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=='">
+            </div>
+            
+            <div>
+                <h2>Satellite View</h2>
+                <p>URL Format: <code>https://maps.googleapis.com/maps/api/staticmap?center=LAT,LNG&zoom=19&size=640x640&maptype=satellite&key=API_KEY</code></p>
+                <img src="https://maps.googleapis.com/maps/api/staticmap?center=41.0082,28.9784&zoom=19&size=640x640&maptype=satellite&markers=color:red%7C41.0082,28.9784&key=YOUR_API_KEY" 
+                     alt="Satellite View"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjQwIiBoZWlnaHQ9IjY0MCIgZmlsbD0iI2Y0ZjRmNCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0Ij5TYXRlbGxpdGUgVmlldyBOb3QgQXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=='">
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: #fff3cd; border-radius: 8px;">
+            <h3>⚠️ Note:</h3>
+            <p>Replace <code>YOUR_API_KEY</code> with your actual Google Maps API key in the application.</p>
+            <p>The images will only display if:</p>
+            <ul>
+                <li>✅ Valid Google Maps API key is set</li>
+                <li>✅ Street View Static API is enabled</li>
+                <li>✅ Maps Static API is enabled</li>
+                <li>✅ API key has proper billing enabled</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 20px; background: #d4edda; border-radius: 8px;">
+            <h3>✅ Implementation Status:</h3>
+            <ul>
+                <li>✅ Street View URLs are generated in LocationStep.jsx</li>
+                <li>✅ Satellite View URLs are generated in LocationStep.jsx</li>
+                <li>✅ Images are displayed immediately in LocationStep</li>
+                <li>✅ Multiple viewing angles are captured</li>
+                <li>✅ Error handling with fallback placeholders</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
