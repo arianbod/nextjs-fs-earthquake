@@ -41,6 +41,8 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 	
 	// Debug: Log image gallery data
 	console.log('WeatherDataStep - Image gallery data:', getImageGallery());
+	console.log('WeatherDataStep - userInput.city:', userInput.city);
+	console.log('WeatherDataStep - coordinates:', userInput.latitude, userInput.longitude);
 	const [weatherData, setWeatherData] = useState(null);
 	
 	// Helper function to convert heading degrees to direction names
@@ -68,9 +70,10 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 
 				// Get city name - prioritize userInput.city from LocationStep
 				let detectedCity = userInput.city;
+				console.log('Initial detectedCity:', detectedCity);
 				
-				// Only do reverse geocoding if we don't already have a city
-				if (!detectedCity && userInput.latitude && userInput.longitude) {
+				// Do reverse geocoding if we don't have a city OR if it's 'Unknown Location' from LocationStep
+				if ((!detectedCity || detectedCity === 'Unknown Location') && userInput.latitude && userInput.longitude) {
 					try {
 						const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 						if (apiKey) {
@@ -111,6 +114,8 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 											...prev,
 											city: detectedCity
 										}));
+										// Also update the local detectedCity variable for immediate use
+										// (since updateUserInput is async and won't affect this render)
 									}
 								}
 							}
@@ -120,16 +125,20 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					}
 				}
 				
-				// Fallback if still no city - only set to Unknown if we really can't determine it
+				// Final fallback - prefer userInput.city if it was updated by geocoding
 				if (!detectedCity) {
-					// Try to extract city from coordinates using a more basic approach
-					if (userInput.latitude >= 36 && userInput.latitude <= 42 && userInput.longitude >= 26 && userInput.longitude <= 45) {
+					// Check if userInput.city was set (it might be from previous geocoding)
+					if (userInput.city) {
+						detectedCity = userInput.city;
+					} else if (userInput.latitude >= 36 && userInput.latitude <= 42 && userInput.longitude >= 26 && userInput.longitude <= 45) {
 						// This is roughly Turkey's bounds, try to get a better name
 						detectedCity = 'Turkey'; // Better than "Unknown Location"
 					} else {
 						detectedCity = 'Unknown Location';
 					}
 				}
+				
+				console.log('Final detectedCity before weather data creation:', detectedCity);
 
 				// Mock weather data based on actual location
 				const mockWeatherData = {
