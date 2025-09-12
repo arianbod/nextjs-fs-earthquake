@@ -41,9 +41,10 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ImageGallery from '@/components/ImageGallery';
 
 const ResultPage = () => {
-	const { userInput, clearSavedData } = useUserInput();
+	const { userInput, clearSavedData, getImageGallery } = useUserInput();
 	const [safetyResult, setSafetyResult] = useState(null);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -205,11 +206,16 @@ const ResultPage = () => {
 			<Tabs
 				defaultValue='summary'
 				className='mb-8'>
-				<TabsList className='grid grid-cols-4 mb-8'>
+				<TabsList className='grid grid-cols-5 mb-8'>
 					<TabsTrigger
 						value='summary'
 						className='gap-1'>
 						<ListChecks className='h-4 w-4' /> Summary
+					</TabsTrigger>
+					<TabsTrigger
+						value='images'
+						className='gap-1'>
+						<Camera className='h-4 w-4' /> Images
 					</TabsTrigger>
 					<TabsTrigger
 						value='data'
@@ -355,6 +361,81 @@ const ResultPage = () => {
 					{/* Earthquake Performance Chart */}
 					<div className="mt-8">
 						<EarthquakePerformanceChart buildingData={safetyResult} />
+					</div>
+				</TabsContent>
+
+				{/* Images Tab - Shows comprehensive image gallery */}
+				<TabsContent value='images'>
+					<div className='space-y-6'>
+						<Card className="border-blue-200 dark:border-blue-800">
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<Camera className="h-5 w-5 text-blue-600" />
+									Complete Image Collection
+								</CardTitle>
+								<CardDescription>
+									All images collected during the assessment process: Google Maps satellite & street views, plus your uploaded photos
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<ImageGallery 
+									imageGallery={getImageGallery()} 
+									showTitle={false} 
+									compact={false}
+									showDownload={true}
+									className="border-0 shadow-none"
+								/>
+							</CardContent>
+						</Card>
+
+						{/* Storage Information */}
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<Info className="h-5 w-5" />
+									Image Storage Details
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+									<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+										<h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">Google Maps Images</h4>
+										<p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+											{getImageGallery().categories.google.images.length}
+										</p>
+										<p className="text-xs text-blue-700 dark:text-blue-300">Satellite & Street View</p>
+									</div>
+									<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+										<h4 className="font-medium text-purple-900 dark:text-purple-200 mb-2">Your Photos</h4>
+										<p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+											{getImageGallery().categories.user.images.length}
+										</p>
+										<p className="text-xs text-purple-700 dark:text-purple-300">Uploaded by you</p>
+									</div>
+									<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+										<h4 className="font-medium text-green-900 dark:text-green-200 mb-2">Total Storage</h4>
+										<p className="text-2xl font-bold text-green-600 dark:text-green-400">
+											{getImageGallery().storageInfo.sizeInMB}
+										</p>
+										<p className="text-xs text-green-700 dark:text-green-300">In Base64 format</p>
+									</div>
+								</div>
+
+								<div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+									<div className="flex items-start gap-3">
+										<Info className="h-5 w-5 text-gray-500 mt-0.5" />
+										<div>
+											<h4 className="font-medium text-gray-900 dark:text-white mb-1">About Image Storage</h4>
+											<p className="text-sm text-gray-600 dark:text-gray-400">
+												All images are automatically converted to Base64 format and stored locally for privacy and performance. 
+												Google Maps images are fetched through our secure proxy to avoid CORS issues. 
+												Images are used for AI analysis and remain accessible throughout your assessment.
+											</p>
+										</div>
+									</div>
+								</div>
+							</CardContent>
+						</Card>
 					</div>
 				</TabsContent>
 

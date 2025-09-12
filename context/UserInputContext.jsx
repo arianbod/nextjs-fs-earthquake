@@ -2,6 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { imageStorageManager, createImageGallery } from '@/lib/imageStorage';
 
 const UserInputContext = createContext();
 
@@ -13,8 +14,13 @@ export const UserInputProvider = ({ children }) => {
 		address: '',
 		latitude: null,
 		longitude: null,
+		city: null,
+		neighborhood: null,
+		country: 'Turkey',
 		typeOfEarthquake: '',
 		typeOfSoil: '',
+		earthquakeZone: '',
+		soilType: '',
 		designRegulation: '',
 		numberOfStories: 0,
 		yearOfConstruction: '',
@@ -33,6 +39,18 @@ export const UserInputProvider = ({ children }) => {
 		buildingType: '',
 		dataSource: '', // 'auto-detected', 'ai-analysis', 'template', 'manual'
 		confidence: null,
+		// Street View and satellite image fields
+		streetViewUrl: null,
+		satelliteViewUrl: null,
+		streetViewImages: [],
+		streetViewData: null,
+		// Enhanced data from Google Places and Street View
+		enhancedData: null,
+		environmentalData: null,
+		environmentalDataReviewed: false,
+		// Structural notes and AI insights
+		structuralNotes: '',
+		aiInsights: null,
 	});
 
 	const [userInput, setUserInput] = useState(getDefaultState);
@@ -74,6 +92,47 @@ export const UserInputProvider = ({ children }) => {
 		setUserInput((prevData) => ({ ...prevData, ...newData }));
 	};
 
+	// Image management functions
+	const storeGoogleImages = async (streetViewUrls, satelliteUrl, location) => {
+		try {
+			const imageData = await imageStorageManager.storeGoogleImages(streetViewUrls, satelliteUrl, location);
+			const gallery = createImageGallery(imageStorageManager.getAllImages());
+			
+			updateUserInput({
+				imageGallery: gallery,
+				googleImagesStored: true,
+				googleImagesStoredAt: new Date().toISOString()
+			});
+			
+			return imageData;
+		} catch (error) {
+			console.error('Error storing Google images:', error);
+			return null;
+		}
+	};
+
+	const storeUserImages = async (files) => {
+		try {
+			const userImages = await imageStorageManager.storeUserImages(files);
+			const gallery = createImageGallery(imageStorageManager.getAllImages());
+			
+			updateUserInput({
+				imageGallery: gallery,
+				userImagesStored: true,
+				userImagesStoredAt: new Date().toISOString()
+			});
+			
+			return userImages;
+		} catch (error) {
+			console.error('Error storing user images:', error);
+			return null;
+		}
+	};
+
+	const getImageGallery = () => {
+		return createImageGallery(imageStorageManager.getAllImages());
+	};
+
 	const clearSavedData = () => {
 		try {
 			localStorage.removeItem(STORAGE_KEY);
@@ -86,6 +145,10 @@ export const UserInputProvider = ({ children }) => {
 		userInput,
 		updateUserInput,
 		clearSavedData,
+		// Image management functions
+		storeGoogleImages,
+		storeUserImages,
+		getImageGallery,
 	};
 
 	return (

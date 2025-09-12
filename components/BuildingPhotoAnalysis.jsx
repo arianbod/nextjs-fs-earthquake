@@ -1,7 +1,7 @@
 // Building Photo Analysis Component
 // Allows users to upload photos for AI-powered building analysis
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -11,6 +11,8 @@ import {
 	processBuildingPhotoAnalysis,
 	prepareImageForAnalysis,
 } from '@/lib/imageAnalysis';
+import ImageGallery from '@/components/ImageGallery';
+import { useUserInput } from '@/context/UserInputContext';
 import {
 	Upload,
 	Camera,
@@ -25,14 +27,16 @@ import {
 } from 'lucide-react';
 
 const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
+	const { storeUserImages, getImageGallery } = useUserInput();
 	const [uploadedImages, setUploadedImages] = useState([]);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
 	const [analysisProgress, setAnalysisProgress] = useState(0);
 	const [analysisResults, setAnalysisResults] = useState(null);
 	const [dragOver, setDragOver] = useState(false);
+	const [showAllImages, setShowAllImages] = useState(false);
 
 	// Handle file upload
-	const handleFileUpload = useCallback((files) => {
+	const handleFileUpload = useCallback(async (files) => {
 		const newImages = Array.from(files).map(file => ({
 			id: Math.random().toString(36).substr(2, 9),
 			file,
@@ -43,7 +47,15 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 		}));
 
 		setUploadedImages(prev => [...prev, ...newImages]);
-	}, []);
+
+		// Store images in base64 format
+		try {
+			await storeUserImages(Array.from(files));
+			console.log('User images stored successfully');
+		} catch (error) {
+			console.error('Failed to store user images:', error);
+		}
+	}, [storeUserImages]);
 
 	// Handle drag and drop
 	const handleDrop = useCallback((e) => {
@@ -226,6 +238,63 @@ const BuildingPhotoAnalysis = ({ onAnalysisComplete, existingData = null }) => {
 							<div>• Structural details (columns, beams)</div>
 						</div>
 					</div>
+				</CardContent>
+			</Card>
+
+			{/* All Collected Images Gallery */}
+			<Card className="border-green-200 dark:border-green-800">
+				<CardHeader>
+					<CardTitle className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<Eye className="h-5 w-5 text-green-600" />
+							All Collected Images
+						</div>
+						<Button 
+							variant="outline" 
+							size="sm" 
+							onClick={() => setShowAllImages(!showAllImages)}
+						>
+							{showAllImages ? 'Hide Details' : 'Show All Images'}
+						</Button>
+					</CardTitle>
+					<p className="text-sm text-gray-600 dark:text-gray-400">
+						Images from Google Maps and your uploads combined for comprehensive analysis
+					</p>
+				</CardHeader>
+				<CardContent>
+					{showAllImages ? (
+						<ImageGallery 
+							imageGallery={getImageGallery()} 
+							showTitle={false} 
+							compact={false}
+							showDownload={true}
+							className="border-0 shadow-none"
+						/>
+					) : (
+						<div className="text-center py-8">
+							<div className="flex items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+								<div className="flex items-center gap-2">
+									<Camera className="h-4 w-4" />
+									<span>{getImageGallery().categories.google.images.length} Google Images</span>
+								</div>
+								<div className="flex items-center gap-2">
+									<Building className="h-4 w-4" />
+									<span>{getImageGallery().categories.user.images.length} Your Photos</span>
+								</div>
+								<div className="flex items-center gap-2">
+									<Zap className="h-4 w-4" />
+									<span>Total: {getImageGallery().totalImages} images</span>
+								</div>
+							</div>
+							<Button 
+								variant="ghost" 
+								onClick={() => setShowAllImages(true)}
+								className="mt-4"
+							>
+								View All Images →
+							</Button>
+						</div>
+					)}
 				</CardContent>
 			</Card>
 

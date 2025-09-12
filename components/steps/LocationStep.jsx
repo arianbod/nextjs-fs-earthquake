@@ -38,7 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 
 const LocationStep = ({ onNext }) => {
-	const { userInput, updateUserInput } = useUserInput();
+	const { userInput, updateUserInput, storeGoogleImages } = useUserInput();
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [seismicZoneInfo, setSeismicZoneInfo] = useState(null);
@@ -53,7 +53,7 @@ const LocationStep = ({ onNext }) => {
 	const [activeTab, setActiveTab] = useState('location');
 
 	// Enhanced automatic data collection
-	const collectEnhancedData = async (latitude, longitude) => {
+	const collectEnhancedData = async (latitude, longitude, fallbackCity = null) => {
 		setAutoDataLoading(true);
 		
 		try {
@@ -78,11 +78,17 @@ const LocationStep = ({ onNext }) => {
 					typeOfSoil: buildingInfo.suggestedSoilType || prev.typeOfSoil,
 					// Add address information
 					address: addressInfo?.formatted || prev.address,
-					city: addressInfo?.components?.city || addressInfo?.components?.locality || 'Istanbul',
+					city: addressInfo?.components?.city || addressInfo?.components?.locality || fallbackCity || prev.city,
 					neighborhood: addressInfo?.components?.neighborhood || prev.neighborhood,
 					country: addressInfo?.components?.country || 'Turkey'
 				}));
 			}
+
+			// Generate Google Maps satellite view URL regardless of Street View success
+			const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+			const satelliteUrl = apiKey ? 
+				`https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x640&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}` :
+				null;
 
 			// Process Street View data but save for later reveal
 			if (streetViewData.status === 'fulfilled' && streetViewData.value.success) {
@@ -95,9 +101,6 @@ const LocationStep = ({ onNext }) => {
 				// Get the main street view URL (first available image)
 				const mainStreetView = streetViewImages.find(img => img.available) || streetViewImages[0];
 				
-				// Generate Google Maps satellite view URL
-				const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x640&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
-				
 				updateUserInput(prev => ({
 					...prev,
 					// Save street view URLs for later reveal
@@ -109,6 +112,42 @@ const LocationStep = ({ onNext }) => {
 					designRegulation: analysis?.estimatedCharacteristics?.ageEstimationContext || prev.designRegulation,
 					structuralNotes: `AI Analysis: ${analysis?.estimatedCharacteristics?.estimatedType}` || prev.structuralNotes
 				}));
+
+				// Store images in base64 format
+				const locationData = {
+					latitude,
+					longitude,
+					city: prev.city || 'Unknown Location',
+					address: prev.address || 'Address not available'
+				};
+				
+				storeGoogleImages(streetViewImages, satelliteUrl, locationData);
+			} else {
+				// Even if Street View fails, save satellite URL
+				console.warn('Street View data failed:', streetViewData.status === 'rejected' ? streetViewData.reason : 'Unknown error');
+				
+				// Create basic street view URL as fallback
+				const fallbackStreetViewUrl = apiKey ? 
+					`https://maps.googleapis.com/maps/api/streetview?size=640x640&location=${latitude},${longitude}&key=${apiKey}` :
+					null;
+				
+				updateUserInput(prev => ({
+					...prev,
+					streetViewUrl: fallbackStreetViewUrl,
+					satelliteViewUrl: satelliteUrl,
+					streetViewImages: [],
+					streetViewData: null,
+				}));
+
+				// Store fallback images
+				const locationData = {
+					latitude,
+					longitude,
+					city: prev.city || 'Unknown Location',
+					address: prev.address || 'Address not available'
+				};
+				
+				storeGoogleImages([], satelliteUrl, locationData);
 			}
 
 		} catch (error) {
@@ -160,6 +199,23 @@ const LocationStep = ({ onNext }) => {
 					const zoneInfo = getZoneByCoordinates(latitude, longitude);
 					setSeismicZoneInfo(zoneInfo);
 					
+					// Try to get city name using reverse geocoding as fallback
+					let detectedCity = 'Unknown Location';
+					try {
+						const response = await fetch(
+							`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY || 'demo'}`
+						);
+						if (response.ok) {
+							const data = await response.json();
+							if (data.results && data.results[0]) {
+								const components = data.results[0].components;
+								detectedCity = components.city || components.town || components.village || components.county || 'Unknown Location';
+							}
+						}
+					} catch (error) {
+						console.warn('Failed to reverse geocode location:', error);
+					}
+					
 					// Update basic location data
 					updateUserInput({
 						// Direct properties for compatibility with other steps
@@ -170,6 +226,8 @@ const LocationStep = ({ onNext }) => {
 							latitude: latitude,
 							longitude: longitude,
 						},
+						// Set detected city name
+						city: detectedCity,
 						// Auto-set earthquake zone based on location
 						typeOfEarthquake: zoneInfo.zone,
 						earthquakeZone: zoneInfo.zone, // Also save with this key
@@ -179,7 +237,7 @@ const LocationStep = ({ onNext }) => {
 					});
 
 					// Collect enhanced data in background
-					collectEnhancedData(latitude, longitude);
+					collectEnhancedData(latitude, longitude, detectedCity);
 					
 					setLoadingStep('Analysis complete!');
 					setLoadingProgress(100);
@@ -234,7 +292,7 @@ const LocationStep = ({ onNext }) => {
 		}));
 
 		// Collect enhanced data for new location
-		collectEnhancedData(lat, lng);
+		collectEnhancedData(lat, lng, null);
 	};
 
 	useEffect(() => {
