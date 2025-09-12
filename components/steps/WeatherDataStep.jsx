@@ -154,7 +154,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 						precipitation: 0,
 					},
 					location: {
-						city: detectedCity,
+						city: detectedCity, // Use the local detectedCity variable, not userInput.city
 						country: 'Turkey',
 						coordinates: {
 							lat: userInput.latitude,
@@ -255,8 +255,9 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				}
 				setSatelliteImageUrl(satelliteUrl);
 
-				// Save to user context
+				// Save to user context - make sure to update the city field too
 				updateUserInput({
+					city: detectedCity, // Force update the city field with the detected value
 					environmentalData: {
 						weather: mockWeatherData,
 						seismic: mockSeismicData,
@@ -401,7 +402,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
 						<div>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>City</p>
-							<p className='font-medium'>{userInput.city || weatherData?.location.city || 'Unknown Location'}</p>
+							<p className='font-medium'>{weatherData?.location.city || userInput.city || 'Unknown Location'}</p>
 						</div>
 						<div>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>Coordinates</p>
@@ -491,7 +492,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 							<div className='text-white'>
 								<p className='text-sm opacity-90 flex items-center gap-1'>
 									<MapPin className='h-4 w-4' />
-									{userInput.city || weatherData.location.city}, {weatherData.location.country}
+									{weatherData.location.city}, {weatherData.location.country}
 								</p>
 								<div className='flex items-end justify-between mt-2'>
 									<div>

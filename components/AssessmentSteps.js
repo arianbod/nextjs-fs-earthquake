@@ -1,5 +1,7 @@
 import LocationStep from './steps/LocationStep';
 import WeatherDataStep from './steps/WeatherDataStep';
+import ArchitecturePlanStep from './steps/ArchitecturePlanStep';
+import AdditionalPhotosStep from './steps/AdditionalPhotosStep';
 import AIPhotoStep from './steps/AIPhotoStep';
 import BuildingInfoStep from './steps/BuildingInfoStep';
 import StructuralSystemStep from './steps/StructuralSystemStep';
@@ -13,6 +15,8 @@ import NeighborBuildingsStep from './steps/NeighborBuildingsStep';
 const AssessmentSteps = [
     { component: LocationStep, title: "Location" },
     { component: WeatherDataStep, title: "Environmental Data" },
+    { component: ArchitecturePlanStep, title: "Architectural Plans" },
+    { component: AdditionalPhotosStep, title: "Additional Photos" },
     { component: AIPhotoStep, title: "AI Photo Analysis" },
     { component: BuildingInfoStep, title: "Building Information" },
     { component: StructuralSystemStep, title: "Structural System" },
