@@ -86,9 +86,11 @@ const LocationStep = ({ onNext }) => {
 
 			// Generate Google Maps satellite view URL regardless of Street View success
 			const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+			console.log('LocationStep - Google Maps API Key available:', !!apiKey);
 			const satelliteUrl = apiKey ? 
 				`https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x640&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}` :
 				null;
+			console.log('LocationStep - Generated satellite URL:', satelliteUrl);
 
 			// Process Street View data but save for later reveal
 			if (streetViewData.status === 'fulfilled' && streetViewData.value.success) {
@@ -121,6 +123,11 @@ const LocationStep = ({ onNext }) => {
 					address: prev.address || 'Address not available'
 				};
 				
+				console.log('LocationStep - About to store images:', {
+					streetViewImages: streetViewImages.length,
+					satelliteUrl: !!satelliteUrl,
+					locationData
+				});
 				storeGoogleImages(streetViewImages, satelliteUrl, locationData);
 			} else {
 				// Even if Street View fails, save satellite URL
@@ -147,6 +154,11 @@ const LocationStep = ({ onNext }) => {
 					address: prev.address || 'Address not available'
 				};
 				
+				console.log('LocationStep - Fallback store images (Street View failed):', {
+					streetViewImages: 0,
+					satelliteUrl: !!satelliteUrl,
+					locationData
+				});
 				storeGoogleImages([], satelliteUrl, locationData);
 			}
 

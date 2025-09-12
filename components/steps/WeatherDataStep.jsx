@@ -38,6 +38,9 @@ import { useUserInput } from '@/context/UserInputContext';
 
 const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 	const { getImageGallery } = useUserInput();
+	
+	// Debug: Log image gallery data
+	console.log('WeatherDataStep - Image gallery data:', getImageGallery());
 	const [weatherData, setWeatherData] = useState(null);
 	const [seismicData, setSeismicData] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -162,10 +165,13 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				setWeatherData(mockWeatherData);
 				setSeismicData(mockSeismicData);
 
-				// Generate satellite image URL using actual coordinates
+				// Generate satellite image URL using actual coordinates  
 				const lat = userInput.latitude;
 				const lng = userInput.longitude;
-				const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=YOUR_API_KEY`;
+				const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+				const satelliteUrl = apiKey ? 
+					`https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=${apiKey}` :
+					null;
 				setSatelliteImageUrl(satelliteUrl);
 
 				// Save to user context
