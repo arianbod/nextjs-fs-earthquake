@@ -11,6 +11,64 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Helper function to validate Claude API response structure
+function validateClaudeResponseStructure(response, analysisType) {
+  if (!response || typeof response !== 'object') {
+    console.error('Claude response is not a valid object');
+    return false;
+  }
+
+  // Check basic response structure
+  if (!response.content || !Array.isArray(response.content)) {
+    console.error('Claude response missing content array');
+    return false;
+  }
+
+  if (response.content.length === 0) {
+    console.error('Claude response has empty content array');
+    return false;
+  }
+
+  // For building analysis with tools, validate tool response
+  if (analysisType === 'building') {
+    const toolUseBlock = response.content.find(block => block.type === 'tool_use');
+    
+    if (!toolUseBlock) {
+      console.error('Claude response missing tool_use block for building analysis');
+      return false;
+    }
+
+    if (!toolUseBlock.input || typeof toolUseBlock.input !== 'object') {
+      console.error('Claude tool response missing or invalid input data');
+      return false;
+    }
+
+    // Validate required fields in tool input
+    const requiredFields = ['structuralSystem', 'materialCondition', 'irregularities', 'riskFactors', 'confidence'];
+    for (const field of requiredFields) {
+      if (!(field in toolUseBlock.input)) {
+        console.error(`Claude tool response missing required field: ${field}`);
+        return false;
+      }
+    }
+  } else {
+    // For non-building analysis, validate text response
+    const textBlock = response.content.find(block => block.type === 'text');
+    
+    if (!textBlock || !textBlock.text) {
+      console.error('Claude response missing text content for non-building analysis');
+      return false;
+    }
+
+    if (textBlock.text.length < 20) {
+      console.error('Claude response text too short to be valid');
+      return false;
+    }
+  }
+
+  return true;
+}
+
 // Helper function for formatting analysis results
 function formatAnalysisResult(raw, type) {
   // Ensure raw is an object
@@ -377,56 +435,93 @@ Use the analyze_building tool to return your analysis.`,
     console.log('Prompt length:', prompt.length);
     console.log('Number of images to analyze:', imageBase64Array.length);
     
-    // Call Claude Vision API with timeout and error handling
+    // Call Claude Vision API with retry logic for malformed responses
     let response;
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-      
-      console.log('Calling Claude API with model: claude-3-5-sonnet-20241022');
-      const startTime = Date.now();
-      
-      // Use tool-based approach for structured output (latest Claude best practice)
-      response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022', // Use correct model name
-        max_tokens: 2000,
-        temperature: 0.1, // Lower temperature for more consistent structured output
-        tools: analysisType === 'building' ? [buildingAnalysisTool] : undefined,
-        tool_choice: analysisType === 'building' ? { type: 'tool', name: 'analyze_building' } : undefined,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: prompt,
-              },
-              ...imageBase64Array,
-            ],
-          },
-        ],
-      });
-      
-      clearTimeout(timeoutId);
-      const endTime = Date.now();
-      console.log(`Claude API responded in ${endTime - startTime}ms`);
-      console.log('Response received:', {
-        id: response.id,
-        model: response.model,
-        usage: response.usage,
-        stop_reason: response.stop_reason
-      });
-    } catch (apiError) {
-      console.error('CLAUDE API ERROR:', apiError);
-      console.error('Error details:', {
-        name: apiError.name,
-        message: apiError.message,
-        status: apiError.status,
-        statusText: apiError.statusText,
-        type: apiError.type
-      });
-      
-      if (apiError.message?.includes('abort')) {
+    let lastApiError;
+    const maxApiRetries = 2;
+    
+    for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
+      try {
+        console.log(`Claude API attempt ${apiAttempt + 1}/${maxApiRetries + 1}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        console.log('Calling Claude API with model: claude-3-5-sonnet-20241022');
+        const startTime = Date.now();
+        
+        // Use tool-based approach for structured output (latest Claude best practice)
+        response = await anthropic.messages.create({
+          model: 'claude-3-5-sonnet-20241022', // Use correct model name
+          max_tokens: 2000,
+          temperature: 0.1, // Lower temperature for more consistent structured output
+          tools: analysisType === 'building' ? [buildingAnalysisTool] : undefined,
+          tool_choice: analysisType === 'building' ? { type: 'tool', name: 'analyze_building' } : undefined,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: prompt,
+                },
+                ...imageBase64Array,
+              ],
+            },
+          ],
+        });
+        
+        clearTimeout(timeoutId);
+        const endTime = Date.now();
+        console.log(`Claude API responded in ${endTime - startTime}ms`);
+        console.log('Response received:', {
+          id: response.id,
+          model: response.model,
+          usage: response.usage,
+          stop_reason: response.stop_reason
+        });
+        
+        // Validate response structure
+        if (!validateClaudeResponseStructure(response, analysisType)) {
+          console.error(`Claude API returned malformed response on attempt ${apiAttempt + 1}`);
+          throw new Error('Malformed response from Claude API - invalid structure');
+        }
+        
+        // If we got here, the response is valid
+        break;
+        
+      } catch (apiError) {
+        console.error(`CLAUDE API ERROR (attempt ${apiAttempt + 1}):`, apiError);
+        console.error('Error details:', {
+          name: apiError.name,
+          message: apiError.message,
+          status: apiError.status,
+          statusText: apiError.statusText,
+          type: apiError.type
+        });
+        
+        lastApiError = apiError;
+        
+        // Don't retry timeouts or client errors
+        if (apiError.message?.includes('abort') || apiError.status < 500) {
+          break;
+        }
+        
+        // Retry only for malformed responses or server errors
+        if (apiAttempt < maxApiRetries && 
+            (apiError.message?.includes('Malformed response') || apiError.status >= 500)) {
+          const waitTime = (apiAttempt + 1) * 1000; // 1s, 2s delay
+          console.log(`Retrying Claude API in ${waitTime}ms...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+        
+        break;
+      }
+    }
+    
+    // If all retries failed, handle the final error
+    if (lastApiError && !response) {
+      if (lastApiError.message?.includes('abort')) {
         return NextResponse.json(
           { 
             error: 'Analysis timeout', 
@@ -439,7 +534,7 @@ Use the analyze_building tool to return your analysis.`,
       return NextResponse.json(
         { 
           error: 'AI service error', 
-          details: apiError.message || 'Failed to analyze images' 
+          details: lastApiError.message || 'Failed to analyze images after multiple attempts' 
         },
         { status: 503 }
       );
