@@ -13,11 +13,11 @@
   "installCommand": "npm install",
   "devCommand": "next dev",
   "env": {
-    "NODE_VERSION": "22.x"
+    "NODE_VERSION": "22.11.0"
   },
   "build": {
     "env": {
-      "NODE_VERSION": "22.x"
+      "NODE_VERSION": "22.11.0"
     }
   }
 }
