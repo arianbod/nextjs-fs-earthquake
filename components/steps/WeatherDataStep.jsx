@@ -37,11 +37,18 @@ import ImageGallery from '@/components/ImageGallery';
 import { useUserInput } from '@/context/UserInputContext';
 
 const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
-	const { getImageGallery } = useUserInput();
+	const { getImageGallery, storeGoogleImages } = useUserInput();
 	
 	// Debug: Log image gallery data
 	console.log('WeatherDataStep - Image gallery data:', getImageGallery());
 	const [weatherData, setWeatherData] = useState(null);
+	
+	// Helper function to convert heading degrees to direction names
+	const getDirectionName = (heading) => {
+		const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+		const index = Math.round(heading / 45) % 8;
+		return directions[index];
+	};
 	const [seismicData, setSeismicData] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -65,31 +72,63 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				// Only do reverse geocoding if we don't already have a city
 				if (!detectedCity && userInput.latitude && userInput.longitude) {
 					try {
-						const response = await fetch(
-							`https://api.opencagedata.com/geocode/v1/json?q=${userInput.latitude}+${userInput.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY || 'demo'}`
-						);
-						if (response.ok) {
-							const data = await response.json();
-							if (data.results && data.results[0]) {
-								const components = data.results[0].components;
-								detectedCity = components.city || components.town || components.village || components.county || 'Unknown Location';
-								
-								// Update userInput with the detected city name
-								updateUserInput(prev => ({
-									...prev,
-									city: detectedCity
-								}));
+						const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+						if (apiKey) {
+							const response = await fetch(
+								`https://maps.googleapis.com/maps/api/geocode/json?latlng=${userInput.latitude},${userInput.longitude}&key=${apiKey}`
+							);
+							if (response.ok) {
+								const data = await response.json();
+								if (data.results && data.results[0]) {
+									const addressComponents = data.results[0].address_components;
+									
+									// Find city/locality in the address components
+									const cityComponent = addressComponents.find(component => 
+										component.types.includes('locality') || 
+										component.types.includes('administrative_area_level_2') ||
+										component.types.includes('administrative_area_level_1')
+									);
+									
+									if (cityComponent) {
+										detectedCity = cityComponent.long_name;
+									}
+									
+									// Fallback to formatted address neighborhood
+									if (!detectedCity) {
+										const neighborhoodComponent = addressComponents.find(component =>
+											component.types.includes('sublocality') ||
+											component.types.includes('neighborhood')
+										);
+										if (neighborhoodComponent) {
+											detectedCity = neighborhoodComponent.long_name;
+										}
+									}
+									
+									// Update userInput with the detected city name
+									if (detectedCity) {
+										console.log('Google Geocoding detected city:', detectedCity);
+										updateUserInput(prev => ({
+											...prev,
+											city: detectedCity
+										}));
+									}
+								}
 							}
 						}
 					} catch (error) {
-						console.warn('Failed to reverse geocode location:', error);
-						detectedCity = 'Unknown Location';
+						console.warn('Failed to reverse geocode location with Google:', error);
 					}
 				}
 				
-				// Fallback if still no city
+				// Fallback if still no city - only set to Unknown if we really can't determine it
 				if (!detectedCity) {
-					detectedCity = 'Unknown Location';
+					// Try to extract city from coordinates using a more basic approach
+					if (userInput.latitude >= 36 && userInput.latitude <= 42 && userInput.longitude >= 26 && userInput.longitude <= 45) {
+						// This is roughly Turkey's bounds, try to get a better name
+						detectedCity = 'Turkey'; // Better than "Unknown Location"
+					} else {
+						detectedCity = 'Unknown Location';
+					}
 				}
 
 				// Mock weather data based on actual location
@@ -165,13 +204,46 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				setWeatherData(mockWeatherData);
 				setSeismicData(mockSeismicData);
 
-				// Generate satellite image URL using actual coordinates  
+				// Generate Google Maps images (Street View + Satellite)
 				const lat = userInput.latitude;
 				const lng = userInput.longitude;
 				const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-				const satelliteUrl = apiKey ? 
-					`https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=${apiKey}` :
-					null;
+				console.log('Google Maps API Key available:', !!apiKey);
+				
+				let satelliteUrl = null;
+				let streetViewUrls = [];
+				
+				if (apiKey && apiKey !== 'your_google_maps_api_key_here') {
+					// Generate satellite image
+					satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=${apiKey}`;
+					console.log('Generated satellite URL:', satelliteUrl);
+					
+					// Generate multiple Street View images from different angles
+					const headings = [0, 45, 90, 135, 180, 225, 270, 315]; // 8 different angles
+					streetViewUrls = headings.map((heading, index) => ({
+						url: `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${lat},${lng}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
+						description: `Street View ${getDirectionName(heading)}`,
+						angle: heading,
+						id: `streetview_${heading}`
+					}));
+					
+					console.log(`Generated ${streetViewUrls.length} Street View URLs`);
+					
+					// Store all images through the image storage system
+					try {
+						await storeGoogleImages(streetViewUrls, satelliteUrl, {
+							city: detectedCity,
+							lat: lat,
+							lng: lng,
+							country: 'Turkey'
+						});
+						console.log('All Google images stored successfully');
+					} catch (error) {
+						console.warn('Failed to store Google images:', error);
+					}
+				} else {
+					console.warn('Google Maps API key not configured properly');
+				}
 				setSatelliteImageUrl(satelliteUrl);
 
 				// Save to user context
