@@ -56,10 +56,11 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				// Simulate API delay
 				await new Promise(resolve => setTimeout(resolve, 1500));
 
-				// Get city name from coordinates using reverse geocoding
-				let detectedCity = userInput.city || 'Unknown Location';
-				if (userInput.latitude && userInput.longitude && !userInput.city) {
-					// Use reverse geocoding to get city name
+				// Get city name - prioritize userInput.city from LocationStep
+				let detectedCity = userInput.city;
+				
+				// Only do reverse geocoding if we don't already have a city
+				if (!detectedCity && userInput.latitude && userInput.longitude) {
 					try {
 						const response = await fetch(
 							`https://api.opencagedata.com/geocode/v1/json?q=${userInput.latitude}+${userInput.longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY || 'demo'}`
@@ -69,11 +70,23 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 							if (data.results && data.results[0]) {
 								const components = data.results[0].components;
 								detectedCity = components.city || components.town || components.village || components.county || 'Unknown Location';
+								
+								// Update userInput with the detected city name
+								updateUserInput(prev => ({
+									...prev,
+									city: detectedCity
+								}));
 							}
 						}
 					} catch (error) {
 						console.warn('Failed to reverse geocode location:', error);
+						detectedCity = 'Unknown Location';
 					}
+				}
+				
+				// Fallback if still no city
+				if (!detectedCity) {
+					detectedCity = 'Unknown Location';
 				}
 
 				// Mock weather data based on actual location
@@ -301,7 +314,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
 						<div>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>City</p>
-							<p className='font-medium'>{weatherData?.location.city || userInput.city || 'Unknown'}</p>
+							<p className='font-medium'>{userInput.city || weatherData?.location.city || 'Unknown Location'}</p>
 						</div>
 						<div>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>Coordinates</p>
@@ -391,7 +404,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 							<div className='text-white'>
 								<p className='text-sm opacity-90 flex items-center gap-1'>
 									<MapPin className='h-4 w-4' />
-									{weatherData.location.city}, {weatherData.location.country}
+									{userInput.city || weatherData.location.city}, {weatherData.location.country}
 								</p>
 								<div className='flex items-end justify-between mt-2'>
 									<div>
