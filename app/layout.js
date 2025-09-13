@@ -28,7 +28,7 @@ const MainLayout = ({ children }) => {
           id='voice-assistant-script'
         />
       </head>
-      <body className="min-h-screen bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800">
+      <body className="min-h-screen bg-gradient-to-b from-blue-100 to-white dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
         <Script
           strategy='afterInteractive'
           id='voice-assistant-init'
@@ -116,13 +116,13 @@ Based on your assessment results, we provide:
           }}
         />
         <Providers>
-          <div className="grid grid-cols-1 h-full">
-            <div className="flex flex-col">
+          <div className="grid grid-cols-1 h-screen">
+            <div className="flex flex-col h-full">
               <Navbar />
 
               {/* Assessment progress bar */}
               {isAssessmentPath && (
-                <div className="container mx-auto px-4 py-2 mt-4">
+                <div className="container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 py-1 lg:py-2 mt-2 lg:mt-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Assessment Progress</span>
                     <span className="text-sm font-medium">{Math.round(progress)}%</span>
@@ -136,7 +136,7 @@ Based on your assessment results, we provide:
               )}
 
               {/* Page children */}
-              <main className="flex-grow container mx-auto px-4 ">
+              <main className="flex-grow overflow-y-auto container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
                 {children}
               </main>
             </div>

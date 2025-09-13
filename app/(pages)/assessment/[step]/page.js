@@ -26,7 +26,7 @@ export default function AssessmentStep({ params }) {
     }
 
     return (
-        <div className="container mx-auto px-4 ">
+        <div className="w-full">
             {/* <ProgressBar currentStep={currentStep} totalSteps={AssessmentSteps.length} /> */}
             <StepComponent
                 userInput={userInput}

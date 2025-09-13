@@ -315,7 +315,7 @@ const LocationStep = ({ onNext }) => {
 
 	return (
 		<div className='max-w-4xl mx-auto'>
-			<div className='text-center mb-8'>
+			<div className='text-center mb-4 lg:mb-8'>
 				<div className='inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4'>
 					<MapPin className='h-6 w-6 text-blue-600 dark:text-blue-400' />
 				</div>
@@ -328,7 +328,7 @@ const LocationStep = ({ onNext }) => {
 			</div>
 
 			<Card className='shadow-md border border-gray-200 dark:border-gray-700'>
-				<CardHeader className='pb-4'>
+				<CardHeader className='pb-2 lg:pb-4'>
 					<CardTitle className='text-xl flex items-center gap-2'>
 						<LocateFixed className='h-5 w-5 text-blue-600 dark:text-blue-400' />
 						Building Location
@@ -426,7 +426,7 @@ const LocationStep = ({ onNext }) => {
 							</div>
 						</div>
 					) : userInput.location ? (
-						<div className='space-y-4'>
+						<div className='space-y-2 lg:space-y-4'>
 							{/* Map Display */}
 							<div className='rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 								<MyMapComponent
@@ -597,7 +597,7 @@ const LocationStep = ({ onNext }) => {
 					)}
 				</CardContent>
 
-				<CardFooter className='flex justify-end pt-4 border-t'>
+				<CardFooter className='flex justify-end pt-2 lg:pt-4 border-t'>
 					<Button
 						onClick={onNext}
 						disabled={!userInput.location}
