@@ -294,15 +294,106 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 				</div>
 			</div>
 
+			{/* Uploaded Images Preview - Above Upload Area */}
+			{uploadedImages.length > 0 && (
+				<Card>
+					<CardHeader>
+						<CardTitle className='flex items-center justify-between'>
+							<span className='flex items-center gap-2'>
+								<ImageIcon className='h-5 w-5' />
+								Uploaded Photos ({uploadedImages.length}/10)
+							</span>
+							{uploadedImages.length > 0 && !isAnalyzing && (
+								<Button
+									size='sm'
+									variant='outline'
+									onClick={() => setUploadedImages([])}
+									className='text-red-600 hover:text-red-700'
+								>
+									Clear All
+								</Button>
+							)}
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4'>
+							{uploadedImages.map((image) => (
+								<div key={image.id} className='relative group'>
+									<div className='aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700'>
+										<img
+											src={image.url}
+											alt={image.name}
+											className='w-full h-full object-cover'
+										/>
+									</div>
+									<div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded-lg flex items-center justify-center'>
+										{!isAnalyzing && (
+											<Button
+												variant='destructive'
+												size='sm'
+												className='opacity-0 group-hover:opacity-100 transition-opacity'
+												onClick={() => removeImage(image.id)}
+											>
+												<X className='h-4 w-4' />
+											</Button>
+										)}
+									</div>
+									{image.analyzed && (
+										<div className='absolute top-2 right-2'>
+											<Badge variant='success' className='text-xs bg-green-600'>
+												<CheckCircle className='h-3 w-3 mr-1' />
+												Analyzed
+											</Badge>
+										</div>
+									)}
+									<div className='mt-2'>
+										<p className='text-xs text-gray-600 dark:text-gray-400 truncate'>
+											{image.name}
+										</p>
+										<p className='text-xs text-gray-500'>
+											{(image.size / 1024 / 1024).toFixed(1)}MB
+										</p>
+									</div>
+								</div>
+							))}
+						</div>
+
+						<div className='mt-6 flex justify-center'>
+							<Button
+								onClick={analyzeImages}
+								disabled={isAnalyzing || uploadedImages.length === 0}
+								size='lg'
+								className='gap-2'
+							>
+								{isAnalyzing ? (
+									<>
+										<Loader2 className='h-4 w-4 animate-spin' />
+										Analyzing...
+									</>
+								) : (
+									<>
+										<Zap className='h-4 w-4' />
+										Analyze with AI
+									</>
+								)}
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			)}
+
 			{/* Upload Area */}
 			<Card className='border-dashed border-2 border-gray-300 dark:border-gray-600'>
 				<CardHeader>
 					<CardTitle className='flex items-center gap-2'>
 						<Camera className='h-5 w-5 text-blue-600' />
-						Upload Building Photos
+						{uploadedImages.length > 0 ? 'Add More Photos' : 'Upload Building Photos'}
 					</CardTitle>
 					<p className='text-sm text-gray-600 dark:text-gray-400'>
-						Upload multiple angles of your building for comprehensive analysis. The more photos you provide, the more accurate our AI analysis will be.
+						{uploadedImages.length > 0 
+							? `You've uploaded ${uploadedImages.length} photo${uploadedImages.length !== 1 ? 's' : ''}. Add more angles for better analysis.`
+							: 'Upload multiple angles of your building for comprehensive analysis. The more photos you provide, the more accurate our AI analysis will be.'
+						}
 					</p>
 				</CardHeader>
 				<CardContent>
@@ -469,93 +560,6 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 				</Card>
 			)}
 
-			{/* Uploaded Images Preview */}
-			{uploadedImages.length > 0 && (
-				<Card>
-					<CardHeader>
-						<CardTitle className='flex items-center justify-between'>
-							<span className='flex items-center gap-2'>
-								<ImageIcon className='h-5 w-5' />
-								Uploaded Photos ({uploadedImages.length}/10)
-							</span>
-							{uploadedImages.length > 0 && !isAnalyzing && (
-								<Button
-									size='sm'
-									variant='outline'
-									onClick={() => setUploadedImages([])}
-									className='text-red-600 hover:text-red-700'
-								>
-									Clear All
-								</Button>
-							)}
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-							{uploadedImages.map((image) => (
-								<div key={image.id} className='relative group'>
-									<div className='aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700'>
-										<img
-											src={image.url}
-											alt={image.name}
-											className='w-full h-full object-cover'
-										/>
-									</div>
-									<div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded-lg flex items-center justify-center'>
-										{!isAnalyzing && (
-											<Button
-												variant='destructive'
-												size='sm'
-												className='opacity-0 group-hover:opacity-100 transition-opacity'
-												onClick={() => removeImage(image.id)}
-											>
-												<X className='h-4 w-4' />
-											</Button>
-										)}
-									</div>
-									{image.analyzed && (
-										<div className='absolute top-2 right-2'>
-											<Badge variant='success' className='text-xs bg-green-600'>
-												<CheckCircle className='h-3 w-3 mr-1' />
-												Analyzed
-											</Badge>
-										</div>
-									)}
-									<div className='mt-2'>
-										<p className='text-xs text-gray-600 dark:text-gray-400 truncate'>
-											{image.name}
-										</p>
-										<p className='text-xs text-gray-500'>
-											{(image.size / 1024 / 1024).toFixed(1)}MB
-										</p>
-									</div>
-								</div>
-							))}
-						</div>
-
-						<div className='mt-6 flex justify-center'>
-							<Button
-								onClick={analyzeImages}
-								disabled={isAnalyzing || uploadedImages.length === 0}
-								size='lg'
-								className='gap-2'
-							>
-								{isAnalyzing ? (
-									<>
-										<Loader2 className='h-4 w-4 animate-spin' />
-										Analyzing...
-									</>
-								) : (
-									<>
-										<Zap className='h-4 w-4' />
-										Analyze with AI
-									</>
-								)}
-							</Button>
-						</div>
-					</CardContent>
-				</Card>
-			)}
 
 			{/* Analysis Progress with Stages */}
 			{isAnalyzing && (
@@ -785,7 +789,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 			<div className='flex justify-between pt-4'>
 				<Link href='/assessment/2'>
 					<Button variant='outline' className='gap-2'>
-						<ArrowLeft className='h-4 w-4' /> Back to Environmental Data
+						<ArrowLeft className='h-4 w-4' /> Back to Plans Upload
 					</Button>
 				</Link>
 

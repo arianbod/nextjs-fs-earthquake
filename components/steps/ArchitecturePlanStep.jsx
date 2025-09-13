@@ -224,11 +224,47 @@ const ArchitecturePlanStep = ({ onNext }) => {
 			setAnalysisResults(result.analysis || {});
 			setShowAnalysisResults(true);
 			
-			// Update user input with analysis results
+			// Store COMPREHENSIVE analysis results in user context
 			updateUserInput(prev => ({
 				...prev,
+				// Complete architectural analysis data
 				architecturalPlanAnalysis: result.analysis,
-				architecturalPlanAnalyzed: true
+				architecturalPlanAnalyzed: true,
+				
+				// Detailed structural data for calculations
+				structuralElements: result.analysis?.structuralElements,
+				reinforcementDetails: result.analysis?.reinforcementDetails,
+				rebarPositions: result.analysis?.rebarPositions,
+				gridSystem: result.analysis?.gridSystem,
+				positioningCoordinates: result.analysis?.positioningCoordinates,
+				
+				// Building layout for calculations
+				roomLayout: result.analysis?.roomLayout || result.analysis?.architecturalLayout,
+				doorWindows: result.analysis?.doorWindows || result.analysis?.openings,
+				verticalCirculation: result.analysis?.verticalCirculation,
+				stairs: result.analysis?.stairs,
+				elevators: result.analysis?.elevators,
+				
+				// MEP and infrastructure data
+				mepSystems: result.analysis?.mepSystems,
+				infrastructure: result.analysis?.infrastructure,
+				
+				// Technical specifications for calculations
+				technicalSpecs: result.analysis?.technicalSpecs,
+				dimensions: result.analysis?.dimensions,
+				seismicReinforcement: result.analysis?.seismicReinforcement,
+				
+				// Quality and completeness data
+				planQualityAssessment: result.analysis?.qualityAssessment,
+				
+				// All annotations and notes
+				annotations: result.analysis?.annotations,
+				technicalNotes: result.analysis?.technicalNotes,
+				textExtraction: result.analysis?.textExtraction,
+				
+				// Flag for comprehensive data availability
+				hasComprehensivePlanData: true,
+				planAnalysisTimestamp: new Date().toISOString()
 			}));
 			
 		} catch (error) {
@@ -398,6 +434,519 @@ const ArchitecturePlanStep = ({ onNext }) => {
 								</div>
 							</div>
 						)}
+
+						{/* Analysis Results Display */}
+						{showAnalysisResults && analysisResults && (
+							<div className="mt-4 space-y-4">
+								{/* Reinforcement Bar Positions - MOST CRITICAL */}
+								{(analysisResults.reinforcementDetails || analysisResults.rebarPositions || analysisResults.structuralElements?.reinforcement) && (
+									<Card className="border-red-200 dark:border-red-800">
+										<CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20">
+											<CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
+												<Zap className="h-5 w-5" />
+												🔩 REINFORCEMENT BAR POSITIONS - CRITICAL FOR EARTHQUAKE SAFETY
+											</CardTitle>
+											<p className="text-sm text-red-600 dark:text-red-400 mt-2">
+												Exact positions of steel bars determine building survival during earthquakes
+											</p>
+										</CardHeader>
+										<CardContent className="pt-6 space-y-6">
+											{/* Column Rebar Positions */}
+											{(analysisResults.reinforcementDetails?.columnRebar || analysisResults.rebarPositions?.columns) && (
+												<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200">
+													<h4 className="font-semibold text-red-900 dark:text-red-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-red-600 rounded-sm"></div>
+														📍 Column Reinforcement Positions
+													</h4>
+													<div className="text-sm space-y-2">
+														{analysisResults.reinforcementDetails?.columnRebar && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-red-500">
+																<p className="font-medium">Position Details:</p>
+																<p>{analysisResults.reinforcementDetails.columnRebar}</p>
+															</div>
+														)}
+														{analysisResults.rebarPositions?.columns && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-red-500">
+																<p className="font-medium">Spatial Positioning:</p>
+																<p>{analysisResults.rebarPositions.columns}</p>
+															</div>
+														)}
+													</div>
+												</div>
+											)}
+
+											{/* Beam Rebar Positions */}
+											{(analysisResults.reinforcementDetails?.beamRebar || analysisResults.rebarPositions?.beams) && (
+												<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200">
+													<h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-purple-600 rounded-sm"></div>
+														📍 Beam Reinforcement Positions
+													</h4>
+													<div className="text-sm space-y-2">
+														{analysisResults.reinforcementDetails?.beamRebar && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-purple-500">
+																<p className="font-medium">Reinforcement Layout:</p>
+																<p>{analysisResults.reinforcementDetails.beamRebar}</p>
+															</div>
+														)}
+														{analysisResults.rebarPositions?.beams && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-purple-500">
+																<p className="font-medium">Spatial Positioning:</p>
+																<p>{analysisResults.rebarPositions.beams}</p>
+															</div>
+														)}
+													</div>
+												</div>
+											)}
+
+											{/* Foundation Rebar Positions */}
+											{(analysisResults.reinforcementDetails?.foundationRebar || analysisResults.rebarPositions?.foundation) && (
+												<div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200">
+													<h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-amber-600 rounded-sm"></div>
+														📍 Foundation Reinforcement Positions
+													</h4>
+													<div className="text-sm space-y-2">
+														{analysisResults.reinforcementDetails?.foundationRebar && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-amber-500">
+																<p className="font-medium">Foundation Layout:</p>
+																<p>{analysisResults.reinforcementDetails.foundationRebar}</p>
+															</div>
+														)}
+														{analysisResults.rebarPositions?.foundation && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-amber-500">
+																<p className="font-medium">Spatial Positioning:</p>
+																<p>{analysisResults.rebarPositions.foundation}</p>
+															</div>
+														)}
+													</div>
+												</div>
+											)}
+
+											{/* Structural Grid & Positioning */}
+											{(analysisResults.gridSystem || analysisResults.positioningCoordinates) && (
+												<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
+													<h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-blue-600 rounded-sm"></div>
+														🗺️ Building Grid & Rebar Coordinates
+													</h4>
+													<div className="text-sm space-y-2">
+														{analysisResults.gridSystem && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-blue-500">
+																<p className="font-medium">Structural Grid:</p>
+																<p>{analysisResults.gridSystem}</p>
+															</div>
+														)}
+														{analysisResults.positioningCoordinates && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-blue-500">
+																<p className="font-medium">Reinforcement Coordinates:</p>
+																<p>{analysisResults.positioningCoordinates}</p>
+															</div>
+														)}
+													</div>
+												</div>
+											)}
+
+											{/* Seismic Reinforcement Details */}
+											{analysisResults.seismicReinforcement && (
+												<div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200">
+													<h4 className="font-semibold text-orange-900 dark:text-orange-200 mb-3 flex items-center gap-2">
+														<AlertTriangle className="w-4 h-4 text-orange-600" />
+														⚡ Seismic Reinforcement Positioning
+													</h4>
+													<div className="text-sm">
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-orange-500">
+															<p className="font-medium">Critical Seismic Details:</p>
+															<p>{analysisResults.seismicReinforcement}</p>
+														</div>
+													</div>
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Structural Elements */}
+								{analysisResults.structuralElements && (
+									<Card className="border-green-200 dark:border-green-800">
+										<CardHeader className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
+											<CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
+												<Building2 className="h-5 w-5" />
+												🏗️ Extracted Structural Elements
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6">
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+												{/* Columns & Grid */}
+												{(analysisResults.structuralElements.columns || analysisResults.structuralElements.gridLayout) && (
+													<div className="space-y-3">
+														<h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+															<div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+															Column System
+														</h4>
+														{analysisResults.structuralElements.columns && (
+															<div className="text-sm space-y-1">
+																<p><strong>Positions:</strong> {analysisResults.structuralElements.columns}</p>
+															</div>
+														)}
+														{analysisResults.structuralElements.gridLayout && (
+															<div className="text-sm space-y-1">
+																<p><strong>Grid Layout:</strong> {analysisResults.structuralElements.gridLayout}</p>
+															</div>
+														)}
+													</div>
+												)}
+
+												{/* Beams */}
+												{analysisResults.structuralElements.beams && (
+													<div className="space-y-3">
+														<h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+															<div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+															Beam System
+														</h4>
+														<div className="text-sm">
+															<p>{analysisResults.structuralElements.beams}</p>
+														</div>
+													</div>
+												)}
+
+												{/* Walls */}
+												{analysisResults.structuralElements.walls && (
+													<div className="space-y-3">
+														<h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+															<div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+															Wall System
+														</h4>
+														<div className="text-sm">
+															<p>{analysisResults.structuralElements.walls}</p>
+														</div>
+													</div>
+												)}
+
+												{/* Foundation */}
+												{analysisResults.structuralElements.foundation && (
+													<div className="space-y-3">
+														<h4 className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+															<div className="w-3 h-3 bg-amber-600 rounded-full"></div>
+															Foundation
+														</h4>
+														<div className="text-sm">
+															<p>{analysisResults.structuralElements.foundation}</p>
+														</div>
+													</div>
+												)}
+											</div>
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Dimensions & Technical Data */}
+								{analysisResults.dimensions && (
+									<Card className="border-blue-200 dark:border-blue-800">
+										<CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+											<CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+												<Ruler className="h-5 w-5" />
+												📏 Dimensional Analysis
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6">
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+												{analysisResults.dimensions.buildingLength && (
+													<div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+														<p className="text-2xl font-bold text-blue-900 dark:text-blue-200">
+															{analysisResults.dimensions.buildingLength}m
+														</p>
+														<p className="text-sm text-blue-700 dark:text-blue-300">Building Length</p>
+													</div>
+												)}
+												{analysisResults.dimensions.buildingWidth && (
+													<div className="text-center p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+														<p className="text-2xl font-bold text-indigo-900 dark:text-indigo-200">
+															{analysisResults.dimensions.buildingWidth}m
+														</p>
+														<p className="text-sm text-indigo-700 dark:text-indigo-300">Building Width</p>
+													</div>
+												)}
+												{analysisResults.dimensions.totalArea && (
+													<div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+														<p className="text-2xl font-bold text-purple-900 dark:text-purple-200">
+															{analysisResults.dimensions.totalArea}m²
+														</p>
+														<p className="text-sm text-purple-700 dark:text-purple-300">Total Area</p>
+													</div>
+												)}
+											</div>
+											
+											{(analysisResults.dimensions.columnSpacing || analysisResults.dimensions.wallThickness) && (
+												<div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+													{analysisResults.dimensions.columnSpacing && (
+														<div className="p-3 border rounded-lg">
+															<p className="font-medium text-sm">Column Spacing</p>
+															<p className="text-gray-600 dark:text-gray-400 text-sm">{analysisResults.dimensions.columnSpacing}</p>
+														</div>
+													)}
+													{analysisResults.dimensions.wallThickness && (
+														<div className="p-3 border rounded-lg">
+															<p className="font-medium text-sm">Wall Thickness</p>
+															<p className="text-gray-600 dark:text-gray-400 text-sm">{analysisResults.dimensions.wallThickness}</p>
+														</div>
+													)}
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Technical Specifications */}
+								{analysisResults.technicalSpecs && (
+									<Card className="border-purple-200 dark:border-purple-800">
+										<CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+											<CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
+												<FileText className="h-5 w-5" />
+												⚙️ Technical Specifications
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6 space-y-4">
+											{analysisResults.technicalSpecs.structuralSystem && (
+												<div>
+													<p className="font-medium">Structural System</p>
+													<p className="text-gray-600 dark:text-gray-400 text-sm">{analysisResults.technicalSpecs.structuralSystem}</p>
+												</div>
+											)}
+											{analysisResults.technicalSpecs.foundationSystem && (
+												<div>
+													<p className="font-medium">Foundation System</p>
+													<p className="text-gray-600 dark:text-gray-400 text-sm">{analysisResults.technicalSpecs.foundationSystem}</p>
+												</div>
+											)}
+											{(analysisResults.technicalSpecs.concreteGrade || analysisResults.technicalSpecs.steelGrade) && (
+												<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+													{analysisResults.technicalSpecs.concreteGrade && (
+														<div>
+															<p className="font-medium text-sm">Concrete Grade</p>
+															<p className="text-gray-600 dark:text-gray-400 text-sm">{analysisResults.technicalSpecs.concreteGrade}</p>
+														</div>
+													)}
+													{analysisResults.technicalSpecs.steelGrade && (
+														<div>
+															<p className="font-medium text-sm">Steel Grade</p>
+															<p className="text-gray-600 dark:text-gray-400 text-sm">{analysisResults.technicalSpecs.steelGrade}</p>
+														</div>
+													)}
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Room Layout & Positioning */}
+								{(analysisResults.roomLayout || analysisResults.architecturalLayout) && (
+									<Card className="border-cyan-200 dark:border-cyan-800">
+										<CardHeader className="bg-gradient-to-r from-cyan-50 to-teal-50 dark:from-cyan-900/20 dark:to-teal-900/20">
+											<CardTitle className="flex items-center gap-2 text-cyan-800 dark:text-cyan-200">
+												<Home className="h-5 w-5" />
+												🏠 Room Layout & Architectural Elements
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6 space-y-4">
+											{/* Room Positioning */}
+											{(analysisResults.roomLayout?.rooms || analysisResults.architecturalLayout?.rooms) && (
+												<div className="p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200">
+													<h4 className="font-semibold text-cyan-900 dark:text-cyan-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-cyan-600 rounded-sm"></div>
+														📍 Room Positions & Dimensions
+													</h4>
+													<div className="text-sm">
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-cyan-500">
+															{analysisResults.roomLayout?.rooms || analysisResults.architecturalLayout?.rooms}
+														</div>
+													</div>
+												</div>
+											)}
+
+											{/* Doors & Windows */}
+											{(analysisResults.doorWindows || analysisResults.openings) && (
+												<div className="p-4 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-200">
+													<h4 className="font-semibold text-teal-900 dark:text-teal-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-teal-600 rounded-sm"></div>
+														🚪 Doors & Windows Positioning
+													</h4>
+													<div className="text-sm">
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-teal-500">
+															{analysisResults.doorWindows || analysisResults.openings}
+														</div>
+													</div>
+												</div>
+											)}
+
+											{/* Stairs & Elevators */}
+											{(analysisResults.verticalCirculation || analysisResults.stairs || analysisResults.elevators) && (
+												<div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200">
+													<h4 className="font-semibold text-emerald-900 dark:text-emerald-200 mb-3 flex items-center gap-2">
+														<div className="w-4 h-4 bg-emerald-600 rounded-sm"></div>
+														🪜 Vertical Circulation Elements
+													</h4>
+													<div className="text-sm space-y-2">
+														{analysisResults.stairs && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-emerald-500">
+																<p className="font-medium">Stairs:</p>
+																<p>{analysisResults.stairs}</p>
+															</div>
+														)}
+														{analysisResults.elevators && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-emerald-500">
+																<p className="font-medium">Elevators:</p>
+																<p>{analysisResults.elevators}</p>
+															</div>
+														)}
+														{analysisResults.verticalCirculation && (
+															<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-emerald-500">
+																<p className="font-medium">Circulation Details:</p>
+																<p>{analysisResults.verticalCirculation}</p>
+															</div>
+														)}
+													</div>
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								)}
+
+								{/* MEP Systems & Infrastructure */}
+								{(analysisResults.mepSystems || analysisResults.infrastructure) && (
+									<Card className="border-indigo-200 dark:border-indigo-800">
+										<CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+											<CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
+												<Wrench className="h-5 w-5" />
+												⚡ MEP Systems & Infrastructure
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6 space-y-4">
+											{analysisResults.mepSystems?.mechanical && (
+												<div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200">
+													<h5 className="font-medium text-indigo-900 dark:text-indigo-200 mb-2">🌬️ Mechanical Systems</h5>
+													<div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-indigo-500">
+														{analysisResults.mepSystems.mechanical}
+													</div>
+												</div>
+											)}
+											{analysisResults.mepSystems?.electrical && (
+												<div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200">
+													<h5 className="font-medium text-yellow-900 dark:text-yellow-200 mb-2">⚡ Electrical Systems</h5>
+													<div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-yellow-500">
+														{analysisResults.mepSystems.electrical}
+													</div>
+												</div>
+											)}
+											{analysisResults.mepSystems?.plumbing && (
+												<div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
+													<h5 className="font-medium text-blue-900 dark:text-blue-200 mb-2">🚿 Plumbing Systems</h5>
+													<div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-blue-500">
+														{analysisResults.mepSystems.plumbing}
+													</div>
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Text Annotations & Technical Notes */}
+								{(analysisResults.annotations || analysisResults.technicalNotes || analysisResults.textExtraction) && (
+									<Card className="border-gray-200 dark:border-gray-800">
+										<CardHeader className="bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-900/20 dark:to-slate-900/20">
+											<CardTitle className="flex items-center gap-2 text-gray-800 dark:text-gray-200">
+												<FileText className="h-5 w-5" />
+												📝 Annotations & Technical Notes
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6 space-y-4">
+											{analysisResults.annotations && (
+												<div className="p-3 bg-gray-50 dark:bg-gray-900/20 rounded-lg border border-gray-200">
+													<h5 className="font-medium text-gray-900 dark:text-gray-200 mb-2">Plan Annotations</h5>
+													<div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-gray-500">
+														{analysisResults.annotations}
+													</div>
+												</div>
+											)}
+											{analysisResults.technicalNotes && (
+												<div className="p-3 bg-slate-50 dark:bg-slate-900/20 rounded-lg border border-slate-200">
+													<h5 className="font-medium text-slate-900 dark:text-slate-200 mb-2">Technical Specifications</h5>
+													<div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-slate-500">
+														{analysisResults.technicalNotes}
+													</div>
+												</div>
+											)}
+											{analysisResults.textExtraction && (
+												<div className="p-3 bg-neutral-50 dark:bg-neutral-900/20 rounded-lg border border-neutral-200">
+													<h5 className="font-medium text-neutral-900 dark:text-neutral-200 mb-2">Extracted Text & Labels</h5>
+													<div className="text-sm bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-neutral-500">
+														{analysisResults.textExtraction}
+													</div>
+												</div>
+											)}
+										</CardContent>
+									</Card>
+								)}
+
+								{/* Quality Assessment */}
+								{analysisResults.qualityAssessment && (
+									<Card className="border-yellow-200 dark:border-yellow-800">
+										<CardHeader className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20">
+											<CardTitle className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
+												<Eye className="h-5 w-5" />
+												🔍 Analysis Quality Report
+											</CardTitle>
+										</CardHeader>
+										<CardContent className="pt-6">
+											<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+												<div className="text-center">
+													<div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-2 ${
+														analysisResults.qualityAssessment.imageClarity === 'excellent' ? 'bg-green-100 text-green-600' :
+														analysisResults.qualityAssessment.imageClarity === 'good' ? 'bg-blue-100 text-blue-600' :
+														analysisResults.qualityAssessment.imageClarity === 'fair' ? 'bg-yellow-100 text-yellow-600' :
+														'bg-red-100 text-red-600'
+													}`}>
+														{analysisResults.qualityAssessment.imageClarity === 'excellent' ? '🌟' :
+														 analysisResults.qualityAssessment.imageClarity === 'good' ? '👍' :
+														 analysisResults.qualityAssessment.imageClarity === 'fair' ? '⚠️' : '❌'}
+													</div>
+													<p className="font-medium text-sm">Image Clarity</p>
+													<p className="text-xs text-gray-600 capitalize">{analysisResults.qualityAssessment.imageClarity}</p>
+												</div>
+
+												<div className="text-center">
+													<div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-2 bg-blue-100 text-blue-600">
+														{analysisResults.qualityAssessment.completeness || 0}%
+													</div>
+													<p className="font-medium text-sm">Completeness</p>
+													<p className="text-xs text-gray-600">Information Available</p>
+												</div>
+
+												<div className="text-center">
+													<div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-2 ${
+														analysisResults.qualityAssessment.dimensionsAvailable ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+													}`}>
+														{analysisResults.qualityAssessment.dimensionsAvailable ? '📏' : '❌'}
+													</div>
+													<p className="font-medium text-sm">Dimensions</p>
+													<p className="text-xs text-gray-600">{analysisResults.qualityAssessment.dimensionsAvailable ? 'Available' : 'Missing'}</p>
+												</div>
+
+												<div className="text-center">
+													<div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-2 ${
+														analysisResults.qualityAssessment.sufficient ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'
+													}`}>
+														{analysisResults.qualityAssessment.sufficient ? '✅' : '⚠️'}
+													</div>
+													<p className="font-medium text-sm">Assessment</p>
+													<p className="text-xs text-gray-600">{analysisResults.qualityAssessment.sufficient ? 'Sufficient' : 'Needs More Data'}</p>
+												</div>
+											</div>
+										</CardContent>
+									</Card>
+								)}
+							</div>
+						)}
 					</CardContent>
 				</Card>
 			)}
@@ -488,7 +1037,7 @@ const ArchitecturePlanStep = ({ onNext }) => {
 					onClick={onNext} 
 					className="gap-2"
 				>
-					Continue to Additional Photos
+					Continue to Building Photos
 					<ArrowRight className="h-4 w-4" />
 				</Button>
 			</div>

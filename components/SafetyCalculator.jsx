@@ -19,6 +19,23 @@ class SafetyCalculator {
 			numberOfStories: parseInt(userInput.numberOfStories) || CALCULATION_CONFIG.defaults.stories,
 		};
 
+		// ENHANCED: Process comprehensive architectural plan data
+		const planData = this.processArchitecturalPlanData(userInput);
+		console.log('Processed Plan Data:', planData);
+
+		// Apply architectural plan data impacts to safety calculation
+		if (planData.hasData) {
+			// Modify base score based on structural analysis
+			if (planData.structuralQuality) {
+				baseScore += planData.structuralQuality * 0.2;
+			}
+			
+			// Apply reinforcement bar impacts
+			if (planData.reinforcementScore) {
+				baseScore += planData.reinforcementScore;
+			}
+		}
+
 		console.log('Validated Input:', validatedInput);
 
 		// Start with building type base score
@@ -94,8 +111,17 @@ class SafetyCalculator {
 				zoneImpact,
 				ageImpact,
 				storyImpact,
-				irregularityPenalty
-			}
+				irregularityPenalty,
+				// Add architectural plan contributions
+				...(planData.hasData && {
+					architecturalPlanBonus: (planData.structuralQuality * 0.2) + planData.reinforcementScore,
+					planDataQuality: planData.analysisQuality
+				})
+			},
+			// Include extracted architectural plan data in results
+			...(planData.hasData && {
+				architecturalPlanData: planData.extractedData
+			})
 		};
 
 		console.log('Calculated Result:', result);
@@ -133,6 +159,116 @@ class SafetyCalculator {
 		if (score >= 80) return 'Low';
 		if (score >= 60) return 'Moderate';
 		return 'High';
+	}
+
+	processArchitecturalPlanData(userInput) {
+		// Check if architectural plan analysis data exists
+		const planAnalysis = userInput.architecturalPlanAnalysis;
+		
+		if (!planAnalysis) {
+			return { hasData: false };
+		}
+
+		let structuralQuality = 0;
+		let reinforcementScore = 0;
+
+		// Process reinforcement bar data
+		if (planAnalysis.reinforcementDetails) {
+			const rebarData = planAnalysis.reinforcementDetails;
+			
+			// Analyze rebar density and positioning
+			if (rebarData.columns && rebarData.columns.length > 0) {
+				reinforcementScore += 5; // Bonus for having column reinforcement data
+				
+				// Check for proper rebar spacing and sizing
+				const hasProperRebar = rebarData.columns.some(col => 
+					col.includes('Ø') && (col.includes('20mm') || col.includes('16mm') || col.includes('25mm'))
+				);
+				if (hasProperRebar) reinforcementScore += 3;
+			}
+
+			if (rebarData.beams && rebarData.beams.length > 0) {
+				reinforcementScore += 3; // Bonus for beam reinforcement data
+			}
+
+			if (rebarData.slabs && rebarData.slabs.length > 0) {
+				reinforcementScore += 2; // Bonus for slab reinforcement data
+			}
+		}
+
+		// Process structural elements quality
+		if (planAnalysis.structuralElements) {
+			const elements = planAnalysis.structuralElements;
+			
+			// Check for structural grid regularity
+			if (elements.gridSystem && elements.gridSystem.regularity === 'regular') {
+				structuralQuality += 2;
+			}
+
+			// Check for proper column distribution
+			if (elements.columns && elements.columns.length > 0) {
+				structuralQuality += 1;
+			}
+
+			// Check for beam continuity
+			if (elements.beams && elements.beams.length > 0) {
+				structuralQuality += 1;
+			}
+		}
+
+		// Process room layout for irregularity assessment
+		if (planAnalysis.roomLayout) {
+			const rooms = planAnalysis.roomLayout;
+			
+			// Regular room layout indicates better structural performance
+			if (rooms.length > 0) {
+				const hasRegularLayout = rooms.some(room => 
+					room.shape === 'rectangular' || room.shape === 'square'
+				);
+				if (hasRegularLayout) structuralQuality += 1;
+			}
+		}
+
+		// Process MEP systems impact
+		if (planAnalysis.mepSystems) {
+			const mep = planAnalysis.mepSystems;
+			
+			// Well-designed MEP systems indicate better overall planning
+			if (mep.electrical && mep.electrical.length > 0) structuralQuality += 0.5;
+			if (mep.plumbing && mep.plumbing.length > 0) structuralQuality += 0.5;
+		}
+
+		// Process technical specifications
+		if (planAnalysis.technicalSpecs) {
+			const specs = planAnalysis.technicalSpecs;
+			
+			// Check for seismic design considerations
+			if (specs.seismicDesign && specs.seismicDesign.length > 0) {
+				reinforcementScore += 5; // Significant bonus for seismic considerations
+			}
+
+			// Check for material specifications
+			if (specs.materials && specs.materials.length > 0) {
+				const hasHighGradeConcrete = specs.materials.some(material =>
+					material.includes('C30') || material.includes('C35') || material.includes('C40')
+				);
+				if (hasHighGradeConcrete) reinforcementScore += 2;
+			}
+		}
+
+		return {
+			hasData: true,
+			structuralQuality: Math.min(structuralQuality, 10), // Cap at 10
+			reinforcementScore: Math.min(reinforcementScore, 15), // Cap at 15
+			analysisQuality: planAnalysis.analysisQuality || 'good',
+			extractedData: {
+				reinforcementDetails: planAnalysis.reinforcementDetails,
+				structuralElements: planAnalysis.structuralElements,
+				roomLayout: planAnalysis.roomLayout,
+				mepSystems: planAnalysis.mepSystems,
+				technicalSpecs: planAnalysis.technicalSpecs
+			}
+		};
 	}
 }
 

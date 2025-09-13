@@ -526,6 +526,303 @@ const ResultPage = () => {
 							</Card>
 						)}
 
+						{/* Comprehensive Architectural Plan Analysis Data */}
+						{userInput.hasComprehensivePlanData && (
+							<Card className="border-2 border-blue-200 dark:border-blue-800">
+								<CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+									<CardTitle className='flex items-center gap-2'>
+										<Building className='h-5 w-5 text-blue-600' />
+										📋 Comprehensive Architectural Plan Analysis
+									</CardTitle>
+									<CardDescription>
+										Complete structural and architectural data extracted from your building plans
+									</CardDescription>
+								</CardHeader>
+								<CardContent className="pt-6 space-y-6">
+									{/* Reinforcement Bar Positions */}
+									{(userInput.reinforcementDetails || userInput.rebarPositions) && (
+										<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200">
+											<h4 className="font-semibold text-red-900 dark:text-red-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-red-600 rounded-sm"></div>
+												🔩 CRITICAL: Reinforcement Bar Positions
+											</h4>
+											<div className="space-y-3 text-sm">
+												{userInput.reinforcementDetails?.columnRebar && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-red-500">
+														<p className="font-medium">Column Reinforcement:</p>
+														<p className="text-gray-700 dark:text-gray-300">{userInput.reinforcementDetails.columnRebar}</p>
+													</div>
+												)}
+												{userInput.reinforcementDetails?.beamRebar && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-purple-500">
+														<p className="font-medium">Beam Reinforcement:</p>
+														<p className="text-gray-700 dark:text-gray-300">{userInput.reinforcementDetails.beamRebar}</p>
+													</div>
+												)}
+												{userInput.seismicReinforcement && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-orange-500">
+														<p className="font-medium">Seismic Reinforcement Details:</p>
+														<p className="text-gray-700 dark:text-gray-300">{userInput.seismicReinforcement}</p>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* Structural Grid & Positioning */}
+									{(userInput.gridSystem || userInput.positioningCoordinates) && (
+										<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
+											<h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-blue-600 rounded-sm"></div>
+												🗺️ Building Grid System & Coordinates
+											</h4>
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+												{userInput.gridSystem && (
+													<div className="space-y-2">
+														<h5 className="font-medium">Structural Grid:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-blue-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.gridSystem}</p>
+														</div>
+													</div>
+												)}
+												{userInput.positioningCoordinates && (
+													<div className="space-y-2">
+														<h5 className="font-medium">Positioning Coordinates:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-indigo-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.positioningCoordinates}</p>
+														</div>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* Room Layout & Architectural Elements */}
+									{(userInput.roomLayout || userInput.doorWindows || userInput.stairs || userInput.elevators) && (
+										<div className="p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200">
+											<h4 className="font-semibold text-cyan-900 dark:text-cyan-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-cyan-600 rounded-sm"></div>
+												🏠 Room Layout & Architectural Elements
+											</h4>
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+												{userInput.roomLayout && (
+													<div className="space-y-2">
+														<h5 className="font-medium">Room Positions & Dimensions:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-cyan-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.roomLayout.rooms || userInput.roomLayout}</p>
+														</div>
+													</div>
+												)}
+												{userInput.doorWindows && (
+													<div className="space-y-2">
+														<h5 className="font-medium">Doors & Windows:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-teal-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.doorWindows}</p>
+														</div>
+													</div>
+												)}
+												{userInput.stairs && (
+													<div className="space-y-2">
+														<h5 className="font-medium">Stairs:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-emerald-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.stairs}</p>
+														</div>
+													</div>
+												)}
+												{userInput.elevators && (
+													<div className="space-y-2">
+														<h5 className="font-medium">Elevators:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-emerald-600">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.elevators}</p>
+														</div>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* MEP Systems & Infrastructure */}
+									{userInput.mepSystems && (
+										<div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200">
+											<h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-indigo-600 rounded-sm"></div>
+												⚡ MEP Systems & Infrastructure
+											</h4>
+											<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+												{userInput.mepSystems.mechanical && (
+													<div className="space-y-2">
+														<h5 className="font-medium flex items-center gap-2">🌬️ Mechanical:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-indigo-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.mepSystems.mechanical}</p>
+														</div>
+													</div>
+												)}
+												{userInput.mepSystems.electrical && (
+													<div className="space-y-2">
+														<h5 className="font-medium flex items-center gap-2">⚡ Electrical:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-yellow-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.mepSystems.electrical}</p>
+														</div>
+													</div>
+												)}
+												{userInput.mepSystems.plumbing && (
+													<div className="space-y-2">
+														<h5 className="font-medium flex items-center gap-2">🚿 Plumbing:</h5>
+														<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-blue-500">
+															<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.mepSystems.plumbing}</p>
+														</div>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* Detailed Dimensions */}
+									{userInput.dimensions && (
+										<div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200">
+											<h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-purple-600 rounded-sm"></div>
+												📏 Precise Dimensions from Plans
+											</h4>
+											<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+												{userInput.dimensions.buildingLength && (
+													<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+														<p className="text-2xl font-bold text-purple-600">{userInput.dimensions.buildingLength}m</p>
+														<p className="text-sm text-gray-600">Building Length</p>
+													</div>
+												)}
+												{userInput.dimensions.buildingWidth && (
+													<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+														<p className="text-2xl font-bold text-indigo-600">{userInput.dimensions.buildingWidth}m</p>
+														<p className="text-sm text-gray-600">Building Width</p>
+													</div>
+												)}
+												{userInput.dimensions.totalArea && (
+													<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+														<p className="text-2xl font-bold text-blue-600">{userInput.dimensions.totalArea}m²</p>
+														<p className="text-sm text-gray-600">Total Area</p>
+													</div>
+												)}
+												{userInput.dimensions.columnSpacing && (
+													<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+														<p className="text-lg font-bold text-green-600">{userInput.dimensions.columnSpacing}</p>
+														<p className="text-sm text-gray-600">Column Spacing</p>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* Technical Specifications */}
+									{userInput.technicalSpecs && (
+										<div className="p-4 bg-gray-50 dark:bg-gray-900/20 rounded-lg border border-gray-200">
+											<h4 className="font-semibold text-gray-900 dark:text-gray-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-gray-600 rounded-sm"></div>
+												⚙️ Technical Specifications
+											</h4>
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+												{userInput.technicalSpecs.structuralSystem && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border">
+														<p className="font-medium text-sm">Structural System:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.technicalSpecs.structuralSystem}</p>
+													</div>
+												)}
+												{userInput.technicalSpecs.foundationSystem && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border">
+														<p className="font-medium text-sm">Foundation System:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.technicalSpecs.foundationSystem}</p>
+													</div>
+												)}
+												{userInput.technicalSpecs.concreteGrade && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border">
+														<p className="font-medium text-sm">Concrete Grade:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.technicalSpecs.concreteGrade}</p>
+													</div>
+												)}
+												{userInput.technicalSpecs.steelGrade && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border">
+														<p className="font-medium text-sm">Steel Grade:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.technicalSpecs.steelGrade}</p>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* Annotations & Technical Notes */}
+									{(userInput.annotations || userInput.technicalNotes || userInput.textExtraction) && (
+										<div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200">
+											<h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-amber-600 rounded-sm"></div>
+												📝 Extracted Annotations & Notes
+											</h4>
+											<div className="space-y-3">
+												{userInput.annotations && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-amber-500">
+														<p className="font-medium text-sm">Plan Annotations:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.annotations}</p>
+													</div>
+												)}
+												{userInput.technicalNotes && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-orange-500">
+														<p className="font-medium text-sm">Technical Specifications:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.technicalNotes}</p>
+													</div>
+												)}
+												{userInput.textExtraction && (
+													<div className="bg-white dark:bg-gray-800 p-3 rounded border-l-4 border-yellow-500">
+														<p className="font-medium text-sm">Extracted Text & Labels:</p>
+														<p className="text-sm text-gray-700 dark:text-gray-300">{userInput.textExtraction}</p>
+													</div>
+												)}
+											</div>
+										</div>
+									)}
+
+									{/* Plan Quality Assessment */}
+									{userInput.planQualityAssessment && (
+										<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200">
+											<h4 className="font-semibold text-green-900 dark:text-green-200 mb-3 flex items-center gap-2">
+												<div className="w-4 h-4 bg-green-600 rounded-sm"></div>
+												🔍 Plan Analysis Quality Report
+											</h4>
+											<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+												<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+													<p className="text-xl font-bold capitalize text-green-600">{userInput.planQualityAssessment.imageClarity || 'N/A'}</p>
+													<p className="text-sm text-gray-600">Image Clarity</p>
+												</div>
+												<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+													<p className="text-xl font-bold text-blue-600">{userInput.planQualityAssessment.completeness || 0}%</p>
+													<p className="text-sm text-gray-600">Completeness</p>
+												</div>
+												<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+													<p className="text-xl font-bold text-indigo-600">
+														{userInput.planQualityAssessment.dimensionsAvailable ? '✅' : '❌'}
+													</p>
+													<p className="text-sm text-gray-600">Dimensions Available</p>
+												</div>
+												<div className="text-center p-3 bg-white dark:bg-gray-800 rounded border">
+													<p className="text-xl font-bold text-purple-600">
+														{userInput.planQualityAssessment.sufficient ? '✅' : '⚠️'}
+													</p>
+													<p className="text-sm text-gray-600">Analysis Sufficient</p>
+												</div>
+											</div>
+										</div>
+									)}
+
+									{/* Analysis Timestamp */}
+									{userInput.planAnalysisTimestamp && (
+										<div className="text-center p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+											<p className="text-sm text-gray-600 dark:text-gray-400">
+												📅 Plan analyzed on: {new Date(userInput.planAnalysisTimestamp).toLocaleString()}
+											</p>
+										</div>
+									)}
+								</CardContent>
+							</Card>
+						)}
+
 						{/* Location Data with Google Maps */}
 						<Card>
 							<CardHeader>

@@ -506,38 +506,138 @@ Use the analyze_building tool to return your analysis.`,
 
 CRITICAL TASK: Analyze these architectural plans and extract EVERY possible structural detail for earthquake safety assessment.
 
-## PRIMARY ANALYSIS REQUIREMENTS:
+## PRIMARY ANALYSIS REQUIREMENTS - EXTRACT EVERYTHING POSSIBLE:
 
 ### 1. STRUCTURAL ELEMENTS IDENTIFICATION:
 - Column positions, dimensions, and grid layout
 - Beam locations, sizes, and spans  
 - Load-bearing walls vs partition walls
-- Structural rebar/reinforcement details (if visible)
+- **REINFORCEMENT BAR (REBAR) ANALYSIS - CRITICAL FOR SEISMIC ASSESSMENT:**
+  - **EXACT REBAR POSITIONS IN BUILDING COORDINATE SYSTEM:**
+    - Column rebar positions relative to grid lines (e.g., "Column A1: 8Ø20mm at corners + 4Ø16mm on faces")
+    - Specific bar locations within each column cross-section (corner bars, face bars, center bars)
+    - Distance from column faces to rebar centerlines (cover distances)
+    - Rebar positioning in different building zones (perimeter vs interior columns)
+    - Vertical positioning of reinforcement (ground level, upper floors, roof level)
+  - **BEAM REBAR EXACT POSITIONING:**
+    - Top bar positions along beam length (support zones vs span zones)
+    - Bottom bar positioning and curtailment points
+    - Stirrup locations and spacing variations along beam length
+    - Beam-to-beam connection rebar positioning
+  - **SPATIAL REINFORCEMENT LAYOUT:**
+    - Rebar density maps across building plan (where reinforcement is heavy/light)
+    - Critical reinforcement concentration points (beam-column joints, shear walls)
+    - Reinforcement continuity paths through the structure
+    - Position of seismic reinforcement relative to building edges and openings
+  - **FOUNDATION REBAR POSITIONING:**
+    - Mat foundation top and bottom bar positions and grid layout
+    - Footing rebar positioning relative to column locations
+    - Tie beam reinforcement positions connecting footings
+  - **SLAB REINFORCEMENT SPATIAL LAYOUT:**
+    - Top and bottom mesh positioning across slab area
+    - Additional reinforcement around openings and edges
+    - Reinforcement positioning at slab-beam interfaces
 - Foundation type and layout
 - Slab thickness and type
 - Structural joints and connections
 
-### 2. DIMENSIONAL ANALYSIS:
+### **COMPREHENSIVE ARCHITECTURAL LAYOUT EXTRACTION:**
+- **ROOM IDENTIFICATION & POSITIONING:**
+  - All room types and their exact locations (living rooms, bedrooms, kitchens, bathrooms, etc.)
+  - Room dimensions and areas (length x width x height if shown)
+  - Room positioning relative to structural grid
+  - Floor-by-floor room layout if multi-story
+  - Special rooms (mechanical rooms, storage, utility spaces)
+  - Ceiling heights and level changes between rooms
+
+- **DOORS & WINDOWS POSITIONING:**
+  - All door locations and types (entry doors, interior doors, emergency exits)
+  - Door dimensions and swing directions
+  - Window positions, sizes, and types
+  - Opening positioning relative to structural elements
+  - Fire exits and emergency egress paths
+
+- **VERTICAL CIRCULATION ELEMENTS:**
+  - Staircase locations, dimensions, and orientations
+  - Number of steps, riser/tread dimensions if visible
+  - Stair construction type (concrete, steel, wood)
+  - Elevator locations and shaft dimensions
+  - Elevator positioning relative to structural grid
+  - Emergency stair locations and fire safety features
+
+- **ARCHITECTURAL FEATURES & DETAILS:**
+  - Balcony locations, dimensions, and support systems
+  - Terrace and outdoor space positioning
+  - Architectural projections and setbacks
+  - Roof features (parapets, overhangs, mechanical equipment locations)
+  - Building entrances and their structural implications
+
+### 2. DIMENSIONAL ANALYSIS & PRECISE POSITIONING:
 - Building length and width (in meters)
-- Column-to-column spacing/grid dimensions
+- **STRUCTURAL GRID SYSTEM:**
+  - Exact column grid coordinates (A1, A2, B1, B2, etc.)
+  - Grid line spacing in both X and Y directions
+  - Column positioning relative to building perimeter
+  - Distance from building edges to first interior columns
+- **REINFORCEMENT POSITIONING COORDINATES:**
+  - Rebar positions referenced to structural grid system
+  - Distance measurements from grid lines to rebar centroids
+  - Elevation/level positioning of reinforcement layers
+  - Spatial relationships between different structural elements
 - Room dimensions and areas
 - Wall thicknesses (structural vs non-structural)
 - Floor-to-ceiling heights
 - Overall building footprint area
 
-### 3. TECHNICAL SPECIFICATIONS:
+### 3. TECHNICAL SPECIFICATIONS & ANNOTATIONS:
 - Structural system type (RC frame, steel frame, masonry, hybrid)
 - Foundation system (isolated footings, mat foundation, pile foundation)
 - Concrete grades/steel grades (if marked)
 - Load specifications (live loads, dead loads)
 - Structural notes and design criteria
+- **ALL TEXT ANNOTATIONS & LABELS:**
+  - Material specifications and grades
+  - Construction notes and special instructions
+  - Reference numbers and drawing symbols
+  - Level markings and elevation data
+  - Any codes or standards referenced
+  - Architect/engineer notes and calculations
+  - Revision marks and drawing dates
 
-### 4. SEISMIC DESIGN FEATURES:
+### 4. SEISMIC DESIGN FEATURES & REINFORCEMENT PATTERNS:
 - Shear walls presence and locations
+- **SEISMIC REINFORCEMENT DETAILING:**
+  - Confinement reinforcement in columns (hoop spacing, especially in plastic hinge regions)
+  - Beam-column joint reinforcement (stirrups through joints)
+  - Special seismic detailing requirements compliance
+  - Ductility reinforcement provisions
+  - Reinforcement continuity through joints
+  - Anchorage details in seismic zones
 - Structural irregularities (plan/vertical)
 - Expansion joints or seismic joints
 - Base isolation or seismic devices
 - Lateral force resisting system details
+
+### **MEP SYSTEMS & INFRASTRUCTURE POSITIONING:**
+- **MECHANICAL SYSTEMS:**
+  - HVAC equipment locations and room positioning
+  - Ventilation shafts and duct routing
+  - Mechanical room locations and dimensions
+  - Air conditioning units and their structural support requirements
+- **ELECTRICAL SYSTEMS:**
+  - Electrical panels and switchgear locations
+  - Electrical room positioning
+  - Cable routing and conduit paths
+  - Emergency power systems locations
+- **PLUMBING & UTILITIES:**
+  - Water supply and drainage system routing
+  - Bathroom fixture locations and plumbing connections
+  - Utility connections and meter locations
+  - Fire protection systems (sprinklers, standpipes)
+- **COMMUNICATION SYSTEMS:**
+  - Telephone/data system locations
+  - Security system components
+  - Fire alarm system components
 
 ### 5. QUALITY & COMPLETENESS ASSESSMENT:
 Rate the plan quality and completeness:
@@ -554,8 +654,18 @@ Based on your analysis, provide a professional recommendation:
 - Rate confidence in structural analysis (low/medium/high)
 
 ## OUTPUT FORMAT:
-Return comprehensive JSON with all extracted data organized by categories above.
-Include specific measurements, technical specifications, and professional assessment.`,
+Return comprehensive JSON with ALL extracted data organized by categories above.
+Include:
+- EVERY structural element with precise positioning
+- ALL reinforcement bar details with exact locations
+- COMPLETE room layout with dimensions and positioning
+- ALL doors, windows, stairs, elevators with coordinates
+- EVERY architectural feature and detail
+- ALL MEP system components and their locations
+- COMPLETE text annotations and technical specifications
+- DETAILED quality assessment and professional recommendations
+
+**IMPORTANT:** Extract MAXIMUM possible information - assume this is the only chance to capture all details from this plan. Be thorough and comprehensive in analysis.`,
       
       satellite: `Analyze this satellite/aerial view of a building and extract:
         1. Building footprint dimensions (approximate length x width in meters)
