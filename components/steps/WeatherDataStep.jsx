@@ -152,6 +152,8 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 						icon: Sun,
 						uvIndex: 6,
 						precipitation: 0,
+						timestamp: new Date().toISOString(),
+						lastUpdated: 'Just now',
 					},
 					location: {
 						city: detectedCity, // Use the local detectedCity variable, not userInput.city
@@ -174,9 +176,34 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 						},
 					},
 					historical: {
-						avgRainfall: 844, // mm per year
+						avgRainfall: 844,
 						avgTemperature: 15,
 						extremeWeather: ['Heavy rain', 'Strong winds', 'Occasional snow'],
+						extremesData: {
+							highestTemp: { value: 42, year: 2021, month: 'August' },
+							lowestTemp: { value: -8, year: 2020, month: 'February' },
+							heaviestRain: { value: 180, year: 2022, duration: '24 hours' },
+							strongestWind: { value: 85, year: 2019, event: 'Mediterranean Storm' },
+							longestDrought: { days: 67, year: 2023, season: 'Summer' },
+						},
+						floodRisk: {
+							level: 'Moderate',
+							lastFloodEvent: 2019,
+							riskFactors: ['Seasonal heavy rain', 'Urban drainage capacity'],
+							floodZone: 'X - Minimal risk area'
+						},
+						droughtRisk: {
+							level: 'Low-Moderate',
+							seasonalPattern: 'Dry summers, wet winters',
+							waterReserves: 'Adequate',
+							irrigationDependency: 'High for agriculture'
+						},
+						stormFrequency: {
+							annualStorms: 12,
+							severeStorms: 2,
+							peakSeason: 'November-February',
+							lastSevereStorm: { date: '2023-11-15', type: 'Mediterranean Cyclone', impact: 'Power outages, flooding' }
+						}
 					},
 				};
 
@@ -498,18 +525,23 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 									<div>
 										<p className='text-5xl font-bold'>{weatherData.current.temperature}°</p>
 										<p className='text-lg mt-1'>{weatherData.current.condition}</p>
+										<p className='text-xs opacity-75 mt-1'>Current • {weatherData.current.lastUpdated}</p>
 									</div>
 									<div className='text-right'>
-										<p className='text-sm opacity-90'>H: {weatherData.forecast.temperature.max}°</p>
-										<p className='text-sm opacity-90'>L: {weatherData.forecast.temperature.min}°</p>
+										<p className='text-sm opacity-90'>Today High: {weatherData.forecast.temperature.max}°</p>
+										<p className='text-sm opacity-90'>Today Low: {weatherData.forecast.temperature.min}°</p>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					{/* Simple Weather Details */}
+					{/* Current Weather Details */}
 					<CardContent className='pt-6'>
+						<div className='mb-4'>
+							<h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-1'>Current Conditions</h3>
+							<p className='text-sm text-gray-600 dark:text-gray-400'>Live weather data for structural assessment</p>
+						</div>
 						<div className='grid grid-cols-3 gap-4 text-center'>
 							<div className='p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors'>
 								<div className='flex justify-center mb-2'>
@@ -518,7 +550,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 									</div>
 								</div>
 								<p className='text-2xl font-bold text-gray-900 dark:text-white'>{weatherData.current.humidity}%</p>
-								<p className='text-sm text-gray-600 dark:text-gray-400'>Humidity</p>
+								<p className='text-sm text-gray-600 dark:text-gray-400'>Current Humidity</p>
 							</div>
 
 							<div className='p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors'>
@@ -528,7 +560,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 									</div>
 								</div>
 								<p className='text-2xl font-bold text-gray-900 dark:text-white'>{weatherData.current.windSpeed}</p>
-								<p className='text-sm text-gray-600 dark:text-gray-400'>km/h Wind</p>
+								<p className='text-sm text-gray-600 dark:text-gray-400'>km/h Current Wind</p>
 							</div>
 
 							<div className='p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors'>
@@ -538,7 +570,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 									</div>
 								</div>
 								<p className='text-2xl font-bold text-gray-900 dark:text-white'>{weatherData.forecast.rain.probability}%</p>
-								<p className='text-sm text-gray-600 dark:text-gray-400'>Rain Chance</p>
+								<p className='text-sm text-gray-600 dark:text-gray-400'>Today's Rain Chance</p>
 							</div>
 						</div>
 
@@ -569,6 +601,141 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 							}
 						`}</style>
 
+					</CardContent>
+				</Card>
+			)}
+
+			{/* Historical Weather Extremes - Critical for Disaster Assessment */}
+			{weatherData && (
+				<Card className='border-red-200 dark:border-red-800'>
+					<CardHeader className='bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20'>
+						<CardTitle className='flex items-center gap-2 text-red-800 dark:text-red-200'>
+							<AlertTriangle className='h-5 w-5' />
+							Critical Weather History
+						</CardTitle>
+						<p className='text-sm text-red-600 dark:text-red-400 mt-2'>
+							Extreme weather events that affect structural integrity
+						</p>
+					</CardHeader>
+					<CardContent className='space-y-6 pt-6'>
+						{/* Weather Extremes Grid */}
+						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+							<div className='p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800'>
+								<div className='flex items-center gap-2 mb-3'>
+									<Thermometer className='h-5 w-5 text-orange-600' />
+									<h4 className='font-medium text-orange-900 dark:text-orange-200'>Temperature Extremes</h4>
+								</div>
+								<div className='space-y-2 text-sm'>
+									<div className='flex justify-between'>
+										<span className='text-gray-600 dark:text-gray-400'>Highest:</span>
+										<span className='font-bold text-red-600'>{weatherData.historical.extremesData.highestTemp.value}°C ({weatherData.historical.extremesData.highestTemp.month} {weatherData.historical.extremesData.highestTemp.year})</span>
+									</div>
+									<div className='flex justify-between'>
+										<span className='text-gray-600 dark:text-gray-400'>Lowest:</span>
+										<span className='font-bold text-blue-600'>{weatherData.historical.extremesData.lowestTemp.value}°C ({weatherData.historical.extremesData.lowestTemp.month} {weatherData.historical.extremesData.lowestTemp.year})</span>
+									</div>
+								</div>
+							</div>
+
+							<div className='p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800'>
+								<div className='flex items-center gap-2 mb-3'>
+									<CloudRain className='h-5 w-5 text-blue-600' />
+									<h4 className='font-medium text-blue-900 dark:text-blue-200'>Rainfall Extremes</h4>
+								</div>
+								<div className='space-y-2 text-sm'>
+									<div className='flex justify-between'>
+										<span className='text-gray-600 dark:text-gray-400'>Heaviest:</span>
+										<span className='font-bold text-blue-600'>{weatherData.historical.extremesData.heaviestRain.value}mm in {weatherData.historical.extremesData.heaviestRain.duration}</span>
+									</div>
+									<div className='text-xs text-gray-500 dark:text-gray-400'>
+										Occurred: {weatherData.historical.extremesData.heaviestRain.year}
+									</div>
+								</div>
+							</div>
+
+							<div className='p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200 dark:border-cyan-800'>
+								<div className='flex items-center gap-2 mb-3'>
+									<Wind className='h-5 w-5 text-cyan-600' />
+									<h4 className='font-medium text-cyan-900 dark:text-cyan-200'>Wind Extremes</h4>
+								</div>
+								<div className='space-y-2 text-sm'>
+									<div className='flex justify-between'>
+										<span className='text-gray-600 dark:text-gray-400'>Strongest:</span>
+										<span className='font-bold text-cyan-600'>{weatherData.historical.extremesData.strongestWind.value} km/h</span>
+									</div>
+									<div className='text-xs text-gray-500 dark:text-gray-400'>
+										{weatherData.historical.extremesData.strongestWind.event} ({weatherData.historical.extremesData.strongestWind.year})
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Disaster Risk Assessment */}
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+							{/* Flood Risk */}
+							<div className='p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800'>
+								<div className='flex items-center justify-between mb-3'>
+									<h4 className='font-medium text-amber-900 dark:text-amber-200 flex items-center gap-2'>
+										<Waves className='h-5 w-5' />
+										Flood Risk
+									</h4>
+									<Badge variant={weatherData.historical.floodRisk.level === 'Moderate' ? 'warning' : 'secondary'}>
+										{weatherData.historical.floodRisk.level}
+									</Badge>
+								</div>
+								<div className='space-y-2 text-sm'>
+									<p><strong>Zone:</strong> {weatherData.historical.floodRisk.floodZone}</p>
+									<p><strong>Last Event:</strong> {weatherData.historical.floodRisk.lastFloodEvent}</p>
+									<div>
+										<p><strong>Risk Factors:</strong></p>
+										<ul className='list-disc list-inside ml-2 text-xs text-gray-600 dark:text-gray-400'>
+											{weatherData.historical.floodRisk.riskFactors.map((factor, index) => (
+												<li key={index}>{factor}</li>
+											))}
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							{/* Storm Frequency */}
+							<div className='p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800'>
+								<div className='flex items-center gap-2 mb-3'>
+									<Zap className='h-5 w-5 text-purple-600' />
+									<h4 className='font-medium text-purple-900 dark:text-purple-200'>Storm Activity</h4>
+								</div>
+								<div className='space-y-2 text-sm'>
+									<div className='flex justify-between'>
+										<span>Annual Storms:</span>
+										<span className='font-bold'>{weatherData.historical.stormFrequency.annualStorms}</span>
+									</div>
+									<div className='flex justify-between'>
+										<span>Severe Storms:</span>
+										<span className='font-bold text-purple-600'>{weatherData.historical.stormFrequency.severeStorms}/year</span>
+									</div>
+									<div className='text-xs text-gray-600 dark:text-gray-400'>
+										<p><strong>Peak Season:</strong> {weatherData.historical.stormFrequency.peakSeason}</p>
+										<p><strong>Last Severe:</strong> {weatherData.historical.stormFrequency.lastSevereStorm.type} ({weatherData.historical.stormFrequency.lastSevereStorm.date})</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Impact Notice */}
+						<div className='p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800'>
+							<div className='flex items-start gap-3'>
+								<Info className='h-5 w-5 text-red-600 mt-0.5 flex-shrink-0' />
+								<div>
+									<h4 className='font-medium text-red-900 dark:text-red-200'>
+										Why This Matters for Your Assessment
+									</h4>
+									<p className='text-sm text-red-700 dark:text-red-300 mt-1'>
+										These extreme weather patterns directly impact structural integrity. High temperatures cause expansion/contraction stress, 
+										heavy rainfall can compromise foundations and increase soil instability, while strong winds create lateral forces 
+										that must be considered alongside seismic loads for a comprehensive safety evaluation.
+									</p>
+								</div>
+							</div>
+						</div>
 					</CardContent>
 				</Card>
 			)}

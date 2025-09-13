@@ -244,57 +244,7 @@ const AdditionalPhotosStep = ({ onNext }) => {
 				</CardContent>
 			</Card>
 
-			{/* Upload Area */}
-			<Card className="border-dashed border-2 border-green-300 dark:border-green-600">
-				<CardContent className="pt-6">
-					<div
-						className="cursor-pointer transition-all duration-200 rounded-lg p-8 text-center hover:bg-gray-50 dark:hover:bg-gray-800/50"
-						onDragOver={handleDragOver}
-						onDrop={handleDrop}
-						onClick={() => document.getElementById('photo-upload').click()}
-					>
-						<Upload className="mx-auto h-12 w-12 mb-4 text-gray-400" />
-						
-						<div>
-							<p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-								Upload Additional Photos
-							</p>
-							<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-								Drag & drop your photos here, or click to select files
-							</p>
-							<Button variant="outline" className="mb-4">
-								<Camera className="h-4 w-4 mr-2" />
-								Choose Photos
-							</Button>
-							<div className="flex justify-center space-x-4 text-xs text-gray-400">
-								<span>• JPG/PNG</span>
-								<span>• Multiple files</span>
-								<span>• Max 10MB each</span>
-							</div>
-						</div>
-						<input
-							id="photo-upload"
-							type="file"
-							multiple
-							accept="image/*"
-							className="hidden"
-							onChange={(e) => handleFileUpload(e.target.files)}
-						/>
-					</div>
-
-					{isUploading && (
-						<div className="mt-4">
-							<div className="flex items-center justify-between mb-2">
-								<span className="text-sm text-gray-600 dark:text-gray-400">Uploading photos...</span>
-								<span className="text-sm text-gray-600 dark:text-gray-400">{uploadProgress}%</span>
-							</div>
-							<Progress value={uploadProgress} className="w-full" />
-						</div>
-					)}
-				</CardContent>
-			</Card>
-
-			{/* Uploaded Photos */}
+			{/* Uploaded Photos - Above Upload Area */}
 			{uploadedPhotos.length > 0 && (
 				<Card>
 					<CardHeader>
@@ -349,6 +299,56 @@ const AdditionalPhotosStep = ({ onNext }) => {
 					</CardContent>
 				</Card>
 			)}
+
+			{/* Upload Area */}
+			<Card className="border-dashed border-2 border-green-300 dark:border-green-600">
+				<CardContent className="pt-6">
+					<div
+						className="cursor-pointer transition-all duration-200 rounded-lg p-8 text-center hover:bg-gray-50 dark:hover:bg-gray-800/50"
+						onDragOver={handleDragOver}
+						onDrop={handleDrop}
+						onClick={() => document.getElementById('photo-upload').click()}
+					>
+						<Upload className="mx-auto h-12 w-12 mb-4 text-gray-400" />
+						
+						<div>
+							<p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+								{uploadedPhotos.length > 0 ? 'Add More Photos' : 'Upload Additional Photos'}
+							</p>
+							<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+								Drag & drop your photos here, or click to select files
+							</p>
+							<Button variant="outline" className="mb-4">
+								<Camera className="h-4 w-4 mr-2" />
+								Choose Photos
+							</Button>
+							<div className="flex justify-center space-x-4 text-xs text-gray-400">
+								<span>• JPG/PNG</span>
+								<span>• Multiple files</span>
+								<span>• Max 10MB each</span>
+							</div>
+						</div>
+						<input
+							id="photo-upload"
+							type="file"
+							multiple
+							accept="image/*"
+							className="hidden"
+							onChange={(e) => handleFileUpload(e.target.files)}
+						/>
+					</div>
+
+					{isUploading && (
+						<div className="mt-4">
+							<div className="flex items-center justify-between mb-2">
+								<span className="text-sm text-gray-600 dark:text-gray-400">Uploading photos...</span>
+								<span className="text-sm text-gray-600 dark:text-gray-400">{uploadProgress}%</span>
+							</div>
+							<Progress value={uploadProgress} className="w-full" />
+						</div>
+					)}
+				</CardContent>
+			</Card>
 
 			{/* Instructions */}
 			<Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">

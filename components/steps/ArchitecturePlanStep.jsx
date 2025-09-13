@@ -29,6 +29,9 @@ const ArchitecturePlanStep = ({ onNext }) => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [selectedPlan, setSelectedPlan] = useState(null);
+	const [isAnalyzing, setIsAnalyzing] = useState(false);
+	const [analysisResults, setAnalysisResults] = useState({});
+	const [showAnalysisResults, setShowAnalysisResults] = useState(false);
 
 	const handleFileUpload = useCallback(async (files) => {
 		setIsUploading(true);
@@ -82,6 +85,16 @@ const ArchitecturePlanStep = ({ onNext }) => {
 			await storeUserImages(planFiles);
 
 			setUploadedPlans(prev => [...prev, ...processedPlans]);
+			
+			// Automatically analyze uploaded plans
+			setIsAnalyzing(true);
+			try {
+				await analyzePlans(processedPlans);
+			} catch (error) {
+				console.error('Plan analysis failed:', error);
+			} finally {
+				setIsAnalyzing(false);
+			}
 			
 			// Update user input
 			updateUserInput(prev => ({
@@ -174,6 +187,75 @@ const ArchitecturePlanStep = ({ onNext }) => {
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	};
 
+	const analyzePlans = async (plans) => {
+		const formData = new FormData();
+		
+		// Add image files
+		plans.forEach((plan) => {
+			formData.append('images', plan.file);
+		});
+		
+		// Set analysis type for architectural plans
+		formData.append('analysisType', 'architecturalPlan');
+		
+		// Add context from user input
+		const context = {
+			location: {
+				city: userInput.city,
+				latitude: userInput.latitude,
+				longitude: userInput.longitude
+			},
+			seismic: userInput.environmentalData?.seismic,
+			weather: userInput.environmentalData?.weather
+		};
+		formData.append('additionalContext', JSON.stringify(context));
+
+		try {
+			const response = await fetch('/api/analyze-image', {
+				method: 'POST',
+				body: formData,
+			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const result = await response.json();
+			setAnalysisResults(result.analysis || {});
+			setShowAnalysisResults(true);
+			
+			// Update user input with analysis results
+			updateUserInput(prev => ({
+				...prev,
+				architecturalPlanAnalysis: result.analysis,
+				architecturalPlanAnalyzed: true
+			}));
+			
+		} catch (error) {
+			console.error('Plan analysis error:', error);
+			alert('Failed to analyze architectural plans. The plans have been uploaded successfully, but AI analysis is unavailable.');
+		}
+	};
+
+	const getAnalysisStatus = () => {
+		if (isAnalyzing) return { color: 'yellow', text: 'Analyzing...', icon: '🔄' };
+		if (analysisResults.qualityAssessment?.sufficient === false) {
+			return { color: 'red', text: 'Needs Better Images', icon: '⚠️' };
+		}
+		if (analysisResults.structuralElements) {
+			return { color: 'green', text: 'Analysis Complete', icon: '✅' };
+		}
+		return { color: 'gray', text: 'Ready for Analysis', icon: '📋' };
+	};
+
+	const shouldShowReuploadSuggestion = () => {
+		return analysisResults.qualityAssessment && (
+			analysisResults.qualityAssessment.imageClarity === 'poor' ||
+			analysisResults.qualityAssessment.sufficient === false ||
+			analysisResults.qualityAssessment.completeness < 50
+		);
+	};
+
 	return (
 		<div className="max-w-4xl mx-auto space-y-6">
 			{/* Header */}
@@ -193,69 +275,28 @@ const ArchitecturePlanStep = ({ onNext }) => {
 				</p>
 			</div>
 
-			{/* Upload Area */}
-			<Card className="border-dashed border-2 border-blue-300 dark:border-blue-600">
-				<CardContent className="pt-6">
-					<div
-						className="cursor-pointer transition-all duration-200 rounded-lg p-8 text-center hover:bg-gray-50 dark:hover:bg-gray-800/50"
-						onDragOver={handleDragOver}
-						onDrop={handleDrop}
-						onClick={() => document.getElementById('plan-upload').click()}
-					>
-						<Upload className="mx-auto h-12 w-12 mb-4 text-gray-400" />
-						
-						<div>
-							<p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-								Upload Architectural Plans
-							</p>
-							<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-								Drag & drop your plans here, or click to select files
-							</p>
-							<Button variant="outline" className="mb-4">
-								<Building2 className="h-4 w-4 mr-2" />
-								Choose Files
-							</Button>
-							<div className="flex justify-center space-x-4 text-xs text-gray-400">
-								<span>• Floor Plans</span>
-								<span>• Elevations</span>
-								<span>• Sections</span>
-								<span>• Site Plans</span>
-								<span>• Structural Drawings</span>
-							</div>
-						</div>
-						<input
-							id="plan-upload"
-							type="file"
-							multiple
-							accept="image/*,.pdf"
-							className="hidden"
-							onChange={(e) => handleFileUpload(e.target.files)}
-						/>
-					</div>
-
-					{isUploading && (
-						<div className="mt-4">
-							<div className="flex items-center justify-between mb-2">
-								<span className="text-sm text-gray-600 dark:text-gray-400">Uploading plans...</span>
-								<span className="text-sm text-gray-600 dark:text-gray-400">{uploadProgress}%</span>
-							</div>
-							<Progress value={uploadProgress} className="w-full" />
-						</div>
-					)}
-				</CardContent>
-			</Card>
-
-			{/* Uploaded Plans */}
+			{/* Uploaded Plans - Above Upload Area */}
 			{uploadedPlans.length > 0 && (
 				<Card>
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<CheckCircle2 className="h-5 w-5 text-green-600" />
-							Uploaded Plans
-							<Badge variant="outline">
-								{uploadedPlans.length} file{uploadedPlans.length !== 1 ? 's' : ''}
-							</Badge>
-						</CardTitle>
+						<div className="flex items-center justify-between">
+							<CardTitle className="flex items-center gap-2">
+								<CheckCircle2 className="h-5 w-5 text-green-600" />
+								Uploaded Plans
+								<Badge variant="outline">
+									{uploadedPlans.length} file{uploadedPlans.length !== 1 ? 's' : ''}
+								</Badge>
+							</CardTitle>
+							<div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+								getAnalysisStatus().color === 'green' ? 'bg-green-100 text-green-800' :
+								getAnalysisStatus().color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+								getAnalysisStatus().color === 'red' ? 'bg-red-100 text-red-800' :
+								'bg-gray-100 text-gray-800'
+							}`}>
+								<span>{getAnalysisStatus().icon}</span>
+								<span>{getAnalysisStatus().text}</span>
+							</div>
+						</div>
 					</CardHeader>
 					<CardContent>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -310,9 +351,109 @@ const ArchitecturePlanStep = ({ onNext }) => {
 								</div>
 							))}
 						</div>
+
+						{/* Analysis Progress */}
+						{isAnalyzing && (
+							<div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+								<div className="flex items-center gap-3">
+									<div className="animate-spin">
+										<Sparkles className="h-5 w-5 text-blue-600" />
+									</div>
+									<div>
+										<p className="font-medium text-blue-900 dark:text-blue-200">AI is analyzing your architectural plans...</p>
+										<p className="text-sm text-blue-700 dark:text-blue-300">Extracting structural elements, dimensions, and technical specifications</p>
+									</div>
+								</div>
+							</div>
+						)}
+
+						{/* Re-upload Suggestion */}
+						{shouldShowReuploadSuggestion() && (
+							<div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+								<div className="flex items-start gap-3">
+									<AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+									<div>
+										<h4 className="font-medium text-red-900 dark:text-red-200 mb-2">
+											📸 Improve Plan Quality for Better Analysis
+										</h4>
+										<div className="text-sm text-red-700 dark:text-red-300 space-y-1">
+											{analysisResults.qualityAssessment?.imageClarity === 'poor' && (
+												<p>• 🔍 The image quality is too low - please upload clearer, high-resolution images</p>
+											)}
+											{analysisResults.qualityAssessment?.completeness < 50 && (
+												<p>• 📏 Limited structural details visible - include plans with dimensions and technical annotations</p>
+											)}
+											{analysisResults.recommendations && analysisResults.recommendations.length > 0 && (
+												<div>
+													<p className="font-medium">AI Recommendations:</p>
+													<ul className="list-disc list-inside ml-2">
+														{analysisResults.recommendations.map((rec, index) => (
+															<li key={index}>{rec}</li>
+														))}
+													</ul>
+												</div>
+											)}
+										</div>
+									</div>
+								</div>
+							</div>
+						)}
 					</CardContent>
 				</Card>
 			)}
+
+			{/* Upload Area */}
+			<Card className="border-dashed border-2 border-blue-300 dark:border-blue-600">
+				<CardContent className="pt-6">
+					<div
+						className="cursor-pointer transition-all duration-200 rounded-lg p-8 text-center hover:bg-gray-50 dark:hover:bg-gray-800/50"
+						onDragOver={handleDragOver}
+						onDrop={handleDrop}
+						onClick={() => document.getElementById('plan-upload').click()}
+					>
+						<Upload className="mx-auto h-12 w-12 mb-4 text-gray-400" />
+						
+						<div>
+							<p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+								{uploadedPlans.length > 0 ? 'Add More Plans' : 'Upload Architectural Plans'}
+							</p>
+							<p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+								Drag & drop your plans here, or click to select files
+							</p>
+							<Button variant="outline" className="mb-4">
+								<Building2 className="h-4 w-4 mr-2" />
+								Choose Files
+							</Button>
+							<div className="flex justify-center space-x-4 text-xs text-gray-400">
+								<span>• Floor Plans</span>
+								<span>• Elevations</span>
+								<span>• Sections</span>
+								<span>• Site Plans</span>
+								<span>• Structural Drawings</span>
+							</div>
+						</div>
+						<input
+							id="plan-upload"
+							type="file"
+							multiple
+							accept="image/*,.pdf"
+							className="hidden"
+							onChange={(e) => handleFileUpload(e.target.files)}
+						/>
+					</div>
+
+					{isUploading && (
+						<div className="mt-4">
+							<div className="flex items-center justify-between mb-2">
+								<span className="text-sm text-gray-600 dark:text-gray-400">Uploading plans...</span>
+								<span className="text-sm text-gray-600 dark:text-gray-400">{uploadProgress}%</span>
+							</div>
+							<Progress value={uploadProgress} className="w-full" />
+						</div>
+					)}
+				</CardContent>
+			</Card>
+
 
 			{/* Instructions */}
 			<Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">

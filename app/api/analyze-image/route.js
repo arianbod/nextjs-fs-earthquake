@@ -11,6 +11,89 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Helper function to detect actual image type from binary data
+function detectImageType(buffer) {
+  if (!buffer || buffer.length < 12) {
+    return null; // Not enough data to determine type
+  }
+  
+  // Check for common image format signatures
+  const first4Bytes = buffer.slice(0, 4);
+  const first8Bytes = buffer.slice(0, 8);
+  const first12Bytes = buffer.slice(0, 12);
+  
+  // JPEG: FF D8 FF (more lenient check - just need FF D8)
+  if (first4Bytes[0] === 0xFF && first4Bytes[1] === 0xD8) {
+    return 'image/jpeg';
+  }
+  
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (first8Bytes[0] === 0x89 && first8Bytes[1] === 0x50 && 
+      first8Bytes[2] === 0x4E && first8Bytes[3] === 0x47 &&
+      first8Bytes[4] === 0x0D && first8Bytes[5] === 0x0A && 
+      first8Bytes[6] === 0x1A && first8Bytes[7] === 0x0A) {
+    return 'image/png';
+  }
+  
+  // GIF: 47 49 46 38 (GIF8) or 47 49 46 39 (GIF9)
+  if (first4Bytes[0] === 0x47 && first4Bytes[1] === 0x49 && 
+      first4Bytes[2] === 0x46 && (first4Bytes[3] === 0x38 || first4Bytes[3] === 0x39)) {
+    return 'image/gif';
+  }
+  
+  // WebP: 52 49 46 46 ... 57 45 42 50 (RIFF...WEBP)
+  if (first4Bytes[0] === 0x52 && first4Bytes[1] === 0x49 && 
+      first4Bytes[2] === 0x46 && first4Bytes[3] === 0x46 &&
+      buffer.length >= 12 &&
+      first12Bytes[8] === 0x57 && first12Bytes[9] === 0x45 && 
+      first12Bytes[10] === 0x42 && first12Bytes[11] === 0x50) {
+    return 'image/webp';
+  }
+  
+  // BMP: 42 4D
+  if (first4Bytes[0] === 0x42 && first4Bytes[1] === 0x4D) {
+    return 'image/bmp';
+  }
+  
+  // TIFF: 49 49 2A 00 (little endian) or 4D 4D 00 2A (big endian)
+  if ((first4Bytes[0] === 0x49 && first4Bytes[1] === 0x49 && 
+       first4Bytes[2] === 0x2A && first4Bytes[3] === 0x00) ||
+      (first4Bytes[0] === 0x4D && first4Bytes[1] === 0x4D && 
+       first4Bytes[2] === 0x00 && first4Bytes[3] === 0x2A)) {
+    return 'image/tiff';
+  }
+  
+  // HEIC/HEIF: Check for 'ftyp' and 'heic'/'mif1' boxes
+  if (buffer.length >= 16) {
+    const ftypBox = buffer.slice(4, 8);
+    const brand = buffer.slice(8, 12);
+    if (ftypBox[0] === 0x66 && ftypBox[1] === 0x74 && 
+        ftypBox[2] === 0x79 && ftypBox[3] === 0x70) { // 'ftyp'
+      const brandStr = brand.toString('ascii');
+      if (brandStr.includes('heic') || brandStr.includes('mif1')) {
+        return 'image/heic';
+      }
+    }
+  }
+  
+  // AVIF: Similar to HEIC but with 'avif' brand
+  if (buffer.length >= 16) {
+    const ftypBox = buffer.slice(4, 8);
+    const brand = buffer.slice(8, 12);
+    if (ftypBox[0] === 0x66 && ftypBox[1] === 0x74 && 
+        ftypBox[2] === 0x79 && ftypBox[3] === 0x70) { // 'ftyp'
+      const brandStr = brand.toString('ascii');
+      if (brandStr.includes('avif')) {
+        return 'image/avif';
+      }
+    }
+  }
+  
+  // If no signature matches, return null to use the declared type
+  console.log('Image type detection: No matching signature found');
+  return null;
+}
+
 // Helper function to validate Claude API response structure
 function validateClaudeResponseStructure(response, analysisType) {
   if (!response || typeof response !== 'object') {
@@ -257,15 +340,34 @@ export async function POST(request) {
         const base64Data = buffer.toString('base64');
         console.log(`Image ${index + 1} base64 length:`, base64Data.length);
         
+        // Detect actual image format from binary data
+        const actualMediaType = detectImageType(buffer);
+        console.log(`Image ${index + 1} declared type: ${image.type}, detected type: ${actualMediaType}`);
+        
+        // Use detected type if available, otherwise fall back to declared type
+        let finalMediaType = actualMediaType || image.type;
+        
+        // Ensure the media type starts with 'image/' for safety
+        if (finalMediaType && !finalMediaType.startsWith('image/')) {
+          console.warn(`Non-image media type detected: ${finalMediaType}, defaulting to image/jpeg`);
+          finalMediaType = 'image/jpeg'; // Safe fallback
+        }
+        
+        // If we still don't have a valid media type, make one final attempt
+        if (!finalMediaType) {
+          console.warn(`No media type could be determined for image ${index + 1}, defaulting to image/jpeg`);
+          finalMediaType = 'image/jpeg';
+        }
+        
         imageBase64Array.push({
           type: 'image',
           source: {
             type: 'base64',
-            media_type: image.type,
+            media_type: finalMediaType,
             data: base64Data,
           },
         });
-        console.log(`Image ${index + 1} converted successfully`);
+        console.log(`Image ${index + 1} converted successfully with type: ${finalMediaType}`);
       } catch (conversionError) {
         console.error(`Error converting image ${index + 1}:`, conversionError);
         return NextResponse.json(
@@ -399,6 +501,61 @@ Use the analyze_building tool to return your analysis.`,
         8. Any structural notes or specifications visible
         
         Be very precise with numbers visible on the plan. Return as JSON.`,
+      
+      architecturalPlan: `You are an expert structural engineer analyzing architectural plans, blueprints, and technical drawings for detailed structural assessment.
+
+CRITICAL TASK: Analyze these architectural plans and extract EVERY possible structural detail for earthquake safety assessment.
+
+## PRIMARY ANALYSIS REQUIREMENTS:
+
+### 1. STRUCTURAL ELEMENTS IDENTIFICATION:
+- Column positions, dimensions, and grid layout
+- Beam locations, sizes, and spans  
+- Load-bearing walls vs partition walls
+- Structural rebar/reinforcement details (if visible)
+- Foundation type and layout
+- Slab thickness and type
+- Structural joints and connections
+
+### 2. DIMENSIONAL ANALYSIS:
+- Building length and width (in meters)
+- Column-to-column spacing/grid dimensions
+- Room dimensions and areas
+- Wall thicknesses (structural vs non-structural)
+- Floor-to-ceiling heights
+- Overall building footprint area
+
+### 3. TECHNICAL SPECIFICATIONS:
+- Structural system type (RC frame, steel frame, masonry, hybrid)
+- Foundation system (isolated footings, mat foundation, pile foundation)
+- Concrete grades/steel grades (if marked)
+- Load specifications (live loads, dead loads)
+- Structural notes and design criteria
+
+### 4. SEISMIC DESIGN FEATURES:
+- Shear walls presence and locations
+- Structural irregularities (plan/vertical)
+- Expansion joints or seismic joints
+- Base isolation or seismic devices
+- Lateral force resisting system details
+
+### 5. QUALITY & COMPLETENESS ASSESSMENT:
+Rate the plan quality and completeness:
+- Image clarity (poor/fair/good/excellent)
+- Technical detail level (basic/moderate/detailed/comprehensive)  
+- Measurable dimensions available (yes/no + percentage)
+- Structural information completeness (0-100%)
+
+### 6. DECISION MAKING:
+Based on your analysis, provide a professional recommendation:
+- Is this plan sufficient for structural assessment? (yes/no)
+- What additional plans/information would improve the analysis?
+- Should the user upload clearer images or additional views?
+- Rate confidence in structural analysis (low/medium/high)
+
+## OUTPUT FORMAT:
+Return comprehensive JSON with all extracted data organized by categories above.
+Include specific measurements, technical specifications, and professional assessment.`,
       
       satellite: `Analyze this satellite/aerial view of a building and extract:
         1. Building footprint dimensions (approximate length x width in meters)
