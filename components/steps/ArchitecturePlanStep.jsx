@@ -18,7 +18,10 @@ import {
 	Ruler,
 	FileImage,
 	Zap,
-	Sparkles
+	Sparkles,
+	AlertTriangle,
+	Home,
+	Wrench
 } from 'lucide-react';
 import { useUserInput } from '@/context/UserInputContext';
 import Link from 'next/link';
@@ -86,15 +89,7 @@ const ArchitecturePlanStep = ({ onNext }) => {
 
 			setUploadedPlans(prev => [...prev, ...processedPlans]);
 			
-			// Automatically analyze uploaded plans
-			setIsAnalyzing(true);
-			try {
-				await analyzePlans(processedPlans);
-			} catch (error) {
-				console.error('Plan analysis failed:', error);
-			} finally {
-				setIsAnalyzing(false);
-			}
+			// Don't auto-analyze, let user trigger analysis manually
 			
 			// Update user input
 			updateUserInput(prev => ({
@@ -187,6 +182,22 @@ const ArchitecturePlanStep = ({ onNext }) => {
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	};
 
+	const handleStartAnalysis = async () => {
+		if (uploadedPlans.length === 0) {
+			alert('Please upload at least one architectural plan before starting analysis.');
+			return;
+		}
+
+		setIsAnalyzing(true);
+		try {
+			await analyzePlans(uploadedPlans);
+		} catch (error) {
+			console.error('Plan analysis failed:', error);
+		} finally {
+			setIsAnalyzing(false);
+		}
+	};
+
 	const analyzePlans = async (plans) => {
 		const formData = new FormData();
 		
@@ -197,6 +208,11 @@ const ArchitecturePlanStep = ({ onNext }) => {
 		
 		// Set analysis type for architectural plans
 		formData.append('analysisType', 'architecturalPlan');
+		
+		console.log('Starting architectural plan analysis with:', {
+			numImages: plans.length,
+			context: context
+		});
 		
 		// Add context from user input
 		const context = {
@@ -211,16 +227,22 @@ const ArchitecturePlanStep = ({ onNext }) => {
 		formData.append('additionalContext', JSON.stringify(context));
 
 		try {
+			console.log('Sending request to /api/analyze-image...');
 			const response = await fetch('/api/analyze-image', {
 				method: 'POST',
 				body: formData,
 			});
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+				const errorText = await response.text();
+				console.error('API Error Response:', errorText);
+				throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
 			}
 
+			console.log('Analysis response received, parsing...');
 			const result = await response.json();
+			console.log('Architectural plan analysis result:', result);
+			
 			setAnalysisResults(result.analysis || {});
 			setShowAnalysisResults(true);
 			
@@ -387,6 +409,29 @@ const ArchitecturePlanStep = ({ onNext }) => {
 								</div>
 							))}
 						</div>
+
+						{/* Start Analysis Button */}
+						{uploadedPlans.length > 0 && !showAnalysisResults && !isAnalyzing && (
+							<div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+								<div className="text-center">
+									<h4 className="font-medium text-purple-900 dark:text-purple-200 mb-2 flex items-center justify-center gap-2">
+										<Sparkles className="h-5 w-5 text-purple-600" />
+										Ready for AI Analysis
+									</h4>
+									<p className="text-sm text-purple-700 dark:text-purple-300 mb-4">
+										Upload more plans if needed, then start AI analysis to extract structural information
+									</p>
+									<Button 
+										onClick={handleStartAnalysis} 
+										className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2"
+										disabled={isAnalyzing}
+									>
+										<Sparkles className="h-4 w-4 mr-2" />
+										Start AI Analysis
+									</Button>
+								</div>
+							</div>
+						)}
 
 						{/* Analysis Progress */}
 						{isAnalyzing && (

@@ -119,8 +119,8 @@ const LocationStep = ({ onNext }) => {
 				const locationData = {
 					latitude,
 					longitude,
-					city: prev.city || 'Unknown Location',
-					address: prev.address || 'Address not available'
+					city: userInput.city || 'Unknown Location',
+					address: userInput.address || 'Address not available'
 				};
 				
 				console.log('LocationStep - About to store images:', {
@@ -150,8 +150,8 @@ const LocationStep = ({ onNext }) => {
 				const locationData = {
 					latitude,
 					longitude,
-					city: prev.city || 'Unknown Location',
-					address: prev.address || 'Address not available'
+					city: userInput.city || 'Unknown Location',
+					address: userInput.address || 'Address not available'
 				};
 				
 				console.log('LocationStep - Fallback store images (Street View failed):', {
