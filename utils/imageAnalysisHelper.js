@@ -11,9 +11,20 @@ import {
   extractConfidence,
 } from './llmResponseParser';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to avoid build-time errors when env var is not set
+let openaiClient = null;
+
+function getOpenAIClient() {
+  if (!openaiClient) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return openaiClient;
+}
 
 /**
  * Analyze building image for structural issues
@@ -37,6 +48,7 @@ export async function analyzeBuildingImage(imageUrl, options = {}) {
     try {
       console.log(`Analyzing image (attempt ${attempt + 1}/${retryAttempts + 1})...`);
 
+      const openai = getOpenAIClient();
       const response = await openai.chat.completions.create({
         model,
         messages: [

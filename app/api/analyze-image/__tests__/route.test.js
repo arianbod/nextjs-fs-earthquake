@@ -1,6 +1,49 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from '../route';
+import { POST, GET } from '../route';
 import { NextResponse } from 'next/server';
+
+// Mock the image analysis helper
+const mockAnalyzeBuildingImage = vi.fn();
+vi.mock('@/utils/imageAnalysisHelper', () => ({
+  analyzeBuildingImage: (...args) => mockAnalyzeBuildingImage(...args),
+  validateImageData: vi.fn((imageData) => {
+    if (!imageData) return { valid: false, errors: ['No image data'] };
+    if (imageData === 'invalid') return { valid: false, errors: ['Invalid format'] };
+    if (imageData.startsWith('data:image/')) return { valid: true, isBase64: true, isURL: false };
+    if (imageData.startsWith('http')) return { valid: true, isURL: true, isBase64: false };
+    return { valid: false, errors: ['Must be URL or base64'] };
+  }),
+  formatAnalysisResult: vi.fn((result) => {
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || 'Analysis failed',
+        errorCode: result.errorCode,
+        metadata: result.metadata,
+      };
+    }
+    return {
+      success: true,
+      data: {
+        analysis: result.analysis,
+        confidence: result.confidence,
+        issues: result.issues,
+        recommendations: result.recommendations,
+      },
+      metadata: result.metadata,
+    };
+  }),
+  createFallbackResponse: vi.fn((reason) => ({
+    success: false,
+    error: reason,
+    data: {
+      analysis: { structural_type: 'unknown' },
+      confidence: 0,
+      issues: ['Analysis failed'],
+      recommendations: ['Please try uploading a clearer image'],
+    },
+  })),
+}));
 
 // Mock NextResponse
 vi.mock('next/server', () => ({
@@ -16,47 +59,65 @@ vi.mock('next/server', () => ({
 describe('/api/analyze-image POST endpoint', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.OPENAI_API_KEY = 'test-key';
   });
 
-  it('should successfully analyze image with valid payload', async () => {
+  it('should successfully analyze image with base64 data', async () => {
+    mockAnalyzeBuildingImage.mockResolvedValue({
+      success: true,
+      analysis: { structural_type: 'concrete', condition: 'good' },
+      confidence: 0.85,
+      issues: ['minor cracks'],
+      recommendations: ['monitor cracks'],
+      metadata: { tokensUsed: 100 },
+    });
+
     const mockRequest = {
       json: vi.fn().mockResolvedValue({
-        imageData: 'base64encodedimage',
-        analysisType: 'structural',
+        imageData: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
       }),
     };
 
     const response = await POST(mockRequest);
     const data = await response.json();
 
-    expect(mockRequest.json).toHaveBeenCalledTimes(1);
-    expect(NextResponse.json).toHaveBeenCalledWith(
+    expect(mockAnalyzeBuildingImage).toHaveBeenCalledWith(
+      'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
       expect.objectContaining({
-        analysis: expect.any(Object),
+        model: 'gpt-4o-mini',
+        maxTokens: 1000,
+        retryAttempts: 2,
       })
     );
-    expect(data.analysis).toBeDefined();
-    expect(data.analysis.type).toBe('demo');
+    expect(data.success).toBe(true);
+    expect(data.data.analysis.structural_type).toBe('concrete');
+    expect(data.data.confidence).toBe(0.85);
   });
 
-  it('should format analysis result correctly', async () => {
-    const mockPayload = {
-      imageData: 'testimage',
-      metadata: { filename: 'building.jpg' },
-    };
+  it('should successfully analyze image with URL', async () => {
+    mockAnalyzeBuildingImage.mockResolvedValue({
+      success: true,
+      analysis: { structural_type: 'masonry' },
+      confidence: 0.9,
+      issues: [],
+      recommendations: [],
+      metadata: {},
+    });
 
     const mockRequest = {
-      json: vi.fn().mockResolvedValue(mockPayload),
+      json: vi.fn().mockResolvedValue({
+        imageUrl: 'https://example.com/building.jpg',
+      }),
     };
 
     const response = await POST(mockRequest);
     const data = await response.json();
 
-    expect(data.analysis.type).toBe('demo');
-    expect(data.analysis.raw).toEqual(mockPayload);
+    expect(mockAnalyzeBuildingImage).toHaveBeenCalled();
+    expect(data.success).toBe(true);
   });
 
-  it('should handle empty payload', async () => {
+  it('should return 400 for missing image data', async () => {
     const mockRequest = {
       json: vi.fn().mockResolvedValue({}),
     };
@@ -64,28 +125,12 @@ describe('/api/analyze-image POST endpoint', () => {
     const response = await POST(mockRequest);
     const data = await response.json();
 
-    expect(data.analysis).toBeDefined();
-    expect(data.analysis.type).toBe('demo');
-    expect(data.analysis.raw).toEqual({});
+    expect(response.status).toBe(400);
+    expect(data.success).toBe(false);
+    expect(data.error).toContain('No image data provided');
   });
 
-  it('should return 500 on JSON parsing error', async () => {
-    const mockRequest = {
-      json: vi.fn().mockRejectedValue(new Error('Invalid JSON')),
-    };
-
-    const response = await POST(mockRequest);
-    const data = await response.json();
-
-    expect(NextResponse.json).toHaveBeenCalledWith(
-      { error: 'Image analysis failed' },
-      { status: 500 }
-    );
-    expect(data.error).toBe('Image analysis failed');
-    expect(response.status).toBe(500);
-  });
-
-  it('should handle malformed request', async () => {
+  it('should return 400 for invalid JSON in request', async () => {
     const mockRequest = {
       json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token')),
     };
@@ -93,59 +138,109 @@ describe('/api/analyze-image POST endpoint', () => {
     const response = await POST(mockRequest);
     const data = await response.json();
 
-    expect(response.status).toBe(500);
-    expect(data.error).toBe('Image analysis failed');
+    expect(response.status).toBe(400);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Invalid JSON in request body');
   });
 
-  it('should handle network errors gracefully', async () => {
+  it('should return 400 for invalid image data format', async () => {
     const mockRequest = {
-      json: vi.fn().mockRejectedValue(new Error('Network error')),
+      json: vi.fn().mockResolvedValue({
+        imageData: 'invalid',
+      }),
+    };
+
+    const response = await POST(mockRequest);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('Invalid image data');
+  });
+
+  it('should return 500 when OpenAI API key is missing', async () => {
+    delete process.env.OPENAI_API_KEY;
+
+    const mockRequest = {
+      json: vi.fn().mockResolvedValue({
+        imageData: 'data:image/jpeg;base64,test',
+      }),
     };
 
     const response = await POST(mockRequest);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data).toHaveProperty('error');
+    expect(data.success).toBe(false);
+    expect(data.error).toContain('OpenAI API key');
   });
 
-  it('should process different payload structures', async () => {
-    const payloads = [
-      { image: 'data1', type: 'crack' },
-      { image: 'data2', analysis: 'full' },
-      { imageUrl: 'http://example.com/image.jpg' },
-    ];
-
-    for (const payload of payloads) {
-      const mockRequest = {
-        json: vi.fn().mockResolvedValue(payload),
-      };
-
-      const response = await POST(mockRequest);
-      const data = await response.json();
-
-      expect(data.analysis.raw).toEqual(payload);
-      expect(data.analysis.type).toBe('demo');
-    }
-  });
-
-  it('should handle large payloads', async () => {
-    const largePayload = {
-      imageData: 'x'.repeat(10000),
-      metadata: {
-        size: 10000,
-        format: 'base64',
-      },
-    };
+  it('should handle analysis failures', async () => {
+    mockAnalyzeBuildingImage.mockResolvedValue({
+      success: false,
+      error: 'OpenAI API error',
+      errorCode: 'RATE_LIMIT',
+      metadata: { attempts: 3 },
+    });
 
     const mockRequest = {
-      json: vi.fn().mockResolvedValue(largePayload),
+      json: vi.fn().mockResolvedValue({
+        imageData: 'data:image/jpeg;base64,test',
+      }),
     };
 
     const response = await POST(mockRequest);
     const data = await response.json();
 
-    expect(data.analysis).toBeDefined();
-    expect(data.analysis.raw.imageData).toHaveLength(10000);
+    expect(response.status).toBe(500);
+    expect(data.success).toBe(false);
+    expect(data.error).toBe('OpenAI API error');
+  });
+
+  it('should pass custom options to analysis function', async () => {
+    mockAnalyzeBuildingImage.mockResolvedValue({
+      success: true,
+      analysis: {},
+      confidence: 0.8,
+      issues: [],
+      recommendations: [],
+      metadata: {},
+    });
+
+    const mockRequest = {
+      json: vi.fn().mockResolvedValue({
+        imageUrl: 'https://example.com/image.jpg',
+        options: {
+          model: 'gpt-4o',
+          maxTokens: 2000,
+          temperature: 0.5,
+        },
+      }),
+    };
+
+    await POST(mockRequest);
+
+    expect(mockAnalyzeBuildingImage).toHaveBeenCalledWith(
+      'https://example.com/image.jpg',
+      expect.objectContaining({
+        model: 'gpt-4o',
+        maxTokens: 2000,
+        temperature: 0.5,
+        retryAttempts: 2,
+      })
+    );
+  });
+});
+
+describe('/api/analyze-image GET endpoint', () => {
+  it('should return API documentation', async () => {
+    const response = await GET();
+    const data = await response.json();
+
+    expect(data.endpoint).toBe('/api/analyze-image');
+    expect(data.method).toBe('POST');
+    expect(data.description).toContain('earthquake safety');
+    expect(data.requestFormat).toBeDefined();
+    expect(data.responseFormat).toBeDefined();
   });
 });
