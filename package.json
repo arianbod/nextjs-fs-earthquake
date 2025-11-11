@@ -12,7 +12,8 @@
     "lint": "next lint",
     "api:register": "node scripts/register-app.js",
     "api:test": "node scripts/test-api.js",
-    "api:docs": "echo 'Opening API docs at http://localhost:3000/api-docs'"
+    "api:docs": "echo 'Opening API docs at http://localhost:3000/api-docs'",
+    "api:prod-tokens": "node scripts/generate-production-token.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
