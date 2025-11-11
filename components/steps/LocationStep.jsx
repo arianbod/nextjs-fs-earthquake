@@ -314,15 +314,15 @@ const LocationStep = ({ onNext }) => {
 	const stepOneData = Data.steps.find((step) => step.step === 1);
 
 	return (
-		<div className='max-w-4xl mx-auto'>
-			<div className='text-center mb-4 lg:mb-8'>
-				<div className='inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4'>
-					<MapPin className='h-6 w-6 text-blue-600 dark:text-blue-400' />
+		<div className='max-w-4xl mx-auto viewport-optimized'>
+			<div className='text-center mb-3 lg:mb-6'>
+				<div className='inline-flex items-center justify-center p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-3'>
+					<MapPin className='h-5 w-5 text-blue-600 dark:text-blue-400' />
 				</div>
-				<h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
+				<h1 className='text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1'>
 					{stepOneData.title}
 				</h1>
-				<p className='text-lg text-gray-600 dark:text-gray-300'>
+				<p className='text-base lg:text-lg text-gray-600 dark:text-gray-300'>
 					{stepOneData.description}
 				</p>
 			</div>
@@ -340,51 +340,51 @@ const LocationStep = ({ onNext }) => {
 
 				<CardContent>
 					{isLoading ? (
-						<div className='space-y-6'>
-							<div className='flex justify-center items-center py-8'>
+						<div className='space-y-4'>
+							<div className='flex justify-center items-center py-4'>
 								<div className='text-center max-w-md'>
 									{/* Animated Building Icon */}
-									<div className='relative mb-6'>
-										<div className='w-20 h-20 mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center'>
-											<div className='w-12 h-12 bg-blue-500 rounded animate-pulse flex flex-col items-center justify-center'>
-												<div className='w-8 h-2 bg-white rounded mb-1'></div>
-												<div className='w-6 h-2 bg-white rounded mb-1'></div>
-												<div className='w-8 h-2 bg-white rounded'></div>
+									<div className='relative mb-4'>
+										<div className='w-16 h-16 mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center'>
+											<div className='w-10 h-10 bg-blue-500 rounded animate-pulse flex flex-col items-center justify-center'>
+												<div className='w-6 h-1.5 bg-white rounded mb-1'></div>
+												<div className='w-4 h-1.5 bg-white rounded mb-1'></div>
+												<div className='w-6 h-1.5 bg-white rounded'></div>
 											</div>
 										</div>
-										<div className='absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-bounce'>
-											<MapPin className='w-3 h-3 text-white' />
+										<div className='absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center animate-bounce'>
+											<MapPin className='w-2.5 h-2.5 text-white' />
 										</div>
 									</div>
 									
-									<p className='text-xl font-semibold text-gray-900 dark:text-white mb-2'>
+									<p className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
 										Analyzing Your Location
 									</p>
-									<p className='text-gray-600 dark:text-gray-400 mb-6'>
+									<p className='text-gray-600 dark:text-gray-400 mb-4'>
 										{loadingStep}
 									</p>
 									
 									{/* Progress Bar */}
-									<div className='w-full max-w-sm mx-auto mb-4'>
-										<div className='flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2'>
+									<div className='w-full max-w-sm mx-auto mb-3'>
+										<div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1'>
 											<span>Progress</span>
 											<span>{loadingProgress}%</span>
 										</div>
-										<Progress value={loadingProgress} className='h-2' />
+										<Progress value={loadingProgress} className='h-1.5' />
 									</div>
 									
 									{/* Step-by-step loading text */}
-									<div className='space-y-2 text-sm text-gray-600 dark:text-gray-400'>
-										<div className={`flex items-center justify-center gap-2 ${loadingProgress >= 10 ? 'text-green-600' : ''}`}>
+									<div className='space-y-1 text-xs text-gray-600 dark:text-gray-400'>
+										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 10 ? 'text-green-600' : ''}`}>
 											{loadingProgress >= 10 ? '✓' : '○'} Accessing GPS coordinates
 										</div>
-										<div className={`flex items-center justify-center gap-2 ${loadingProgress >= 60 ? 'text-green-600' : ''}`}>
+										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 60 ? 'text-green-600' : ''}`}>
 											{loadingProgress >= 60 ? '✓' : '○'} Analyzing seismic data
 										</div>
-										<div className={`flex items-center justify-center gap-2 ${loadingProgress >= 80 ? 'text-green-600' : ''}`}>
+										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 80 ? 'text-green-600' : ''}`}>
 											{loadingProgress >= 80 ? '✓' : '○'} Processing earthquake zones
 										</div>
-										<div className={`flex items-center justify-center gap-2 ${loadingProgress >= 100 ? 'text-green-600' : ''}`}>
+										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 100 ? 'text-green-600' : ''}`}>
 											{loadingProgress >= 100 ? '✓' : '○'} Finalizing assessment
 										</div>
 									</div>
@@ -393,10 +393,10 @@ const LocationStep = ({ onNext }) => {
 							
 							{/* Animated skeleton map */}
 							<div className='relative'>
-								<Skeleton className='h-[400px] w-full rounded-lg' />
+								<Skeleton className='h-[280px] w-full rounded-lg' />
 								<div className='absolute inset-0 flex items-center justify-center'>
 									<div className='animate-pulse text-gray-400 dark:text-gray-600'>
-										<MapPin className='w-12 h-12' />
+										<MapPin className='w-8 h-8' />
 									</div>
 								</div>
 							</div>
@@ -459,17 +459,17 @@ const LocationStep = ({ onNext }) => {
 									</CardHeader>
 									<CardContent>
 										{autoDataLoading ? (
-											<div className='grid md:grid-cols-2 gap-4'>
-												<Skeleton className='h-48 rounded-lg' />
-												<Skeleton className='h-48 rounded-lg' />
+											<div className='grid md:grid-cols-2 gap-3'>
+												<Skeleton className='h-32 rounded-lg' />
+												<Skeleton className='h-32 rounded-lg' />
 											</div>
 										) : (
-											<div className='grid md:grid-cols-2 gap-4'>
+											<div className='grid md:grid-cols-2 gap-3'>
 												{/* Street View */}
 												{userInput.streetViewUrl && (
 													<div>
-														<h4 className='text-sm font-medium mb-2 flex items-center gap-1'>
-															<Eye className='h-4 w-4' />
+														<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
+															<Eye className='h-3 w-3' />
 															Street Level View
 														</h4>
 														<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
@@ -492,8 +492,8 @@ const LocationStep = ({ onNext }) => {
 												{/* Satellite View */}
 												{userInput.satelliteViewUrl && (
 													<div>
-														<h4 className='text-sm font-medium mb-2 flex items-center gap-1'>
-															<Building className='h-4 w-4' />
+														<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
+															<Building className='h-3 w-3' />
 															Satellite View
 														</h4>
 														<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
@@ -517,9 +517,9 @@ const LocationStep = ({ onNext }) => {
 										
 										{/* Multiple angles if available */}
 										{userInput.streetViewImages && userInput.streetViewImages.length > 1 && (
-											<div className='mt-4'>
-												<h4 className='text-sm font-medium mb-2'>Additional Angles</h4>
-												<div className='grid grid-cols-4 gap-2'>
+											<div className='mt-3'>
+												<h4 className='text-xs font-medium mb-1'>Additional Angles</h4>
+												<div className='grid grid-cols-4 gap-1'>
 													{userInput.streetViewImages.slice(0, 4).map((img, idx) => (
 														<div key={idx} className='relative aspect-square rounded overflow-hidden border border-gray-200 dark:border-gray-700'>
 															<img 
@@ -542,14 +542,14 @@ const LocationStep = ({ onNext }) => {
 							{/* Seismic Zone Information */}
 							{seismicZoneInfo && (
 								<Card className='border-orange-200 dark:border-orange-800'>
-									<CardHeader>
-										<CardTitle className='flex items-center gap-2'>
-											<Activity className='h-5 w-5 text-orange-600' />
+									<CardHeader className='pb-2'>
+										<CardTitle className='flex items-center gap-2 text-lg'>
+											<Activity className='h-4 w-4 text-orange-600' />
 											Seismic Zone Information
 										</CardTitle>
 									</CardHeader>
-									<CardContent>
-										<div className='grid grid-cols-2 gap-4'>
+									<CardContent className='pt-2'>
+										<div className='grid grid-cols-2 gap-3'>
 											<div>
 												<p className='text-sm text-gray-600 dark:text-gray-400'>Zone</p>
 												<div className='flex items-center gap-2 mt-1'>
@@ -569,11 +569,11 @@ const LocationStep = ({ onNext }) => {
 							)}
 							
 							{/* Location confirmation */}
-							<div className='flex items-start space-x-2 text-sm text-gray-600 dark:text-gray-400 p-4 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg'>
-								<CheckCircle2 className='h-4 w-4 mt-0.5 flex-shrink-0 text-green-600' />
+							<div className='flex items-start space-x-2 text-xs text-gray-600 dark:text-gray-400 p-3 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg'>
+								<CheckCircle2 className='h-3 w-3 mt-0.5 flex-shrink-0 text-green-600' />
 								<div>
-									<p className='font-medium text-gray-900 dark:text-white'>Location data collected successfully!</p>
-									<p className='text-xs mt-1'>We've gathered location information, street view images, and seismic zone data.</p>
+									<p className='font-medium text-gray-900 dark:text-white text-sm'>Location data collected successfully!</p>
+									<p className='text-xs mt-0.5'>We've gathered location information, street view images, and seismic zone data.</p>
 								</div>
 							</div>
 

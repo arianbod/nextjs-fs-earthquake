@@ -25,7 +25,7 @@ import {
 
 const containerStyle = {
 	width: '100%',
-	height: '400px',
+	height: '280px', // Reduced from 400px to 280px for better viewport usage
 };
 
 const libraries = ['drawing', 'geometry', 'places'];
