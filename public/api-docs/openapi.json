@@ -39,6 +39,14 @@
       "description": "Building safety assessment services"
     },
     {
+      "name": "AI Services",
+      "description": "AI-powered image and plan analysis"
+    },
+    {
+      "name": "Utilities",
+      "description": "Helper services and utilities"
+    },
+    {
       "name": "System",
       "description": "System health and parameters"
     },
@@ -264,6 +272,244 @@
           },
           "401": {"$ref": "#/components/responses/Unauthorized"},
           "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/ai/analyze-image": {
+      "post": {
+        "tags": ["AI Services"],
+        "summary": "Analyze building images with AI",
+        "description": "Analyzes building images using Claude AI to extract structural features, dimensions, and risk factors. Supports multiple image types including photos, floor plans, and satellite imagery.",
+        "operationId": "analyzeImage",
+        "security": [{"PlatformToken": [], "BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["images", "analysisType"],
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {"type": "string", "format": "binary"},
+                    "description": "Image files (max 10MB each, up to 10 images)"
+                  },
+                  "analysisType": {
+                    "type": "string",
+                    "enum": ["building", "floorPlan", "architecturalPlan", "satellite"],
+                    "description": "Type of analysis to perform"
+                  },
+                  "additionalContext": {
+                    "type": "string",
+                    "description": "JSON string with location, seismic data, and weather context"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analysis completed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "analysis": {
+                      "type": "object",
+                      "properties": {
+                        "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+                        "detectedFeatures": {"type": "object"},
+                        "dimensions": {"type": "object"},
+                        "irregularities": {"type": "object"},
+                        "riskFactors": {"type": "object"},
+                        "recommendations": {"type": "array", "items": {"type": "string"}}
+                      }
+                    },
+                    "imagesAnalyzed": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "400": {"$ref": "#/components/responses/ValidationError"},
+          "429": {"$ref": "#/components/responses/RateLimitExceeded"}
+        }
+      }
+    },
+    "/ai/analyze-building-photos": {
+      "post": {
+        "tags": ["AI Services"],
+        "summary": "Analyze exterior building photos",
+        "description": "Analyzes exterior building photographs with optional plan cross-reference. Provides visual assessment, structural condition analysis, and seismic vulnerability evaluation.",
+        "operationId": "analyzeBuildingPhotos",
+        "security": [{"PlatformToken": [], "BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["images", "location"],
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "data": {"type": "string", "description": "Base64 encoded image"},
+                        "type": {"type": "string", "description": "MIME type"}
+                      }
+                    }
+                  },
+                  "planAnalysis": {
+                    "type": "object",
+                    "description": "Optional floor plan analysis to cross-reference"
+                  },
+                  "location": {
+                    "type": "object",
+                    "required": ["city", "earthquakeZone"],
+                    "properties": {
+                      "city": {"type": "string"},
+                      "earthquakeZone": {"type": "string"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Photos analyzed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "analysis": {
+                      "type": "object",
+                      "properties": {
+                        "visual": {"type": "object"},
+                        "structural": {"type": "object"},
+                        "construction": {"type": "object"},
+                        "seismic": {"type": "object"},
+                        "integration": {"type": "object"},
+                        "combined": {"type": "object"},
+                        "quality": {"type": "object"}
+                      }
+                    },
+                    "metadata": {"type": "object"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "429": {"$ref": "#/components/responses/RateLimitExceeded"}
+        }
+      }
+    },
+    "/ai/analyze-building-plans": {
+      "post": {
+        "tags": ["AI Services"],
+        "summary": "Analyze architectural plans",
+        "description": "Analyzes architectural or structural plan documents to extract dimensions, structural system details, building specifications, and construction information.",
+        "operationId": "analyzeBuildingPlans",
+        "security": [{"PlatformToken": [], "BearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["images", "location"],
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "data": {"type": "string", "description": "Base64 encoded plan image"},
+                        "type": {"type": "string", "description": "MIME type"}
+                      }
+                    }
+                  },
+                  "location": {
+                    "type": "object",
+                    "required": ["city"],
+                    "properties": {
+                      "city": {"type": "string"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plans analyzed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "analysis": {
+                      "type": "object",
+                      "properties": {
+                        "dimensions": {"type": "object"},
+                        "structural": {"type": "object"},
+                        "building": {"type": "object"},
+                        "construction": {"type": "object"},
+                        "quality": {"type": "object"},
+                        "analysis": {"type": "object"}
+                      }
+                    },
+                    "metadata": {"type": "object"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "429": {"$ref": "#/components/responses/RateLimitExceeded"}
+        }
+      }
+    },
+    "/utils/proxy-image": {
+      "get": {
+        "tags": ["Utilities"],
+        "summary": "Proxy Google Maps images",
+        "description": "CORS proxy for Google Maps images including Street View and satellite imagery. Caches images for improved performance.",
+        "operationId": "proxyImage",
+        "security": [{"PlatformToken": [], "BearerAuth": []}],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Encoded Google Maps image URL"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image retrieved successfully",
+            "content": {
+              "image/jpeg": {"schema": {"type": "string", "format": "binary"}},
+              "image/png": {"schema": {"type": "string", "format": "binary"}}
+            }
+          },
+          "400": {"$ref": "#/components/responses/ValidationError"},
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "429": {"$ref": "#/components/responses/RateLimitExceeded"}
         }
       }
     }
