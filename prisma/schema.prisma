@@ -172,3 +172,222 @@ enum WindowType {
 
   @@map("window_type")
 }
+
+// ============================================
+// MAIN PLATFORM MODELS - Assessment Storage
+// ============================================
+
+// Main assessment record
+model Assessment {
+  id                  String              @id @default(cuid())
+  userId              String              @map("user_id") // Clerk user ID
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  completedAt         DateTime?           @map("completed_at")
+
+  // Assessment metadata
+  assessmentType      String              @default("complete") @map("assessment_type") // complete, quick, detailed
+  version             String              @default("1.0") // App version for tracking
+
+  // Relations
+  location            Location?
+  buildingInfo        BuildingInfo?
+  safetyResult        SafetyResult?
+  images              AssessmentImage[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@map("assessments")
+}
+
+// Location and address information
+model Location {
+  id                  String              @id @default(cuid())
+  assessmentId        String              @unique @map("assessment_id")
+
+  // GPS coordinates
+  latitude            Float
+  longitude           Float
+  accuracy            Float?              // GPS accuracy in meters
+
+  // Address components
+  fullAddress         String?             @map("full_address")
+  city                String?
+  district            String?
+  neighborhood        String?             @map("neighborhood")
+  country             String?
+  postalCode          String?             @map("postal_code")
+
+  // Google Places data
+  placeId             String?             @map("place_id")
+  placeName           String?             @map("place_name")
+
+  // Weather and environmental
+  weatherCondition    String?             @map("weather_condition")
+  temperature         Float?
+
+  // Seismic zone
+  earthquakeZone      String?             @map("earthquake_zone") // Zone 1-4
+  seismicActivity     String?             @map("seismic_activity") // Low, Medium, High, Very High
+
+  // Relations
+  assessment          Assessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([city])
+  @@index([earthquakeZone])
+  @@map("locations")
+}
+
+// Building information and characteristics
+model BuildingInfo {
+  id                  String              @id @default(cuid())
+  assessmentId        String              @unique @map("assessment_id")
+
+  // Basic info
+  buildingName        String?             @map("building_name")
+  buildingType        String?             @map("building_type") // Residential, Commercial, etc.
+  numberOfFloors      Int                 @map("number_of_floors")
+  floorArea           Float?              @map("floor_area") // m²
+  buildingAge         Int?                @map("building_age") // years
+  constructionYear    Int?                @map("construction_year")
+
+  // Structural system
+  structuralSystem    String              @map("structural_system") // Frame, Wall, Hybrid
+  frameType           String?             @map("frame_type") // RC, Steel, Wood, Masonry
+  foundationType      String?             @map("foundation_type")
+
+  // Building code compliance
+  buildingCode        String?             @map("building_code") // TBDY-2018, etc.
+  codeCompliance      String?             @map("code_compliance") // Full, Partial, None
+  hasRetrofit         Boolean             @default(false) @map("has_retrofit")
+  retrofitYear        Int?                @map("retrofit_year")
+
+  // Irregularities
+  hasVerticalIrregularity    Boolean      @default(false) @map("has_vertical_irregularity")
+  hasPlanIrregularity        Boolean      @default(false) @map("has_plan_irregularity")
+  hasShortColumn             Boolean      @default(false) @map("has_short_column")
+  hasSoftStory               Boolean      @default(false) @map("has_soft_story")
+  hasHeavyOverhang           Boolean      @default(false) @map("has_heavy_overhang")
+
+  // Site conditions
+  soilType            String?             @map("soil_type") // Rock, Dense, Medium, Soft
+  slopeCondition      String?             @map("slope_condition") // Flat, Mild, Steep
+  liquefactionRisk    String?             @map("liquefaction_risk") // None, Low, Medium, High
+
+  // Additional loads
+  hasSwimmingPool     Boolean             @default(false) @map("has_swimming_pool")
+  hasWaterTank        Boolean             @default(false) @map("has_water_tank")
+  hasHeavyEquipment   Boolean             @default(false) @map("has_heavy_equipment")
+
+  // Neighboring buildings
+  hasAdjacentBuildings Boolean            @default(false) @map("has_adjacent_buildings")
+  poundingRisk        String?             @map("pounding_risk") // None, Low, Medium, High
+
+  // Material condition
+  materialCondition   String?             @map("material_condition") // Excellent, Good, Fair, Poor
+  visibleDamage       Boolean             @default(false) @map("visible_damage")
+  damageDescription   String?             @map("damage_description")
+
+  // Relations
+  assessment          Assessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([structuralSystem])
+  @@index([constructionYear])
+  @@map("building_info")
+}
+
+// Safety assessment results and scores
+model SafetyResult {
+  id                  String              @id @default(cuid())
+  assessmentId        String              @unique @map("assessment_id")
+
+  // Overall scores
+  overallScore        Float               @map("overall_score") // 0-100
+  riskLevel           String              @map("risk_level") // Low, Moderate, High, Very High
+  safetyRating        String              @map("safety_rating") // A, B, C, D, E
+
+  // Component scores
+  structuralScore     Float?              @map("structural_score")
+  foundationScore     Float?              @map("foundation_score")
+  materialScore       Float?              @map("material_score")
+  irregularityScore   Float?              @map("irregularity_score")
+  siteScore           Float?              @map("site_score")
+
+  // FEMA/TBDY calculations
+  femaScore           Float?              @map("fema_score")
+  tbdyScore           Float?              @map("tbdy_score")
+  vulnerabilityIndex  Float?              @map("vulnerability_index")
+
+  // Risk factors
+  mainRiskFactors     Json?               @map("main_risk_factors") // Array of risk factors
+  criticalIssues      Json?               @map("critical_issues") // Array of critical issues
+
+  // Recommendations
+  immediateActions    Json?               @map("immediate_actions") // Array of actions
+  shortTermActions    Json?               @map("short_term_actions")
+  longTermActions     Json?               @map("long_term_actions")
+
+  // Cost estimates
+  estimatedRetrofitCost Float?            @map("estimated_retrofit_cost")
+  priorityLevel       String?             @map("priority_level") // Urgent, High, Medium, Low
+
+  // AI Analysis results
+  aiAnalysis          Json?               @map("ai_analysis") // Complete AI analysis data
+  aiConfidence        Float?              @map("ai_confidence") // 0-1
+
+  // Calculation metadata
+  calculationMethod   String?             @map("calculation_method")
+  calculatedAt        DateTime            @default(now()) @map("calculated_at")
+
+  // Relations
+  assessment          Assessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([riskLevel])
+  @@index([overallScore])
+  @@map("safety_results")
+}
+
+// Assessment images (Street View, Satellite, User uploads)
+model AssessmentImage {
+  id                  String              @id @default(cuid())
+  assessmentId        String              @map("assessment_id")
+
+  // Image metadata
+  imageType           ImageType           @map("image_type")
+  fileName            String?             @map("file_name")
+  mimeType            String              @default("image/jpeg") @map("mime_type")
+  fileSize            Int?                @map("file_size") // bytes
+
+  // Image data (base64 or URL)
+  imageData           String              @map("image_data") @db.Text // base64 or cloud URL
+  thumbnailData       String?             @map("thumbnail_data") @db.Text // smaller version
+
+  // Additional metadata
+  capturedAt          DateTime?           @map("captured_at")
+  description         String?
+  angle               Int?                // For Street View (0, 90, 180, 270)
+
+  // AI analysis specific to this image
+  aiAnalysis          Json?               @map("ai_analysis")
+
+  uploadedAt          DateTime            @default(now()) @map("uploaded_at")
+
+  // Relations
+  assessment          Assessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@index([imageType])
+  @@map("assessment_images")
+}
+
+// Image type enum
+enum ImageType {
+  STREET_VIEW
+  SATELLITE
+  USER_UPLOAD
+  BUILDING_PLAN
+  STRUCTURAL_PLAN
+
+  @@map("image_type")
+}
