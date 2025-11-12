@@ -15,6 +15,7 @@ import {
         Building,
         HelpCircle,
         LayoutDashboard,
+        History,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -34,6 +35,11 @@ const Navbar = () => {
                         href: '/dashboard',
                         label: 'Dashboard',
                         icon: <LayoutDashboard className='h-4 w-4' />,
+                },
+                {
+                        href: '/history',
+                        label: 'My Assessments',
+                        icon: <History className='h-4 w-4' />,
                 },
                 {
                         href: '/assessment/1',

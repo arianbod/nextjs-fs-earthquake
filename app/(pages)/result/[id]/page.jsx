@@ -1,7 +1,10 @@
 // app/(pages)/result/[id]/page.jsx
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { useUserInput } from '@/context/UserInputContext';
+import { saveAssessment, formatAssessmentForSaving } from '@/lib/assessmentService';
+import { imageStorageManager } from '@/lib/imageStorage';
 import EnhancedCertificate from '@/components/EnhancedCertificate';
 import SafetyCalculator from '@/components/SafetyCalculator';
 import EarthquakePerformanceChart from '@/components/results/EarthquakePerformanceChart';
@@ -44,12 +47,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ImageGallery from '@/components/ImageGallery';
 
 const ResultPage = () => {
+	const { user, isLoaded: isUserLoaded } = useUser();
 	const { userInput, clearSavedData, getImageGallery } = useUserInput();
 	const [safetyResult, setSafetyResult] = useState(null);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 	const [dataLoaded, setDataLoaded] = useState(false);
+	const [assessmentSaved, setAssessmentSaved] = useState(false);
+	const [savedAssessmentId, setSavedAssessmentId] = useState(null);
 
 	useEffect(() => {
 		try {
@@ -83,6 +89,47 @@ const ResultPage = () => {
 			setLoading(false);
 		}
 	}, [userInput, clearSavedData]);
+
+	// Auto-save assessment to database
+	useEffect(() => {
+		const autoSaveAssessment = async () => {
+			// Only save if:
+			// - User is loaded and authenticated
+			// - Safety result is calculated
+			// - Assessment not already saved
+			if (!isUserLoaded || !user || !safetyResult || assessmentSaved) {
+				return;
+			}
+
+			try {
+				console.log('Auto-saving assessment...');
+
+				// Get stored images
+				const storedImages = imageStorageManager.getAllImages();
+
+				// Format assessment data
+				const assessmentData = formatAssessmentForSaving(
+					userInput,
+					safetyResult,
+					storedImages
+				);
+
+				// Save to database
+				const result = await saveAssessment(assessmentData);
+
+				console.log('Assessment saved successfully:', result.assessmentId);
+				setAssessmentSaved(true);
+				setSavedAssessmentId(result.assessmentId);
+
+			} catch (error) {
+				console.error('Failed to auto-save assessment:', error);
+				// Don't show error to user, just log it
+				// Assessment can still be viewed even if save fails
+			}
+		};
+
+		autoSaveAssessment();
+	}, [isUserLoaded, user, safetyResult, userInput, assessmentSaved]);
 
 	// Wait a moment for localStorage to restore data
 	useEffect(() => {
@@ -177,14 +224,26 @@ const ResultPage = () => {
 						<HomeIcon className='h-4 w-4' /> Home
 					</Button>
 				</Link>
-				<Link href='/assessment/1'>
-					<Button
-						variant='outline'
-						size='sm'
-						className='gap-1'>
-						<ArrowLeft className='h-4 w-4' /> New Assessment
-					</Button>
-				</Link>
+				<div className='flex items-center gap-3'>
+					{assessmentSaved && user && (
+						<Link href='/history'>
+							<Button
+								variant='outline'
+								size='sm'
+								className='gap-1 border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'>
+								<CheckCircle2 className='h-4 w-4' /> Saved! View History
+							</Button>
+						</Link>
+					)}
+					<Link href='/assessment/1'>
+						<Button
+							variant='outline'
+							size='sm'
+							className='gap-1'>
+							<ArrowLeft className='h-4 w-4' /> New Assessment
+						</Button>
+					</Link>
+				</div>
 			</div>
 
 			{/* Result Header */}

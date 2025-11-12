@@ -20,7 +20,10 @@
       "Bash(npm install:*)",
       "Bash(npx prisma:*)",
       "Bash(npm uninstall:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(npm run db:migrate:*)",
+      "Bash(npm run db:push:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
