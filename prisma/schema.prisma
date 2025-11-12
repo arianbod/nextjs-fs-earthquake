@@ -1,0 +1,174 @@
+// QuakeWise External API - Prisma Schema
+// PostgreSQL database schema for API usage tracking and analytics
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // For Neon direct connection (migrations)
+}
+
+// Platform apps registry
+// Stores information about external applications using the API
+model ApiApp {
+  id                  String        @id @default(cuid())
+  name                String
+  platformTokenHash   String        @unique @map("platform_token_hash")
+  tier                Tier          @default(FREE)
+  rateLimitPerHour    Int           @default(100) @map("rate_limit_per_hour")
+  rateLimitPerDay     Int           @default(1000) @map("rate_limit_per_day")
+  status              AppStatus     @default(ACTIVE)
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  lastUsedAt          DateTime?     @map("last_used_at")
+  metadata            Json?         // Additional app metadata
+
+  // Relations
+  usage               ApiUsage[]
+  rateLimits          RateLimit[]
+  tokens              ApiToken[]
+  errors              ApiError[]
+  usageSummaries      ApiUsageSummary[]
+
+  @@index([platformTokenHash])
+  @@index([status])
+  @@map("api_apps")
+}
+
+// Usage tracking
+// Records every API call for analytics and billing
+model ApiUsage {
+  id                  Int           @id @default(autoincrement())
+  appId               String        @map("app_id")
+  userId              String?       @map("user_id") // From JWT token
+  endpoint            String
+  method              String
+  timestamp           DateTime      @default(now())
+  responseTimeMs      Int?          @map("response_time_ms")
+  statusCode          Int           @map("status_code")
+  errorCode           String?       @map("error_code")
+  ipAddress           String?       @map("ip_address")
+  userAgent           String?       @map("user_agent")
+  requestSizeBytes    Int?          @default(0) @map("request_size_bytes")
+  responseSizeBytes   Int?          @default(0) @map("response_size_bytes")
+
+  // Relations
+  app                 ApiApp        @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId])
+  @@index([timestamp])
+  @@index([appId, timestamp])
+  @@index([endpoint])
+  @@index([userId])
+  @@map("api_usage")
+}
+
+// Rate limit tracking
+// Tracks API calls per time window for rate limiting
+model RateLimit {
+  appId               String        @map("app_id")
+  windowStart         DateTime      @map("window_start")
+  windowType          WindowType    @map("window_type")
+  requestCount        Int           @default(0) @map("request_count")
+
+  // Relations
+  app                 ApiApp        @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, windowStart, windowType])
+  @@index([appId, windowStart, windowType])
+  @@map("rate_limits")
+}
+
+// API tokens
+// Tracks issued JWT tokens for revocation
+model ApiToken {
+  tokenId             String        @id @map("token_id")
+  appId               String        @map("app_id")
+  userId              String        @map("user_id")
+  issuedAt            DateTime      @default(now()) @map("issued_at")
+  expiresAt           DateTime      @map("expires_at")
+  revoked             Boolean       @default(false)
+  revokedAt           DateTime?     @map("revoked_at")
+  revokeReason        String?       @map("revoke_reason")
+
+  // Relations
+  app                 ApiApp        @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId])
+  @@index([userId])
+  @@index([revoked])
+  @@index([expiresAt])
+  @@map("api_tokens")
+}
+
+// Error logs
+// Detailed error tracking for debugging
+model ApiError {
+  id                  Int           @id @default(autoincrement())
+  appId               String?       @map("app_id")
+  userId              String?       @map("user_id")
+  endpoint            String
+  errorCode           String        @map("error_code")
+  errorMessage        String?       @map("error_message")
+  stackTrace          String?       @map("stack_trace")
+  timestamp           DateTime      @default(now())
+  requestBody         Json?         @map("request_body") // Be careful with PII
+  resolved            Boolean       @default(false)
+
+  // Relations
+  app                 ApiApp?       @relation(fields: [appId], references: [id], onDelete: SetNull)
+
+  @@index([appId])
+  @@index([timestamp])
+  @@index([errorCode])
+  @@index([resolved])
+  @@map("api_errors")
+}
+
+// Usage summary
+// Aggregated statistics for quick analytics
+model ApiUsageSummary {
+  appId               String        @map("app_id")
+  date                DateTime      @db.Date
+  endpoint            String
+  totalRequests       Int           @default(0) @map("total_requests")
+  successfulRequests  Int           @default(0) @map("successful_requests")
+  failedRequests      Int           @default(0) @map("failed_requests")
+  avgResponseTimeMs   Float?        @map("avg_response_time_ms")
+  totalDataBytes      BigInt        @default(0) @map("total_data_bytes")
+
+  // Relations
+  app                 ApiApp        @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@id([appId, date, endpoint])
+  @@index([appId, date])
+  @@map("api_usage_summary")
+}
+
+// Enums
+enum Tier {
+  FREE
+  PRO
+  ENTERPRISE
+
+  @@map("tier")
+}
+
+enum AppStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+
+  @@map("app_status")
+}
+
+enum WindowType {
+  MINUTE
+  HOUR
+  DAY
+
+  @@map("window_type")
+}

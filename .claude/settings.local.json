@@ -14,7 +14,13 @@
       "Bash(git commit:*)",
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(git rm:*)",
+      "Bash(.gitignore)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []
