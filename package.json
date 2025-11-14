@@ -23,7 +23,14 @@
     "api:register": "node scripts/register-app.js",
     "api:test": "node scripts/test-api.js",
     "api:docs": "echo 'Opening API docs at http://localhost:3000/api-docs'",
-    "api:prod-tokens": "node scripts/generate-production-token.js"
+    "api:prod-tokens": "node scripts/generate-production-token.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
+    "test:api": "vitest run --grep=API",
+    "test:integration": "vitest run --grep=Integration"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
@@ -72,13 +79,19 @@
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.27.7",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^22.11.0",
     "@types/react": "^19.0.0",
+    "@vitest/ui": "^4.0.9",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.0.0",
+    "happy-dom": "^20.0.10",
+    "msw": "^2.12.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "vitest": "^4.0.9"
   }
 }
