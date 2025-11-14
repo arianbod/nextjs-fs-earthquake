@@ -1,6 +1,6 @@
 /**
- * Rate Limiting Middleware for QuakeWise External API
- * Implements tiered rate limiting with usage tracking
+ * Rate Limiting Middleware for QuakeWise Internal API
+ * Implements tiered rate limiting with usage tracking for internal services
  */
 
 import { NextResponse } from 'next/server';
@@ -9,32 +9,32 @@ import { getRateLimitCache } from '../lib/cache/rateLimitCache';
 import { createErrorResponse } from '../lib/api/errorHandler';
 
 /**
- * Extracts app ID from request (assumes platform auth already validated)
- * In production, this should be set by platform auth middleware
+ * Extracts service ID from request (assumes service auth already validated)
+ * Service info is set by platform auth middleware
  */
-function getAppIdFromRequest(request) {
-  // This will be set by platform auth middleware
-  return request.appId || 'unknown';
+function getServiceIdFromRequest(request) {
+  // This is set by platform auth middleware
+  return request.service?.id || 'unknown';
 }
 
 /**
  * Middleware to enforce rate limiting
- * Should be applied after platform authentication
+ * Should be applied after service authentication
  *
  * @param {Request} request - Next.js request object
  * @param {Function} handler - The actual route handler function
  * @returns {Promise<Response>} - Response with rate limit headers
  */
 export async function withRateLimit(request, handler) {
-  const appId = getAppIdFromRequest(request);
+  const serviceId = getServiceIdFromRequest(request);
 
   // Check rate limit
-  const rateLimit = checkRateLimit(appId, 'hour');
+  const rateLimit = await checkRateLimit(serviceId, 'HOUR');
 
   if (!rateLimit.allowed) {
     if (rateLimit.error) {
       return createErrorResponse({
-        code: 'INVALID_APP',
+        code: 'INVALID_SERVICE',
         message: rateLimit.error,
         status: 403
       });
@@ -70,7 +70,7 @@ export async function withRateLimit(request, handler) {
 
   // Track API usage asynchronously (don't wait)
   trackApiUsageAsync({
-    appId,
+    serviceId,
     request,
     response,
     responseTimeMs: endTime - startTime
@@ -86,7 +86,7 @@ export async function withRateLimit(request, handler) {
 /**
  * Tracks API usage asynchronously
  */
-async function trackApiUsageAsync({ appId, request, response, responseTimeMs }) {
+async function trackApiUsageAsync({ serviceId, request, response, responseTimeMs }) {
   try {
     const url = new URL(request.url);
     const endpoint = url.pathname;
@@ -109,7 +109,7 @@ async function trackApiUsageAsync({ appId, request, response, responseTimeMs }) 
     }
 
     await trackApiUsage({
-      appId,
+      appId: serviceId,
       userId,
       endpoint,
       method,
@@ -140,26 +140,25 @@ export function withRateLimiting(handler) {
 }
 
 /**
- * Combined middleware: platform auth + rate limiting
- * Most common pattern for external API endpoints
+ * Combined middleware: service auth + rate limiting
+ * Most common pattern for internal API endpoints
  */
 export function withPlatformAuthAndRateLimit(handler) {
   return async (request) => {
-    // Import platform auth
+    // Import service auth
     const { authenticatePlatform } = await import('../lib/auth/platformAuth');
-    const auth = authenticatePlatform(request);
+    const auth = await authenticatePlatform(request);
 
     if (!auth.valid) {
       return createErrorResponse({
-        code: 'INVALID_PLATFORM_TOKEN',
+        code: 'INVALID_SERVICE_TOKEN',
         message: auth.error,
         status: 401
       });
     }
 
-    // Extract app ID from platform token (you'll need to implement this)
-    // For now, using a simple approach - in production, store app ID mapping
-    request.appId = await getAppIdFromPlatformToken(request);
+    // Set service info on request (for rate limiting and tracking)
+    request.service = auth.service;
 
     // Apply rate limiting
     return await withRateLimit(request, handler);
@@ -167,44 +166,11 @@ export function withPlatformAuthAndRateLimit(handler) {
 }
 
 /**
- * Gets app ID from platform token
- * TODO: Implement proper token-to-appId mapping
- */
-async function getAppIdFromPlatformToken(request) {
-  // In production, you should:
-  // 1. Extract the platform token
-  // 2. Look up the app ID from the database
-  // 3. Return the app ID
-
-  // For now, using a simple approach
-  // You could also encode the app ID in the token itself
-  const token = request.headers.get('x-platform-token') ||
-    request.headers.get('authorization')?.replace('Platform ', '');
-
-  // Temporary: Look up app by token hash
-  const { getDb } = await import('../lib/db/usageTracker');
-  const db = getDb();
-
-  try {
-    const crypto = await import('crypto');
-    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-
-    const stmt = db.prepare('SELECT id FROM api_apps WHERE platform_token_hash = ? AND status = "active"');
-    const app = stmt.get(tokenHash);
-
-    return app?.id || 'unknown';
-  } catch (error) {
-    console.error('Failed to get app ID:', error);
-    return 'unknown';
-  }
-}
-
-/**
  * Checks rate limit without enforcing
- * Useful for showing remaining quota to clients
+ * Useful for showing remaining quota to internal services
  */
-export function checkRateLimitStatus(appId, windowType = 'hour') {
-  const rateLimit = checkRateLimit(appId, windowType);
+export async function checkRateLimitStatus(serviceId, windowType = 'HOUR') {
+  const rateLimit = await checkRateLimit(serviceId, windowType);
   return {
     allowed: rateLimit.allowed,
     limit: rateLimit.limit,
@@ -218,8 +184,8 @@ export function checkRateLimitStatus(appId, windowType = 'hour') {
  * Gets rate limit headers as object
  * Can be added to any response
  */
-export function getRateLimitHeaders(appId) {
-  const rateLimit = checkRateLimit(appId, 'hour');
+export async function getRateLimitHeaders(serviceId) {
+  const rateLimit = await checkRateLimit(serviceId, 'HOUR');
 
   if (!rateLimit.allowed && rateLimit.error) {
     return {};

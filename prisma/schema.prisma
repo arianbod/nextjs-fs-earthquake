@@ -11,15 +11,15 @@ datasource db {
   directUrl = env("DIRECT_URL") // For Neon direct connection (migrations)
 }
 
-// Platform apps registry
-// Stores information about external applications using the API
+// Internal services registry
+// Stores information about internal QuakeWise services accessing the API
 model ApiApp {
   id                  String        @id @default(cuid())
   name                String
   platformTokenHash   String        @unique @map("platform_token_hash")
-  tier                Tier          @default(FREE)
-  rateLimitPerHour    Int           @default(100) @map("rate_limit_per_hour")
-  rateLimitPerDay     Int           @default(1000) @map("rate_limit_per_day")
+  tier                Tier          @default(DEV_TESTING)
+  rateLimitPerHour    Int           @default(500) @map("rate_limit_per_hour")
+  rateLimitPerDay     Int           @default(5000) @map("rate_limit_per_day")
   status              AppStatus     @default(ACTIVE)
   createdAt           DateTime      @default(now()) @map("created_at")
   updatedAt           DateTime      @updatedAt @map("updated_at")
@@ -149,10 +149,11 @@ model ApiUsageSummary {
 }
 
 // Enums
+// Internal service tiers (not payment-based)
 enum Tier {
-  FREE
-  PRO
-  ENTERPRISE
+  WEB_APP        // High-traffic user-facing services (10k/hour)
+  BATCH_JOB      // Background jobs and bulk processing (1k/hour)
+  DEV_TESTING    // Development and testing environments (500/hour)
 
   @@map("tier")
 }

@@ -1,13 +1,13 @@
-# QuakeWise External API Documentation
+# QuakeWise Internal API Documentation
 
 ## Overview
 
-The QuakeWise External API is a comprehensive RESTful API that enables third-party applications to perform earthquake safety assessments for buildings. It combines AI-powered analysis, geospatial data, and structural engineering calculations to provide detailed vulnerability assessments.
+The QuakeWise Internal API is a comprehensive RESTful API that enables our internal services and microservices to perform earthquake safety assessments for buildings. It combines AI-powered analysis, geospatial data, and structural engineering calculations to provide detailed vulnerability assessments.
 
 ## Features
 
 - **Dual Authentication System**: Platform-level tokens + JWT tokens for end users
-- **Tiered Rate Limiting**: 100 to 10,000 requests/hour based on subscription tier
+- **Tiered Rate Limiting**: 500 to 10,000 requests/hour based on service tier
 - **AI Image Analysis**: Claude AI-powered building photo and plan analysis
 - **Comprehensive Safety Scoring**: Turkish Building Earthquake Code (TBDY-2018) compliant calculations
 - **Geospatial Integration**: Google Maps APIs for location intelligence and Street View
@@ -15,65 +15,49 @@ The QuakeWise External API is a comprehensive RESTful API that enables third-par
 - **Usage Analytics**: Detailed tracking and analytics for API consumption
 - **Interactive Documentation**: Swagger UI with live testing capabilities
 
-## Quick Start
+## Quick Start for Internal Teams
 
-### 1. Setup Environment Variables
+### 1. Generate Service Tokens
 
-```bash
-# Copy the example environment file
-cp .env.local.example .env.local
-
-# Generate secure tokens
-node -e "console.log('API_PLATFORM_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
-node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(32).toString('hex'))"
-
-# Add these to your .env.local file
-```
-
-### 2. Install Dependencies
+All internal services are pre-registered in `config/internal-services.js`. Generate tokens for these services:
 
 ```bash
-# Install required npm packages
-npm install jose better-sqlite3 zod
+# Generate secure tokens for all pre-registered services
+npm run generate:service-tokens
 
-# Optional: Install Swagger UI for documentation
-npm install swagger-ui-react
+# This creates a timestamped file with all tokens
+# Store these tokens in our team password manager (1Password/Vault)
 ```
 
-### 3. Initialize Database
+Available pre-registered services:
+- `quakewise-web-app` - Main web application (WEB_APP tier)
+- `quakewise-mobile-api` - Mobile backend service (WEB_APP tier)
+- `batch-assessment-processor` - Background job processor (BATCH_JOB tier)
+- `analytics-service` - Data analytics service (BATCH_JOB tier)
+- `dev-testing-service` - Development and testing (DEV_TESTING tier)
+
+### 2. Add Tokens to Environment
 
 ```bash
-# The database will be automatically created on first run
-# Default location: ./data/api_usage.db
+# Add service tokens to .env.local for development
+# Format: SERVICE_TOKEN_WEB_APP=<your-token-here>
+
+# For production, add to Vercel environment variables
+# See the generated file for Vercel-ready format
 ```
 
-### 4. Register Your First App
+### 3. Seed Database
 
-Create a script to register your platform app:
+```bash
+# Initialize database with pre-registered services
+npm run db:seed
 
-```javascript
-// scripts/register-app.js
-const { registerApp } = require('./lib/db/usageTracker');
-const { generatePlatformToken } = require('./lib/auth/platformAuth');
-
-const platformToken = generatePlatformToken();
-
-const result = registerApp({
-  appId: 'my-app',
-  name: 'My Application',
-  tier: 'pro',
-  platformToken: platformToken
-});
-
-console.log('App registered successfully!');
-console.log('App ID:', result.appId);
-console.log('Platform Token:', platformToken);
-console.log('SAVE THIS TOKEN - it will not be shown again!');
+# This creates all service records in the database
 ```
 
-### 5. Test the API
+### 4. Access Internal Documentation
 
-Visit `http://localhost:3000/api-docs` to access the interactive documentation and test the endpoints.
+Visit `http://localhost:3000/api-docs` (requires Clerk authentication with team email)
 
 ## Architecture
 
@@ -123,28 +107,35 @@ quakewise/
 
 ### Platform Authentication
 
-Platform authentication uses a static token that identifies your application:
+Platform authentication uses pre-registered service tokens from our internal registry:
 
 ```http
 POST /api/v1/auth/issue-token
-X-Platform-Token: your_platform_token_here
+X-Platform-Token: <service-token-from-env>
 ```
+
+Each internal service has a dedicated token stored in environment variables:
+- `SERVICE_TOKEN_WEB_APP` - Web application service
+- `SERVICE_TOKEN_MOBILE` - Mobile API service
+- `SERVICE_TOKEN_BATCH` - Batch processing service
+- `SERVICE_TOKEN_ANALYTICS` - Analytics service
+- `SERVICE_TOKEN_DEV` - Development/testing service
 
 ### User Authentication (JWT)
 
-For end-user operations, issue JWT tokens:
+For end-user operations, our services issue JWT tokens:
 
 **Request:**
 ```json
 POST /api/v1/auth/issue-token
 Headers:
-  X-Platform-Token: your_platform_token
+  X-Platform-Token: <SERVICE_TOKEN_WEB_APP>
 
 Body:
 {
-  "userId": "user_123",
-  "appId": "my-app",
-  "tier": "pro",
+  "userId": "clerk_user_123",
+  "appId": "quakewise-web-app",
+  "tier": "WEB_APP",
   "expiresIn": "7d"
 }
 ```
@@ -243,20 +234,20 @@ Returns usage statistics for an app (requires platform token).
 
 ## Rate Limiting
 
-All authenticated endpoints are rate-limited based on your tier:
+All authenticated endpoints are rate-limited based on service tier:
 
-| Tier       | Requests/Hour | Requests/Day | Features                          |
-|------------|---------------|--------------|-----------------------------------|
-| Free       | 100           | 1,000        | Basic assessment                  |
-| Pro        | 1,000         | 10,000       | + AI analysis + Location data     |
-| Enterprise | 10,000        | 100,000      | + Priority support + Custom features |
+| Tier        | Requests/Hour | Requests/Day | Use Case                          |
+|-------------|---------------|--------------|-----------------------------------|
+| WEB_APP     | 10,000        | 100,000      | High-traffic user-facing services (web & mobile apps) |
+| BATCH_JOB   | 1,000         | 50,000       | Background jobs and bulk processing |
+| DEV_TESTING | 500           | 5,000        | Development environments and automated testing |
 
 **Rate Limit Headers:**
 ```http
-X-RateLimit-Limit: 1000
-X-RateLimit-Remaining: 987
+X-RateLimit-Limit: 10000
+X-RateLimit-Remaining: 9987
 X-RateLimit-Reset: 2025-09-15T11:00:00Z
-X-RateLimit-Tier: pro
+X-RateLimit-Tier: WEB_APP
 ```
 
 ## Error Handling
@@ -306,11 +297,11 @@ For complete list, call `GET /api/v1/parameters`
 
 ## Usage Analytics
 
-Track your API usage:
+Track internal service usage:
 
 ```bash
-GET /api/v1/usage/my-app?days=7
-X-Platform-Token: your_platform_token
+GET /api/v1/usage/quakewise-web-app?days=7
+X-Platform-Token: $SERVICE_TOKEN_WEB_APP
 ```
 
 Response includes:
@@ -318,6 +309,13 @@ Response includes:
 - Success/error rates
 - Average response times
 - Endpoint breakdown
+
+Available service IDs:
+- `quakewise-web-app`
+- `quakewise-mobile-api`
+- `batch-assessment-processor`
+- `analytics-service`
+- `dev-testing-service`
 
 ## Development
 
@@ -337,50 +335,67 @@ curl http://localhost:3000/api/v1/status
 ### Testing
 
 ```bash
-# Test platform authentication
+# Test platform authentication with web app service token
 curl -X POST http://localhost:3000/api/v1/auth/issue-token \
-  -H "X-Platform-Token: your_token" \
+  -H "X-Platform-Token: $SERVICE_TOKEN_WEB_APP" \
   -H "Content-Type: application/json" \
-  -d '{"userId":"test_user","appId":"test-app","tier":"pro"}'
+  -d '{"userId":"clerk_user_123","appId":"quakewise-web-app","tier":"WEB_APP"}'
 
 # Test assessment endpoint
 curl -X POST http://localhost:3000/api/v1/assessment/complete \
-  -H "X-Platform-Token: your_platform_token" \
-  -H "Authorization: Bearer your_jwt_token" \
+  -H "X-Platform-Token: $SERVICE_TOKEN_WEB_APP" \
+  -H "Authorization: Bearer <jwt_token>" \
   -H "Content-Type: application/json" \
   -d @test-assessment.json
+
+# Or use the provided test script
+npm run api:test
 ```
 
 ### Database Management
 
 ```bash
-# View database location
-echo $API_DATABASE_PATH
+# Using Prisma Studio (recommended)
+npm run db:studio
 
-# Inspect database
-sqlite3 ./data/api_usage.db
+# View Neon PostgreSQL database
+# Connection details in DATABASE_URL environment variable
 
-# Common queries
-SELECT * FROM api_apps;
-SELECT * FROM api_usage ORDER BY timestamp DESC LIMIT 10;
-SELECT * FROM rate_limits WHERE app_id = 'my-app';
+# Common Prisma queries
+npx prisma db seed  # Seed database with pre-registered services
+npx prisma migrate dev  # Run migrations
+npx prisma generate  # Regenerate Prisma Client
 ```
 
 ## Production Deployment
 
 ### Environment Variables
 
-Set these in your production environment:
+Set these in Vercel production environment:
 
 ```bash
-API_PLATFORM_SECRET=<secure-256-bit-token>
+# Database (Neon PostgreSQL)
+DATABASE_URL=postgresql://...
+DIRECT_URL=postgresql://...
+
+# Service Tokens (from npm run generate:service-tokens)
+SERVICE_TOKEN_WEB_APP=<secure-256-bit-token>
+SERVICE_TOKEN_MOBILE=<secure-256-bit-token>
+SERVICE_TOKEN_BATCH=<secure-256-bit-token>
+SERVICE_TOKEN_ANALYTICS=<secure-256-bit-token>
+SERVICE_TOKEN_DEV=<secure-256-bit-token>
+
+# JWT Configuration
 JWT_SECRET=<secure-256-bit-token>
 JWT_EXPIRY=7d
-API_DATABASE_PATH=/data/api_usage.db
 
-# Existing services
-ANTHROPIC_API_KEY=<your-key>
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<your-key>
+# External Services
+ANTHROPIC_API_KEY=<claude-api-key>
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<google-maps-key>
+
+# Clerk Authentication
+CLERK_SECRET_KEY=<clerk-secret>
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<clerk-publishable>
 ```
 
 ### Security Considerations
@@ -405,18 +420,32 @@ Monitor these metrics:
 
 Logs are written to `./logs/api-YYYY-MM-DD.log`
 
-## Support & Resources
+## Internal Resources
 
-- **Interactive Documentation**: https://quakewise.com/api-docs
-- **OpenAPI Specification**: https://quakewise.com/api-docs/openapi.json
-- **GitHub Issues**: Report bugs and request features
-- **Email Support**: api@quakewise.com
+- **Interactive Documentation**: http://localhost:3000/api-docs (dev) or https://quakewise.com/api-docs (prod, requires Clerk auth)
+- **OpenAPI Specification**: `/public/api-docs/openapi.json`
+- **Service Registry**: `config/internal-services.js` - Pre-registered services and tier configuration
+- **Team Access Control**: `config/team-members.js` - API docs email whitelist
+- **Internal Slack**: #api-support channel for questions
+- **Team Password Manager**: 1Password vault "QuakeWise API Tokens"
 
 ## License
 
 Proprietary - © 2025 QuakeWise. All rights reserved.
 
 ## Changelog
+
+### Version 1.1.0 (2025-09-15)
+
+**Internal API Transformation:**
+- Converted from external/public API to internal-only services architecture
+- Pre-registered service system (no dynamic app registration)
+- Updated tier system: WEB_APP, BATCH_JOB, DEV_TESTING (replaced FREE/PRO/ENTERPRISE)
+- Clerk authentication for API documentation access
+- Team email whitelist for internal access control
+- Automated service token generation script
+- Migrated to Neon PostgreSQL (from SQLite)
+- Prisma ORM integration
 
 ### Version 1.0.0 (2025-09-15)
 

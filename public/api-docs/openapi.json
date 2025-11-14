@@ -1,12 +1,12 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "QuakeWise External API",
-    "version": "1.0.0",
-    "description": "Comprehensive earthquake safety assessment API combining AI analysis, geospatial data, and structural engineering calculations. Provides building vulnerability assessments for seismic risk evaluation.",
+    "title": "QuakeWise Internal API",
+    "version": "1.1.0",
+    "description": "Internal microservices API for earthquake safety assessments. Combines AI analysis, geospatial data, and structural engineering calculations. For QuakeWise internal services only.",
     "contact": {
-      "name": "QuakeWise API Support",
-      "email": "api@quakewise.com"
+      "name": "QuakeWise Internal API Team",
+      "email": "api-team@quakewise.com"
     },
     "license": {
       "name": "Proprietary",
@@ -71,10 +71,10 @@
                 "$ref": "#/components/schemas/IssueTokenRequest"
               },
               "example": {
-                "userId": "user_12345",
-                "appId": "my-app",
-                "tier": "pro",
-                "metadata": {"source": "mobile-app"},
+                "userId": "clerk_user_12345",
+                "appId": "quakewise-web-app",
+                "tier": "WEB_APP",
+                "metadata": {"source": "web-app"},
                 "expiresIn": "7d"
               }
             }
@@ -520,7 +520,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-Platform-Token",
-        "description": "Static platform authentication token provided by QuakeWise"
+        "description": "Internal service authentication token (pre-registered in config/internal-services.js)"
       },
       "BearerAuth": {
         "type": "http",
@@ -534,9 +534,9 @@
         "type": "object",
         "required": ["userId", "appId"],
         "properties": {
-          "userId": {"type": "string", "description": "User identifier from external app"},
-          "appId": {"type": "string", "description": "Platform app identifier"},
-          "tier": {"type": "string", "enum": ["free", "pro", "enterprise"], "default": "free"},
+          "userId": {"type": "string", "description": "Clerk user identifier"},
+          "appId": {"type": "string", "description": "Internal service identifier (e.g., quakewise-web-app)"},
+          "tier": {"type": "string", "enum": ["WEB_APP", "BATCH_JOB", "DEV_TESTING"], "default": "DEV_TESTING"},
           "metadata": {"type": "object", "description": "Additional user metadata"},
           "expiresIn": {"type": "string", "pattern": "^\\d+[dhms]$", "default": "7d", "description": "Token expiry (e.g., 7d, 24h)"}
         }
