@@ -8,15 +8,18 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
-import { isTeamMember } from '@/config/team-members';
+import { isTeamMember, isAdmin } from '@/config/team-members';
 import SwaggerUI from '@/components/api-docs/SwaggerUI';
 import ApiTester from '@/components/api-docs/ApiTester';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { InfoIcon, LockIcon, Code2, Smartphone, Globe, Server } from 'lucide-react';
+import { InfoIcon, LockIcon, Code2, Smartphone, Globe, Server, KeyRound, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function ApiDocsPage() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -24,9 +27,21 @@ export default function ApiDocsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Token generation state
+  const [tokenForm, setTokenForm] = useState({
+    serviceId: '',
+    name: '',
+    email: '',
+    tier: 'DEV_TESTING'
+  });
+  const [generatedToken, setGeneratedToken] = useState(null);
+  const [generating, setGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
   // Check if user has team access
   const userEmail = user?.primaryEmailAddress?.emailAddress;
   const hasAccess = isSignedIn && userEmail && isTeamMember(userEmail);
+  const isUserAdmin = isSignedIn && userEmail && isAdmin(userEmail);
 
   useEffect(() => {
     // Load OpenAPI specification
@@ -41,6 +56,47 @@ export default function ApiDocsPage() {
         setLoading(false);
       });
   }, []);
+
+  // Token generation handler
+  const handleGenerateToken = async (e) => {
+    e.preventDefault();
+    setGenerating(true);
+    setGeneratedToken(null);
+
+    try {
+      const response = await fetch('/api/v1/admin/generate-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tokenForm)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setGeneratedToken(data.data);
+        setTokenForm({
+          serviceId: '',
+          name: '',
+          email: '',
+          tier: 'DEV_TESTING'
+        });
+      } else {
+        alert('Error: ' + data.error.message);
+      }
+    } catch (error) {
+      alert('Failed to generate token: ' + error.message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const copyToken = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   // Loading Clerk user data
   if (!isLoaded) {
@@ -183,6 +239,7 @@ export default function ApiDocsPage() {
             <TabsTrigger value="web">Web Apps</TabsTrigger>
             <TabsTrigger value="reference">Full API Reference</TabsTrigger>
             <TabsTrigger value="tester">API Tester</TabsTrigger>
+            {isUserAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
           </TabsList>
 
           {/* Quick Start Tab */}
@@ -594,6 +651,160 @@ export default function AssessmentForm() {
           <TabsContent value="tester">
             <ApiTester />
           </TabsContent>
+
+          {/* Admin Tab */}
+          {isUserAdmin && (
+            <TabsContent value="admin" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <KeyRound className="h-5 w-5" />
+                    <CardTitle>Generate Service Token</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Create service tokens for developers to access the API
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleGenerateToken} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="serviceId">Service ID *</Label>
+                        <Input
+                          id="serviceId"
+                          placeholder="e.g., dev-john-doe"
+                          value={tokenForm.serviceId}
+                          onChange={(e) => setTokenForm({...tokenForm, serviceId: e.target.value})}
+                          required
+                        />
+                        <p className="text-xs text-gray-500">Unique identifier (lowercase, hyphens only)</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Developer Name *</Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g., John Doe"
+                          value={tokenForm.name}
+                          onChange={(e) => setTokenForm({...tokenForm, name: e.target.value})}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="e.g., john@example.com"
+                          value={tokenForm.email}
+                          onChange={(e) => setTokenForm({...tokenForm, email: e.target.value})}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="tier">Service Tier *</Label>
+                        <Select
+                          value={tokenForm.tier}
+                          onValueChange={(value) => setTokenForm({...tokenForm, tier: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="WEB_APP">WEB_APP (10,000/hour)</SelectItem>
+                            <SelectItem value="BATCH_JOB">BATCH_JOB (1,000/hour)</SelectItem>
+                            <SelectItem value="DEV_TESTING">DEV_TESTING (500/hour)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-gray-500">Rate limit tier</p>
+                      </div>
+                    </div>
+
+                    <Button type="submit" disabled={generating} className="w-full md:w-auto">
+                      {generating ? 'Generating...' : 'Generate Token'}
+                    </Button>
+                  </form>
+
+                  {/* Generated Token Display */}
+                  {generatedToken && (
+                    <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg space-y-4">
+                      <div className="flex items-start gap-2">
+                        <Check className="h-5 w-5 text-green-600 mt-0.5" />
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-green-900">Token Generated Successfully!</h3>
+                          <p className="text-sm text-green-700 mt-1">
+                            Save this token securely. It won't be shown again.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">Service ID</Label>
+                          <div className="flex gap-2 mt-1">
+                            <code className="flex-1 p-2 bg-white border rounded text-sm">
+                              {generatedToken.serviceId}
+                            </code>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyToken(generatedToken.serviceId)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label className="text-xs text-gray-600">Environment Variable</Label>
+                          <div className="flex gap-2 mt-1">
+                            <code className="flex-1 p-2 bg-white border rounded text-sm">
+                              {generatedToken.envVar}
+                            </code>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyToken(generatedToken.envVar)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label className="text-xs text-gray-600">Service Token</Label>
+                          <div className="flex gap-2 mt-1">
+                            <code className="flex-1 p-2 bg-white border rounded text-sm font-mono break-all">
+                              {generatedToken.token}
+                            </code>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => copyToken(generatedToken.token)}
+                            >
+                              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Alert>
+                        <InfoIcon className="h-4 w-4" />
+                        <AlertTitle>Next Steps</AlertTitle>
+                        <AlertDescription className="text-sm space-y-1">
+                          <p>1. Copy the token and send it securely to the developer</p>
+                          <p>2. Add {generatedToken.envVar} to Vercel environment variables</p>
+                          <p>3. The developer should add it to their .env file</p>
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
     </div>
