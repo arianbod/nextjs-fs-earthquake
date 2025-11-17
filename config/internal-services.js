@@ -90,6 +90,24 @@ export const INTERNAL_SERVICES = {
     description: 'For development and testing purposes',
     owner: 'Engineering',
     contact: 'engineering@quakewise.com'
+  },
+
+  'dev-hfgate': {
+    name: 'Developer - H.F. Gate',
+    tier: 'DEV_TESTING',
+    tokenEnvVar: 'SERVICE_TOKEN_DEV_HFGATE',
+    description: 'Personal development access for H.F. Gate',
+    owner: 'Engineering',
+    contact: 'h.f.gate@gmail.com'
+  },
+
+  'dev-mohammadamin': {
+    name: 'Developer - Mohammad Amin',
+    tier: 'DEV_TESTING',
+    tokenEnvVar: 'SERVICE_TOKEN_DEV_MOHAMMADAMIN',
+    description: 'Personal development access for Mohammad Amin',
+    owner: 'Engineering',
+    contact: 'mohammadaminapi@gmail.com'
   }
 };
 
