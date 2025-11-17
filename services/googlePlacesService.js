@@ -459,4 +459,9 @@ export class GooglePlacesService {
 // Export singleton instance
 export const googlePlacesService = new GooglePlacesService();
 
+// Export helper function for route compatibility
+export function getEnhancedLocationData(latitude, longitude) {
+	return googlePlacesService.getEnhancedLocationData(latitude, longitude);
+}
+
 export default GooglePlacesService;

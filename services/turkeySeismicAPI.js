@@ -362,4 +362,9 @@ export const SeismicUtils = {
 	}
 };
 
+// Export helper function for route compatibility
+export function getSeismicDataByCoordinates(latitude, longitude) {
+	return turkeySeismicService.getSeismicData(latitude, longitude);
+}
+
 export default TurkeySeismicService;

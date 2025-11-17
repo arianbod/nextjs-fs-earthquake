@@ -272,4 +272,12 @@ class SafetyCalculator {
 	}
 }
 
+// Export singleton instance
+const safetyCalculatorInstance = new SafetyCalculator();
+
+// Export helper function for route compatibility
+export function calculateSafetyScore(userInput) {
+	return safetyCalculatorInstance.calculateSafety(userInput);
+}
+
 export default SafetyCalculator;
