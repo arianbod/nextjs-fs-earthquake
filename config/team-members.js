@@ -49,6 +49,7 @@ export const ADMIN_EMAILS = [
   'admin@quakewise.com',
   'cto@quakewise.com',
   'devops@quakewise.com',
+  'mohammadsharafi.official@gmail.com',
 ];
 
 /**
