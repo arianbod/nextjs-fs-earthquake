@@ -37,3 +37,9 @@ next-env.d.ts
 .env.production.tokens.*.txt
 
 /generated/prisma
+
+# Service tokens (sensitive)
+.env.service-tokens.*.txt
+
+# Build output logs
+build-output*.txt
