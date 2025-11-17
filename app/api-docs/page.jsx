@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * API Documentation Page
- * Internal documentation for QuakeWise team members only
- * Requires Clerk authentication with @quakewise.com email
+ * API Documentation Page - Developer Focused
+ * Clean, organized documentation for QuakeWise API
+ * Categorized by use case (Mobile, Web, Backend)
  */
 
 import { useState, useEffect } from 'react';
@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { InfoIcon, KeyIcon, ZapIcon, ShieldIcon, BookOpenIcon, LockIcon } from 'lucide-react';
+import { InfoIcon, LockIcon, Code2, Smartphone, Globe, Server } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function ApiDocsPage() {
@@ -88,7 +88,7 @@ export default function ApiDocsPage() {
         <Card className="max-w-md w-full">
           <CardHeader className="text-center">
             <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <ShieldIcon className="h-6 w-6 text-red-600" />
+              <LockIcon className="h-6 w-6 text-red-600" />
             </div>
             <CardTitle className="text-2xl">Access Denied</CardTitle>
             <CardDescription>
@@ -103,7 +103,7 @@ export default function ApiDocsPage() {
               <InfoIcon className="h-4 w-4" />
               <AlertTitle>Team Members Only</AlertTitle>
               <AlertDescription>
-                Access is restricted to @quakewise.com email addresses registered in the team whitelist.
+                Access is restricted to authorized developers.
                 Contact your team admin to request access.
               </AlertDescription>
             </Alert>
@@ -137,205 +137,451 @@ export default function ApiDocsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-4xl">
-            <h1 className="text-4xl font-bold mb-4">QuakeWise Internal API</h1>
-            <p className="text-xl text-blue-100 mb-6">
-              Internal microservices API for QuakeWise team members
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Badge className="bg-white text-blue-800 hover:bg-blue-50">
-                v1.1.0
-              </Badge>
-              <Badge className="bg-blue-500 text-white hover:bg-blue-600">
-                REST API
-              </Badge>
-              <Badge className="bg-green-500 text-white hover:bg-green-600">
-                Internal Only
-              </Badge>
-              <Badge className="bg-purple-500 text-white hover:bg-purple-600">
-                Authenticated: {userEmail}
-              </Badge>
+      {/* Clean Header */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">QuakeWise API Documentation</h1>
+              <p className="text-gray-600">
+                RESTful API for earthquake safety assessments • v1.1.0
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Authenticated as: <span className="font-medium">{userEmail}</span>
+              </p>
+            </div>
+            <Badge variant="outline" className="text-xs">
+              Production
+            </Badge>
+          </div>
+
+          {/* Base URL */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Base URL</p>
+                <code className="text-sm font-mono text-blue-600">https://quakewise.com/api/v1</code>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigator.clipboard.writeText('https://quakewise.com/api/v1')}
+              >
+                Copy
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Quick Start Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <KeyIcon className="h-8 w-8 text-blue-600 mb-2" />
-              <CardTitle className="text-lg">Authentication</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Service tokens + JWT for end users
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <ZapIcon className="h-8 w-8 text-green-600 mb-2" />
-              <CardTitle className="text-lg">Rate Limiting</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Tiered limits: 500-10,000 requests/hour by service tier
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <ShieldIcon className="h-8 w-8 text-purple-600 mb-2" />
-              <CardTitle className="text-lg">Secure</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Industry-standard security with JWT tokens and HTTPS
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <BookOpenIcon className="h-8 w-8 text-orange-600 mb-2" />
-              <CardTitle className="text-lg">Well Documented</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                Complete OpenAPI spec with interactive testing
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Main Documentation */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="reference">API Reference</TabsTrigger>
+        <Tabs defaultValue="quickstart" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="quickstart">Quick Start</TabsTrigger>
+            <TabsTrigger value="mobile">Mobile Apps</TabsTrigger>
+            <TabsTrigger value="web">Web Apps</TabsTrigger>
+            <TabsTrigger value="reference">Full API Reference</TabsTrigger>
             <TabsTrigger value="tester">API Tester</TabsTrigger>
-            <TabsTrigger value="examples">Code Examples</TabsTrigger>
           </TabsList>
 
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
+          {/* Quick Start Tab */}
+          <TabsContent value="quickstart" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Getting Started</CardTitle>
+                <CardTitle>Quick Start Guide</CardTitle>
                 <CardDescription>
-                  Learn how to integrate QuakeWise API into your application
+                  Get started with QuakeWise API in 3 steps
                 </CardDescription>
               </CardHeader>
-              <CardContent className="prose max-w-none">
-                <h3>1. Get Service Tokens</h3>
-                <p>Retrieve service tokens from team password manager (1Password/Vault):</p>
-                <ul>
-                  <li><strong>Service Token:</strong> Pre-registered token for your internal service</li>
-                  <li><strong>Service ID:</strong> quakewise-web-app, quakewise-mobile-api, etc.</li>
-                  <li><strong>Tier:</strong> WEB_APP, BATCH_JOB, or DEV_TESTING</li>
-                </ul>
+              <CardContent className="space-y-6">
+                {/* Step 1 */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Step 1: Authentication Setup</h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Your service token has been provided separately. Add it to your environment:
+                  </p>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-auto text-sm">
+{`# .env
+SERVICE_TOKEN=your_service_token_here`}
+                  </pre>
+                </div>
 
-                <h3>2. Issue User Tokens</h3>
-                <p>For each user session, obtain a JWT token:</p>
-                <pre className="bg-gray-900 text-green-400 p-4 rounded-md overflow-auto">
-{`POST /api/v1/auth/issue-token
-Headers:
-  X-Platform-Token: $SERVICE_TOKEN_WEB_APP
+                {/* Step 2 */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Step 2: Issue User Token</h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    For each user session, obtain a JWT token:
+                  </p>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-auto text-sm">
+                    <code className="language-javascript">{`// JavaScript Example
+const response = await fetch('https://quakewise.com/api/v1/auth/issue-token', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Platform-Token': process.env.SERVICE_TOKEN
+  },
+  body: JSON.stringify({
+    userId: 'user_123',
+    appId: 'your-app-id',
+    tier: 'WEB_APP'
+  })
+});
 
-Body:
-{
-  "userId": "clerk_user_123",
-  "appId": "quakewise-web-app",
-  "tier": "WEB_APP"
-}`}
-                </pre>
+const { data } = await response.json();
+const userToken = data.token;`}</code>
+                  </pre>
+                </div>
 
-                <h3>3. Make Assessment Requests</h3>
-                <p>Use both tokens to perform building assessments:</p>
-                <pre className="bg-gray-900 text-green-400 p-4 rounded-md overflow-auto">
-{`POST /api/v1/assessment/complete
-Headers:
-  X-Platform-Token: your_platform_token
-  Authorization: Bearer user_jwt_token
+                {/* Step 3 */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Step 3: Make API Calls</h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Use both tokens to perform assessments:
+                  </p>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-auto text-sm">
+                    <code className="language-javascript">{`// Perform building assessment
+const assessment = await fetch('https://quakewise.com/api/v1/assessment/complete', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Platform-Token': process.env.SERVICE_TOKEN,
+    'Authorization': \`Bearer \${userToken}\`
+  },
+  body: JSON.stringify({
+    location: {
+      latitude: 41.0082,
+      longitude: 28.9784
+    },
+    building: {
+      structuralSystem: 'C2',
+      numberOfStories: 5,
+      yearOfConstruction: 2010,
+      designRegulation: '2007-2018'
+    }
+  })
+});
 
-Body:
-{
-  "location": { "latitude": 41.0082, "longitude": 28.9784 },
-  "building": {
-    "structuralSystem": "C2",
-    "numberOfStories": 5,
-    "yearOfConstruction": 2010,
-    "designRegulation": "2007-2018"
-  }
-}`}
-                </pre>
+const result = await assessment.json();
+console.log('Safety Score:', result.data.safetyScore.overall);`}</code>
+                  </pre>
+                </div>
 
-                <Alert className="mt-6">
+                <Alert>
                   <InfoIcon className="h-4 w-4" />
-                  <AlertTitle>Base URL</AlertTitle>
+                  <AlertTitle>Rate Limits</AlertTitle>
                   <AlertDescription>
-                    Production: <code>https://quakewise.com/api/v1</code><br />
-                    Development: <code>http://localhost:3000/api/v1</code>
+                    Your tier determines API limits. See your service configuration for details.
                   </AlertDescription>
                 </Alert>
               </CardContent>
             </Card>
+          </TabsContent>
 
+          {/* Mobile Apps Tab */}
+          <TabsContent value="mobile" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Rate Limits & Tiers</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Smartphone className="h-5 w-5" />
+                  <CardTitle>Mobile App Integration</CardTitle>
+                </div>
+                <CardDescription>
+                  Essential APIs for mobile applications (iOS, Android, React Native, Flutter)
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Tier</th>
-                        <th className="text-left p-2">Requests/Hour</th>
-                        <th className="text-left p-2">Requests/Day</th>
-                        <th className="text-left p-2">Features</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b">
-                        <td className="p-2 font-semibold">WEB_APP</td>
-                        <td className="p-2">10,000</td>
-                        <td className="p-2">100,000</td>
-                        <td className="p-2">Web & mobile apps (quakewise-web-app, quakewise-mobile-api)</td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="p-2 font-semibold">BATCH_JOB</td>
-                        <td className="p-2">1,000</td>
-                        <td className="p-2">50,000</td>
-                        <td className="p-2">Background processing (batch-assessment-processor, analytics-service)</td>
-                      </tr>
-                      <tr>
-                        <td className="p-2 font-semibold">DEV_TESTING</td>
-                        <td className="p-2">500</td>
-                        <td className="p-2">5,000</td>
-                        <td className="p-2">Development & testing environments (dev-testing-service)</td>
-                      </tr>
-                    </tbody>
-                  </table>
+              <CardContent className="space-y-8">
+                {/* Authentication */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Code2 className="h-4 w-4" />
+                    Authentication
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="border-l-4 border-blue-500 pl-4 py-2">
+                      <p className="font-medium text-sm">POST /auth/issue-token</p>
+                      <p className="text-xs text-gray-600 mt-1">Issue JWT for mobile users</p>
+                      <details className="mt-2">
+                        <summary className="text-sm text-blue-600 cursor-pointer hover:underline">
+                          View request/response
+                        </summary>
+                        <div className="mt-2 space-y-2">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">REQUEST BODY:</p>
+                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs mt-1">
+                              <code className="language-json">{`{
+  "userId": "mobile_user_123",
+  "appId": "quakewise-mobile-api",
+  "tier": "WEB_APP"
+}`}</code>
+                            </pre>
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">RESPONSE (201):</p>
+                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs mt-1">
+                              <code className="language-json">{`{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresAt": "2025-11-24T00:00:00.000Z"
+  }
+}`}</code>
+                            </pre>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Core Assessment */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Code2 className="h-4 w-4" />
+                    Building Assessment
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="border-l-4 border-green-500 pl-4 py-2">
+                      <p className="font-medium text-sm">POST /assessment/complete</p>
+                      <p className="text-xs text-gray-600 mt-1">Complete safety assessment with GPS location</p>
+                      <details className="mt-2">
+                        <summary className="text-sm text-green-600 cursor-pointer hover:underline">
+                          View request/response
+                        </summary>
+                        <div className="mt-2 space-y-2">
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">REQUEST BODY:</p>
+                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs mt-1">
+                              <code className="language-json">{`{
+  "location": {
+    "latitude": 41.0082,
+    "longitude": 28.9784
+  },
+  "building": {
+    "structuralSystem": "C2",
+    "numberOfStories": 5,
+    "yearOfConstruction": 2010,
+    "designRegulation": "2007-2018",
+    "typeOfSoil": "ZC",
+    "typeOfEarthquake": "Zone 4"
+  },
+  "options": {
+    "includeAiAnalysis": true,
+    "includeLocationIntelligence": true
+  }
+}`}</code>
+                            </pre>
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-gray-600">RESPONSE (200):</p>
+                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs mt-1">
+                              <code className="language-json">{`{
+  "success": true,
+  "data": {
+    "safetyScore": {
+      "overall": 72.5,
+      "interpretation": "Moderate risk",
+      "buildingClassification": "Class B"
+    },
+    "seismicData": {
+      "zone": "Zone 4",
+      "pga": 0.4,
+      "riskLevel": "High"
+    },
+    "recommendations": [
+      "Consider structural reinforcement",
+      "Regular maintenance required"
+    ]
+  }
+}`}</code>
+                            </pre>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Utilities */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Code2 className="h-4 w-4" />
+                    Utilities
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="border-l-4 border-purple-500 pl-4 py-2">
+                      <p className="font-medium text-sm">GET /parameters</p>
+                      <p className="text-xs text-gray-600 mt-1">Get valid options for dropdowns (no auth required)</p>
+                    </div>
+                    <div className="border-l-4 border-purple-500 pl-4 py-2">
+                      <p className="font-medium text-sm">GET /status</p>
+                      <p className="text-xs text-gray-600 mt-1">Check API health (no auth required)</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Code Example */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Complete Mobile Example</h3>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-auto text-sm">
+                    <code className="language-javascript">{`// React Native / Expo Example
+import axios from 'axios';
+
+const API_BASE = 'https://quakewise.com/api/v1';
+const SERVICE_TOKEN = 'your_service_token';
+
+// 1. Issue user token on login
+async function loginUser(userId) {
+  const { data } = await axios.post(
+    \`\${API_BASE}/auth/issue-token\`,
+    {
+      userId,
+      appId: 'quakewise-mobile-api',
+      tier: 'WEB_APP'
+    },
+    {
+      headers: { 'X-Platform-Token': SERVICE_TOKEN }
+    }
+  );
+
+  // Store token securely
+  await SecureStore.setItemAsync('userToken', data.data.token);
+  return data.data.token;
+}
+
+// 2. Perform assessment with user's location
+async function assessBuilding(buildingData) {
+  const userToken = await SecureStore.getItemAsync('userToken');
+
+  const { data } = await axios.post(
+    \`\${API_BASE}/assessment/complete\`,
+    buildingData,
+    {
+      headers: {
+        'X-Platform-Token': SERVICE_TOKEN,
+        'Authorization': \`Bearer \${userToken}\`
+      }
+    }
+  );
+
+  return data.data;
+}
+
+// 3. Usage in your component
+async function handleAssess() {
+  const location = await Location.getCurrentPositionAsync();
+
+  const result = await assessBuilding({
+    location: {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    },
+    building: {
+      structuralSystem: selectedSystem,
+      numberOfStories: parseInt(stories),
+      yearOfConstruction: parseInt(year),
+      designRegulation: selectedRegulation
+    }
+  });
+
+  setAssessmentResult(result);
+}`}</code>
+                  </pre>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* API Reference Tab */}
+          {/* Web Apps Tab */}
+          <TabsContent value="web" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Globe className="h-5 w-5" />
+                  <CardTitle>Web App Integration</CardTitle>
+                </div>
+                <CardDescription>
+                  Essential APIs for web applications (React, Vue, Angular, Next.js)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/* Similar structure to Mobile but with web-specific examples */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Next.js / React Example</h3>
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-md overflow-auto text-sm">
+                    <code className="language-javascript">{`// Next.js API Route (/app/api/assess/route.js)
+import { NextResponse } from 'next/server';
+
+export async function POST(request) {
+  const body = await request.json();
+
+  // 1. Issue user token
+  const tokenResponse = await fetch('https://quakewise.com/api/v1/auth/issue-token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Platform-Token': process.env.SERVICE_TOKEN_WEB_APP
+    },
+    body: JSON.stringify({
+      userId: body.userId,
+      appId: 'quakewise-web-app',
+      tier: 'WEB_APP'
+    })
+  });
+
+  const { data: tokenData } = await tokenResponse.json();
+
+  // 2. Perform assessment
+  const assessmentResponse = await fetch('https://quakewise.com/api/v1/assessment/complete', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Platform-Token': process.env.SERVICE_TOKEN_WEB_APP,
+      'Authorization': \`Bearer \${tokenData.token}\`
+    },
+    body: JSON.stringify(body.assessment)
+  });
+
+  const assessment = await assessmentResponse.json();
+
+  return NextResponse.json(assessment);
+}
+
+// Client Component
+'use client';
+
+export default function AssessmentForm() {
+  const [result, setResult] = useState(null);
+
+  async function handleSubmit(formData) {
+    const response = await fetch('/api/assess', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: session.userId,
+        assessment: formData
+      })
+    });
+
+    const data = await response.json();
+    setResult(data.data);
+  }
+
+  return (/* Your form UI */);
+}`}</code>
+                  </pre>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Full API Reference Tab */}
           <TabsContent value="reference">
             <Card>
               <CardHeader>
-                <CardTitle>API Reference</CardTitle>
+                <CardTitle>Complete API Reference</CardTitle>
                 <CardDescription>
-                  Complete OpenAPI 3.0 specification with interactive examples
+                  Interactive OpenAPI specification for all endpoints
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -347,122 +593,6 @@ Body:
           {/* API Tester Tab */}
           <TabsContent value="tester">
             <ApiTester />
-          </TabsContent>
-
-          {/* Code Examples Tab */}
-          <TabsContent value="examples" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Code Examples</CardTitle>
-                <CardDescription>
-                  Sample code in different programming languages
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">JavaScript / Node.js</h3>
-                  <pre className="bg-gray-900 text-green-400 p-4 rounded-md overflow-auto text-sm">
-{`const axios = require('axios');
-
-const SERVICE_TOKEN = process.env.SERVICE_TOKEN_WEB_APP;
-const BASE_URL = 'https://quakewise.com/api/v1';
-
-// 1. Issue user token
-async function getUserToken(clerkUserId) {
-  const response = await axios.post(
-    \`\${BASE_URL}/auth/issue-token\`,
-    {
-      userId: clerkUserId,
-      appId: 'quakewise-web-app',
-      tier: 'WEB_APP'
-    },
-    {
-      headers: { 'X-Platform-Token': SERVICE_TOKEN }
-    }
-  );
-  return response.data.data.token;
-}
-
-// 2. Perform assessment
-async function assessBuilding(userToken, buildingData) {
-  const response = await axios.post(
-    \`\${BASE_URL}/assessment/complete\`,
-    buildingData,
-    {
-      headers: {
-        'X-Platform-Token': SERVICE_TOKEN,
-        'Authorization': \`Bearer \${userToken}\`
-      }
-    }
-  );
-  return response.data.data;
-}
-
-// Usage
-(async () => {
-  const token = await getUserToken('clerk_user_123');
-  const assessment = await assessBuilding(token, {
-    location: { latitude: 41.0082, longitude: 28.9784 },
-    building: {
-      structuralSystem: 'C2',
-      numberOfStories: 5,
-      yearOfConstruction: 2010,
-      designRegulation: '2007-2018'
-    }
-  });
-  console.log('Safety Score:', assessment.safetyScore.overall);
-})();`}
-                  </pre>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Python</h3>
-                  <pre className="bg-gray-900 text-green-400 p-4 rounded-md overflow-auto text-sm">
-{`import requests
-import os
-
-SERVICE_TOKEN = os.getenv('SERVICE_TOKEN_WEB_APP')
-BASE_URL = 'https://quakewise.com/api/v1'
-
-def get_user_token(clerk_user_id):
-    response = requests.post(
-        f'{BASE_URL}/auth/issue-token',
-        json={
-            'userId': clerk_user_id,
-            'appId': 'quakewise-web-app',
-            'tier': 'WEB_APP'
-        },
-        headers={'X-Platform-Token': SERVICE_TOKEN}
-    )
-    return response.json()['data']['token']
-
-def assess_building(user_token, building_data):
-    response = requests.post(
-        f'{BASE_URL}/assessment/complete',
-        json=building_data,
-        headers={
-            'X-Platform-Token': SERVICE_TOKEN,
-            'Authorization': f'Bearer {user_token}'
-        }
-    )
-    return response.json()['data']
-
-# Usage
-token = get_user_token('clerk_user_123')
-assessment = assess_building(token, {
-    'location': {'latitude': 41.0082, 'longitude': 28.9784},
-    'building': {
-        'structuralSystem': 'C2',
-        'numberOfStories': 5,
-        'yearOfConstruction': 2010,
-        'designRegulation': '2007-2018'
-    }
-})
-print(f"Safety Score: {assessment['safetyScore']['overall']}")`}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>

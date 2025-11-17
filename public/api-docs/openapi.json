@@ -16,11 +16,7 @@
   "servers": [
     {
       "url": "https://quakewise.com/api/v1",
-      "description": "Production server"
-    },
-    {
-      "url": "http://localhost:3000/api/v1",
-      "description": "Development server"
+      "description": "Production API"
     }
   ],
   "security": [
@@ -32,27 +28,33 @@
   "tags": [
     {
       "name": "Authentication",
-      "description": "JWT token issuance and verification"
+      "description": "JWT token issuance and verification (Required for all apps)",
+      "x-displayName": "🔐 Authentication"
     },
     {
       "name": "Assessment",
-      "description": "Building safety assessment services"
+      "description": "Building safety assessment - core endpoint for mobile and web apps",
+      "x-displayName": "📊 Assessment (Mobile & Web)"
     },
     {
       "name": "AI Services",
-      "description": "AI-powered image and plan analysis"
+      "description": "AI-powered image and plan analysis (Optional advanced features)",
+      "x-displayName": "🤖 AI Services (Optional)"
     },
     {
       "name": "Utilities",
-      "description": "Helper services and utilities"
+      "description": "Helper services - image proxy, parameters lookup",
+      "x-displayName": "🛠️ Utilities"
     },
     {
       "name": "System",
-      "description": "System health and parameters"
+      "description": "System health check and valid parameters (No auth required)",
+      "x-displayName": "⚙️ System (Public)"
     },
     {
       "name": "Analytics",
-      "description": "Usage statistics and analytics"
+      "description": "Usage statistics and analytics (Admin/Backend only)",
+      "x-displayName": "📈 Analytics (Backend)"
     }
   ],
   "paths": {
