@@ -6,10 +6,11 @@
 
 import { NextResponse } from 'next/server';
 import { createSuccessResponse } from '@/lib/api/errorHandler';
+import { requirePlatformAuth } from '@/middleware/platformAuthMiddleware';
 
 /**
  * GET /api/v1/status
- * Public endpoint - no authentication required
+ * Protected endpoint - requires platform authentication
  *
  * Response:
  *   {
@@ -27,7 +28,7 @@ import { createSuccessResponse } from '@/lib/api/errorHandler';
  *     }
  *   }
  */
-export async function GET(request) {
+export const GET = requirePlatformAuth(async function(request) {
   const startTime = process.hrtime.bigint();
 
   try {
@@ -67,7 +68,7 @@ export async function GET(request) {
       { status: 503 }
     );
   }
-}
+});
 
 /**
  * Checks health of all services

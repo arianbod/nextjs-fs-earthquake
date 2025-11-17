@@ -1,0 +1,61 @@
+
+> deprem@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.6
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ⚠ Production code optimization has been disabled in your project. Read more: https://nextjs.org/docs/messages/minification-disabled
+ ✓ Compiled successfully in 25.1s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/24) ...
+   Generating static pages (6/24) 
+   Generating static pages (12/24) 
+   Generating static pages (18/24) 
+ ✓ Generating static pages (24/24)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    21.6 kB         287 kB
+├ ○ /_not-found                          1.61 kB         220 kB
+├ ○ /about                                 324 B         235 kB
+├ ○ /api-docs                            13.2 kB         344 kB
+├ ƒ /api/analyze-building-photos           293 B         219 kB
+├ ƒ /api/analyze-building-plans            293 B         219 kB
+├ ƒ /api/analyze-image                     293 B         219 kB
+├ ƒ /api/assessment/[id]                   293 B         219 kB
+├ ƒ /api/assessment/history                293 B         219 kB
+├ ƒ /api/assessment/save                   293 B         219 kB
+├ ƒ /api/proxy-image                       293 B         219 kB
+├ ƒ /api/v1/ai/analyze-building-photos     293 B         219 kB
+├ ƒ /api/v1/ai/analyze-building-plans      293 B         219 kB
+├ ƒ /api/v1/ai/analyze-image               293 B         219 kB
+├ ƒ /api/v1/assessment/complete            293 B         219 kB
+├ ƒ /api/v1/auth/issue-token               293 B         219 kB
+├ ƒ /api/v1/auth/verify-token              293 B         219 kB
+├ ƒ /api/v1/parameters                     293 B         219 kB
+├ ƒ /api/v1/status                         293 B         219 kB
+├ ƒ /api/v1/usage/[appId]                  293 B         219 kB
+├ ƒ /api/v1/utils/proxy-image              293 B         219 kB
+├ ƒ /assessment/[step]                    1.5 kB         498 kB
+├ ○ /dashboard                             293 B         219 kB
+├ ○ /history                             7.06 kB         397 kB
+├ ƒ /result/[id]                          316 kB         759 kB
+├ ƒ /sign-in/[[...sign-in]]              4.37 kB         312 kB
+├ ƒ /sign-up/[[...sign-up]]              4.37 kB         312 kB
+└ ○ /welcome                               313 B         226 kB
++ First Load JS shared by all             218 kB
+  ├ chunks/1255-68e2aa0bb7f91424.js       121 kB
+  ├ chunks/4bd1b696-46f787ba7ea5ab07.js  93.5 kB
+  └ other shared chunks (total)          4.32 kB
+
+
+ƒ Middleware                              175 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

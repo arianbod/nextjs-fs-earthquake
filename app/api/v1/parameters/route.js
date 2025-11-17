@@ -7,10 +7,11 @@
 import { NextResponse } from 'next/server';
 import { createSuccessResponse } from '@/lib/api/errorHandler';
 import { CALCULATION_CONFIG } from '@/config/earthquakeParameters';
+import { requirePlatformAuth } from '@/middleware/platformAuthMiddleware';
 
 /**
  * GET /api/v1/parameters
- * Public endpoint - returns all valid parameter values
+ * Protected endpoint - requires platform authentication
  *
  * Response:
  *   {
@@ -24,7 +25,7 @@ import { CALCULATION_CONFIG } from '@/config/earthquakeParameters';
  *     }
  *   }
  */
-export async function GET(request) {
+export const GET = requirePlatformAuth(async function(request) {
   try {
     const parameters = {
       // Building structural systems
@@ -256,7 +257,7 @@ export async function GET(request) {
     console.error('Parameters retrieval error:', error);
     throw error;
   }
-}
+});
 
 // OPTIONS handler for CORS
 export async function OPTIONS(request) {

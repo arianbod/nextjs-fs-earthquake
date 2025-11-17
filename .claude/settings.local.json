@@ -23,7 +23,12 @@
       "Bash(test:*)",
       "Bash(npm run db:migrate:*)",
       "Bash(npm run db:push:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run db:generate:*)",
+      "Bash(git restore:*)",
+      "Bash(npm run generate:service-tokens:*)",
+      "Bash(rm:*)",
+      "Bash(tee:*)"
     ],
     "deny": [],
     "ask": []

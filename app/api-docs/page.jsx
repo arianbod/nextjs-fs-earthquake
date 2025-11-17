@@ -411,11 +411,11 @@ console.log('Safety Score:', result.data.safetyScore.overall);`}</code>
                   <div className="space-y-3">
                     <div className="border-l-4 border-purple-500 pl-4 py-2">
                       <p className="font-medium text-sm">GET /parameters</p>
-                      <p className="text-xs text-gray-600 mt-1">Get valid options for dropdowns (no auth required)</p>
+                      <p className="text-xs text-gray-600 mt-1">Get valid options for dropdowns (requires auth)</p>
                     </div>
                     <div className="border-l-4 border-purple-500 pl-4 py-2">
                       <p className="font-medium text-sm">GET /status</p>
-                      <p className="text-xs text-gray-600 mt-1">Check API health (no auth required)</p>
+                      <p className="text-xs text-gray-600 mt-1">Check API health (requires auth)</p>
                     </div>
                   </div>
                 </div>

@@ -137,8 +137,7 @@ ${vercelLines.join('\n')}
 }
 
 // Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  generateServiceTokens();
-}
+// Always run when this file is executed
+generateServiceTokens();
 
 export { generateServiceTokens, generateToken };

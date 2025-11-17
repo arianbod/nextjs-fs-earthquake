@@ -48,8 +48,8 @@
     },
     {
       "name": "System",
-      "description": "System health check and valid parameters (No auth required)",
-      "x-displayName": "⚙️ System (Public)"
+      "description": "System health check and valid parameters",
+      "x-displayName": "⚙️ System"
     },
     {
       "name": "Analytics",
@@ -190,9 +190,9 @@
       "get": {
         "tags": ["System"],
         "summary": "API health status",
-        "description": "Returns API health status, version, and service availability. Public endpoint.",
+        "description": "Returns API health status, version, and service availability. Requires platform authentication.",
         "operationId": "getStatus",
-        "security": [],
+        "security": [{"PlatformToken": []}],
         "responses": {
           "200": {
             "description": "API is healthy",
@@ -221,9 +221,9 @@
       "get": {
         "tags": ["System"],
         "summary": "Get valid parameters",
-        "description": "Returns all valid parameter values for building assessments. Public endpoint.",
+        "description": "Returns all valid parameter values for building assessments. Requires platform authentication.",
         "operationId": "getParameters",
-        "security": [],
+        "security": [{"PlatformToken": []}],
         "responses": {
           "200": {
             "description": "Parameters retrieved successfully",
