@@ -30,6 +30,11 @@ export const TEAM_EMAILS = [
   'devops@quakewise.com',
   'ops@quakewise.com',
 
+  // External Developers (Trusted Partners)
+  // These developers have been granted API access for development purposes
+  'h.f.gate@gmail.com',           // H.F. Gate - Mobile App Developer
+  'mohammadaminapi@gmail.com',    // Mohammad Amin - API Integration Developer
+
   // Add individual team member emails here
   // 'john.doe@quakewise.com',
   // 'jane.smith@quakewise.com',
