@@ -108,6 +108,15 @@ export const INTERNAL_SERVICES = {
     description: 'Personal development access for Mohammad Amin',
     owner: 'Engineering',
     contact: 'mohammadaminapi@gmail.com'
+  },
+
+  'dev-mohammadsharafi': {
+    name: 'Developer - Mohammad Sharafi',
+    tier: 'DEV_TESTING',
+    tokenEnvVar: 'SERVICE_TOKEN_DEV_MOHAMMADSHARAFI',
+    description: 'Personal development access for Mohammad Sharafi',
+    owner: 'Engineering',
+    contact: 'mohammadsharafi.official@gmail.com'
   }
 };
 

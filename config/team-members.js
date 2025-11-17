@@ -34,6 +34,7 @@ export const TEAM_EMAILS = [
   // These developers have been granted API access for development purposes
   'h.f.gate@gmail.com',           // H.F. Gate - Mobile App Developer
   'mohammadaminapi@gmail.com',    // Mohammad Amin - API Integration Developer
+  'mohammadsharafi.official@gmail.com', // Mohammad Sharafi - Developer
 
   // Add individual team member emails here
   // 'john.doe@quakewise.com',
