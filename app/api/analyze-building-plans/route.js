@@ -1,9 +1,11 @@
-import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+/**
+ * Building Plans Analysis API
+ * Uses Claude Structured Outputs for guaranteed schema compliance
+ */
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { NextResponse } from 'next/server';
+import { analyzeImagesStructured, createImageContent } from '@/lib/ai/structuredOutputs';
+import { BuildingPlansAnalysisSchema } from '@/lib/schemas/aiAnalysisSchemas';
 
 export async function POST(request) {
   try {
@@ -14,23 +16,20 @@ export async function POST(request) {
     }
 
     // Prepare images for AI analysis
-    const imageContents = images.map(img => ({
-      type: 'image',
-      source: {
-        type: 'base64',
-        media_type: img.type || 'image/jpeg',
-        data: img.data
-      }
-    }));
+    const imageContents = images.map(img =>
+      createImageContent(img.data, img.type || 'image/jpeg')
+    );
 
-    const prompt = `
-You are an expert structural engineer and architect analyzing building architectural plans. 
+    const systemPrompt = `You are an expert structural engineer and architect analyzing building architectural plans.
+You must analyze the provided building plan images and extract precise structural and dimensional information.
+Be thorough and provide confidence scores (0-1) for your analysis.`;
 
+    const userPrompt = `
 Please analyze these building plan images and extract the following information:
 
 BUILDING DIMENSIONS:
 - Overall building length (meters)
-- Overall building width (meters) 
+- Overall building width (meters)
 - Building height/number of stories
 - Floor area calculations
 - Room dimensions if visible
@@ -63,108 +62,57 @@ PLAN QUALITY & CONFIDENCE:
 
 Context: This building is located in ${location?.city || 'Turkey'} and may be subject to seismic design requirements.
 
-Please provide your analysis in the following JSON format:
-{
-  "dimensions": {
-    "length": number,
-    "width": number,
-    "height": number,
-    "stories": number,
-    "totalArea": number,
-    "floorArea": number
-  },
-  "structural": {
-    "system": "string",
-    "materialType": "string",
-    "wallThickness": number,
-    "foundationType": "string",
-    "irregularities": {
-      "plan": "regular/irregular",
-      "planDescription": "string",
-      "vertical": "regular/irregular"
-    }
-  },
-  "building": {
-    "type": "string",
-    "function": "string",
-    "units": number,
-    "rooms": number,
-    "layout": "string"
-  },
-  "construction": {
-    "year": number,
-    "designCode": "string",
-    "specialFeatures": ["array"]
-  },
-  "quality": {
-    "planQuality": "excellent/good/fair/poor",
-    "completeness": number,
-    "confidence": {
-      "dimensions": number,
-      "structural": number,
-      "materials": number,
-      "overall": number
-    }
-  },
-  "analysis": {
-    "keyFindings": ["array"],
-    "assumptions": ["array"],
-    "recommendations": ["array"]
-  }
-}
+Analyze thoroughly and provide your response.`;
 
-Be precise with measurements and provide confidence scores (0-1) for your analysis.
-`;
-
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4000,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...imageContents
-          ]
-        }
-      ]
+    // Call Claude with structured outputs - guaranteed schema compliance
+    const analysisData = await analyzeImagesStructured({
+      systemPrompt,
+      userPrompt,
+      images: imageContents,
+      schema: BuildingPlansAnalysisSchema,
+      maxTokens: 4000,
     });
-
-    // Parse AI response
-    const content = message.content[0].text;
-    
-    // Extract JSON from response
-    let analysisData;
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysisData = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError);
-      return NextResponse.json({ error: 'Failed to parse analysis results' }, { status: 500 });
-    }
 
     // Add metadata
     analysisData.metadata = {
       analysisDate: new Date().toISOString(),
       imagesAnalyzed: images.length,
       analysisType: 'building_plans',
-      location: location
+      location: location,
     };
 
     return NextResponse.json({
       success: true,
       analysis: analysisData,
-      rawResponse: content
     });
 
   } catch (error) {
     console.error('Building plan analysis error:', error);
+
+    // Handle specific error types
+    if (error.message.includes('refused')) {
+      return NextResponse.json(
+        { error: 'AI could not analyze the provided plans', details: error.message },
+        { status: 422 }
+      );
+    }
+
+    if (error.message.includes('Rate limit')) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable', details: 'Please try again in a moment' },
+        { status: 429 }
+      );
+    }
+
+    if (error.message.includes('API key')) {
+      return NextResponse.json(
+        { error: 'Service configuration error' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Failed to analyze building plans' },
+      { error: 'Failed to analyze building plans', details: error.message },
       { status: 500 }
     );
   }

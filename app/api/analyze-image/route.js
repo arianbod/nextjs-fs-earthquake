@@ -1,166 +1,83 @@
+/**
+ * Image Analysis API
+ * Uses Claude Structured Outputs for guaranteed schema compliance
+ *
+ * Supports multiple analysis types:
+ * - building: General building photos
+ * - floorPlan: Floor plan/architectural drawings
+ * - architecturalPlan: Detailed structural plans
+ * - satellite: Aerial/satellite imagery
+ */
+
 import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { analyzeImagesStructured } from '@/lib/ai/structuredOutputs';
+import {
+  BuildingAnalysisSchema,
+  FloorPlanAnalysisSchema,
+  SatelliteAnalysisSchema,
+} from '@/lib/schemas/aiAnalysisSchemas';
 
 // Configure runtime for Vercel deployment
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60; // Maximum function duration for Vercel
+export const maxDuration = 60;
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+// ============================================================================
+// Helper Functions
+// ============================================================================
 
-// Helper function to detect actual image type from binary data
+/**
+ * Detect actual image type from binary data
+ */
 function detectImageType(buffer) {
   if (!buffer || buffer.length < 12) {
-    return null; // Not enough data to determine type
+    return null;
   }
-  
-  // Check for common image format signatures
+
   const first4Bytes = buffer.slice(0, 4);
   const first8Bytes = buffer.slice(0, 8);
   const first12Bytes = buffer.slice(0, 12);
-  
-  // JPEG: FF D8 FF (more lenient check - just need FF D8)
+
+  // JPEG
   if (first4Bytes[0] === 0xFF && first4Bytes[1] === 0xD8) {
     return 'image/jpeg';
   }
-  
-  // PNG: 89 50 4E 47 0D 0A 1A 0A
-  if (first8Bytes[0] === 0x89 && first8Bytes[1] === 0x50 && 
+
+  // PNG
+  if (first8Bytes[0] === 0x89 && first8Bytes[1] === 0x50 &&
       first8Bytes[2] === 0x4E && first8Bytes[3] === 0x47 &&
-      first8Bytes[4] === 0x0D && first8Bytes[5] === 0x0A && 
+      first8Bytes[4] === 0x0D && first8Bytes[5] === 0x0A &&
       first8Bytes[6] === 0x1A && first8Bytes[7] === 0x0A) {
     return 'image/png';
   }
-  
-  // GIF: 47 49 46 38 (GIF8) or 47 49 46 39 (GIF9)
-  if (first4Bytes[0] === 0x47 && first4Bytes[1] === 0x49 && 
+
+  // GIF
+  if (first4Bytes[0] === 0x47 && first4Bytes[1] === 0x49 &&
       first4Bytes[2] === 0x46 && (first4Bytes[3] === 0x38 || first4Bytes[3] === 0x39)) {
     return 'image/gif';
   }
-  
-  // WebP: 52 49 46 46 ... 57 45 42 50 (RIFF...WEBP)
-  if (first4Bytes[0] === 0x52 && first4Bytes[1] === 0x49 && 
+
+  // WebP
+  if (first4Bytes[0] === 0x52 && first4Bytes[1] === 0x49 &&
       first4Bytes[2] === 0x46 && first4Bytes[3] === 0x46 &&
       buffer.length >= 12 &&
-      first12Bytes[8] === 0x57 && first12Bytes[9] === 0x45 && 
+      first12Bytes[8] === 0x57 && first12Bytes[9] === 0x45 &&
       first12Bytes[10] === 0x42 && first12Bytes[11] === 0x50) {
     return 'image/webp';
   }
-  
-  // BMP: 42 4D
-  if (first4Bytes[0] === 0x42 && first4Bytes[1] === 0x4D) {
-    return 'image/bmp';
-  }
-  
-  // TIFF: 49 49 2A 00 (little endian) or 4D 4D 00 2A (big endian)
-  if ((first4Bytes[0] === 0x49 && first4Bytes[1] === 0x49 && 
-       first4Bytes[2] === 0x2A && first4Bytes[3] === 0x00) ||
-      (first4Bytes[0] === 0x4D && first4Bytes[1] === 0x4D && 
-       first4Bytes[2] === 0x00 && first4Bytes[3] === 0x2A)) {
-    return 'image/tiff';
-  }
-  
-  // HEIC/HEIF: Check for 'ftyp' and 'heic'/'mif1' boxes
-  if (buffer.length >= 16) {
-    const ftypBox = buffer.slice(4, 8);
-    const brand = buffer.slice(8, 12);
-    if (ftypBox[0] === 0x66 && ftypBox[1] === 0x74 && 
-        ftypBox[2] === 0x79 && ftypBox[3] === 0x70) { // 'ftyp'
-      const brandStr = brand.toString('ascii');
-      if (brandStr.includes('heic') || brandStr.includes('mif1')) {
-        return 'image/heic';
-      }
-    }
-  }
-  
-  // AVIF: Similar to HEIC but with 'avif' brand
-  if (buffer.length >= 16) {
-    const ftypBox = buffer.slice(4, 8);
-    const brand = buffer.slice(8, 12);
-    if (ftypBox[0] === 0x66 && ftypBox[1] === 0x74 && 
-        ftypBox[2] === 0x79 && ftypBox[3] === 0x70) { // 'ftyp'
-      const brandStr = brand.toString('ascii');
-      if (brandStr.includes('avif')) {
-        return 'image/avif';
-      }
-    }
-  }
-  
-  // If no signature matches, return null to use the declared type
-  console.log('Image type detection: No matching signature found');
+
   return null;
 }
 
-// Helper function to validate Claude API response structure
-function validateClaudeResponseStructure(response, analysisType) {
-  if (!response || typeof response !== 'object') {
-    console.error('Claude response is not a valid object');
-    return false;
-  }
-
-  // Check basic response structure
-  if (!response.content || !Array.isArray(response.content)) {
-    console.error('Claude response missing content array');
-    return false;
-  }
-
-  if (response.content.length === 0) {
-    console.error('Claude response has empty content array');
-    return false;
-  }
-
-  // For building analysis with tools, validate tool response
-  if (analysisType === 'building') {
-    const toolUseBlock = response.content.find(block => block.type === 'tool_use');
-    
-    if (!toolUseBlock) {
-      console.error('Claude response missing tool_use block for building analysis');
-      return false;
-    }
-
-    if (!toolUseBlock.input || typeof toolUseBlock.input !== 'object') {
-      console.error('Claude tool response missing or invalid input data');
-      return false;
-    }
-
-    // Validate required fields in tool input
-    const requiredFields = ['structuralSystem', 'materialCondition', 'irregularities', 'riskFactors', 'confidence'];
-    for (const field of requiredFields) {
-      if (!(field in toolUseBlock.input)) {
-        console.error(`Claude tool response missing required field: ${field}`);
-        return false;
-      }
-    }
-  } else {
-    // For non-building analysis, validate text response
-    const textBlock = response.content.find(block => block.type === 'text');
-    
-    if (!textBlock || !textBlock.text) {
-      console.error('Claude response missing text content for non-building analysis');
-      return false;
-    }
-
-    if (textBlock.text.length < 20) {
-      console.error('Claude response text too short to be valid');
-      return false;
-    }
-  }
-
-  return true;
-}
-
-// Helper function for formatting analysis results
+/**
+ * Format analysis result for backward compatibility with existing UI
+ */
 function formatAnalysisResult(raw, type) {
-  // Ensure raw is an object
   if (!raw || typeof raw !== 'object') {
     raw = { rawAnalysis: raw };
   }
-  
-  // Format the analysis result based on type
-  if (type === 'floorPlan') {
+
+  if (type === 'floorPlan' || type === 'architecturalPlan') {
     return {
       buildingLength: raw?.buildingLength || raw?.length || null,
       buildingWidth: raw?.buildingWidth || raw?.width || null,
@@ -171,24 +88,24 @@ function formatAnalysisResult(raw, type) {
       wallThickness: raw?.wallThickness || null,
       confidence: raw?.confidence || 'medium',
       extractedElements: raw?.extractedElements || [],
-      rawData: raw?.rawAnalysis || raw,
+      rawData: raw,
     };
   }
-  
+
   if (type === 'satellite') {
     return {
-      estimatedLength: raw?.length || raw?.estimatedLength || null,
-      estimatedWidth: raw?.width || raw?.estimatedWidth || null,
-      estimatedStories: raw?.stories || raw?.estimatedStories || null,
-      buildingShape: raw?.shape || raw?.buildingShape || 'Rectangular',
+      estimatedLength: raw?.estimatedLength || null,
+      estimatedWidth: raw?.estimatedWidth || null,
+      estimatedStories: raw?.estimatedStories || null,
+      buildingShape: raw?.buildingShape || 'rectangular',
       roofType: raw?.roofType || 'Flat',
-      adjacentBuildings: raw?.adjacentBuildings || 'Unknown',
+      adjacentBuildings: raw?.adjacentBuildings || 'unknown',
       confidence: raw?.confidence || 'medium',
-      rawData: raw?.rawAnalysis || raw,
+      rawData: raw,
     };
   }
-  
-  // Default building photo analysis
+
+  // Default building analysis
   return {
     confidence: raw?.confidence || 'high',
     detectedFeatures: {
@@ -196,289 +113,93 @@ function formatAnalysisResult(raw, type) {
       estimatedStories: raw?.numberOfStories || raw?.stories || 'Unknown',
       constructionPeriod: raw?.constructionPeriod || 'Unknown',
       structuralSystem: raw?.structuralSystem || 'Unknown',
-      materialCondition: raw?.materialCondition || 'Unknown',
+      materialCondition: raw?.materialCondition || 'unknown',
       irregularities: raw?.irregularities || {
-        plan: 'Unknown',
-        vertical: 'Unknown',
-        mass: 'Unknown',
+        plan: 'unknown',
+        vertical: 'unknown',
+        mass: 'unknown',
       },
     },
     dimensions: {
-      estimatedLength: raw?.buildingLength || raw?.length || null,
-      estimatedWidth: raw?.buildingWidth || raw?.width || null,
-      estimatedHeight: raw?.buildingHeight || raw?.height || null,
+      estimatedLength: raw?.buildingLength || null,
+      estimatedWidth: raw?.buildingWidth || null,
+      estimatedHeight: raw?.buildingHeight || null,
     },
     riskFactors: raw?.riskFactors || {
-      softStory: 'Not detected',
-      heavyOverhang: 'Not detected',
-      adjacentBuilding: 'Unknown',
-      foundation: 'Unknown',
+      softStory: 'not detected',
+      heavyOverhang: 'not detected',
+      adjacentBuilding: 'none',
+      foundation: 'unknown',
     },
-    aiInsights: raw?.specialFeatures || raw?.aiInsights || {},
+    aiInsights: raw?.specialFeatures || {},
     recommendations: raw?.recommendations || [],
-    rawData: raw?.rawAnalysis || raw,
+    rawData: raw,
   };
 }
 
-export async function POST(request) {
-  console.log('=== IMAGE ANALYSIS API CALLED ===');
-  console.log('Request method:', request.method);
-  console.log('Request headers:', Object.fromEntries(request.headers.entries()));
-  
-  try {
-    // Check if request has body
-    if (!request.body) {
-      console.error('ERROR: Request body is empty');
-      return NextResponse.json(
-        { 
-          error: 'Request body is empty', 
-          details: 'No data received',
-          debug: {
-            timestamp: new Date().toISOString(),
-            headers: Object.fromEntries(request.headers.entries())
-          }
-        },
-        { status: 400 }
-      );
-    }
+/**
+ * Build contextual prompt with additional information
+ */
+function buildContextualPrompt(basePrompt, context) {
+  if (!context || Object.keys(context).length === 0) return basePrompt;
 
-    let formData;
-    try {
-      console.log('Attempting to parse FormData...');
-      formData = await request.formData();
-      console.log('FormData parsed successfully');
-    } catch (formError) {
-      console.error('ERROR: Failed to parse form data:', formError);
-      return NextResponse.json(
-        { 
-          error: 'Invalid form data', 
-          details: formError.message,
-          debug: {
-            errorType: formError.name,
-            errorStack: formError.stack
-          }
-        },
-        { status: 400 }
-      );
-    }
+  let enhancedPrompt = basePrompt;
 
-    const images = formData.getAll('images');
-    const analysisType = formData.get('analysisType') || 'building';
-    const additionalContextString = formData.get('additionalContext');
-    
-    let additionalContext = {};
-    if (additionalContextString) {
-      try {
-        additionalContext = JSON.parse(additionalContextString);
-        console.log('Additional context provided:', Object.keys(additionalContext));
-      } catch (e) {
-        console.error('Failed to parse additional context:', e);
-      }
-    }
-    
-    console.log('Images received:', images.length);
-    console.log('Analysis type:', analysisType);
-    console.log('Has additional context:', !!additionalContextString);
-    
-    // Log image details
-    images.forEach((img, idx) => {
-      console.log(`Image ${idx + 1}:`, {
-        name: img.name,
-        size: img.size,
-        type: img.type
-      });
-    });
+  if (context.enhancedPrompt) {
+    enhancedPrompt = context.enhancedPrompt + '\n\n' + basePrompt;
+  }
 
-    if (!images || images.length === 0) {
-      console.error('ERROR: No images in formData');
-      return NextResponse.json(
-        { 
-          error: 'No images provided', 
-          details: 'Please upload at least one image',
-          debug: {
-            formDataKeys: Array.from(formData.keys()),
-            receivedImages: images.length
-          }
-        },
-        { status: 400 }
-      );
-    }
-
-    // Validate and convert images to base64
-    const imageBase64Array = [];
-    const maxImageSize = 10 * 1024 * 1024; // 10MB
-    console.log('Starting image validation and conversion...');
-    
-    for (const [index, image] of images.entries()) {
-      console.log(`Processing image ${index + 1}/${images.length}...`);
-      // Check file size
-      if (image.size > maxImageSize) {
-        return NextResponse.json(
-          { 
-            error: 'Image too large', 
-            details: `Image ${index + 1} exceeds 10MB limit` 
-          },
-          { status: 400 }
-        );
-      }
-      
-      // Check file type
-      if (!image.type || !image.type.startsWith('image/')) {
-        return NextResponse.json(
-          { 
-            error: 'Invalid file type', 
-            details: `File ${index + 1} is not an image` 
-          },
-          { status: 400 }
-        );
-      }
-      
-      try {
-        console.log(`Converting image ${index + 1} to base64...`);
-        const bytes = await image.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const base64Data = buffer.toString('base64');
-        console.log(`Image ${index + 1} base64 length:`, base64Data.length);
-        
-        // Detect actual image format from binary data
-        const actualMediaType = detectImageType(buffer);
-        console.log(`Image ${index + 1} declared type: ${image.type}, detected type: ${actualMediaType}`);
-        
-        // Use detected type if available, otherwise fall back to declared type
-        let finalMediaType = actualMediaType || image.type;
-        
-        // Ensure the media type starts with 'image/' for safety
-        if (finalMediaType && !finalMediaType.startsWith('image/')) {
-          console.warn(`Non-image media type detected: ${finalMediaType}, defaulting to image/jpeg`);
-          finalMediaType = 'image/jpeg'; // Safe fallback
-        }
-        
-        // If we still don't have a valid media type, make one final attempt
-        if (!finalMediaType) {
-          console.warn(`No media type could be determined for image ${index + 1}, defaulting to image/jpeg`);
-          finalMediaType = 'image/jpeg';
-        }
-        
-        imageBase64Array.push({
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: finalMediaType,
-            data: base64Data,
-          },
-        });
-        console.log(`Image ${index + 1} converted successfully with type: ${finalMediaType}`);
-      } catch (conversionError) {
-        console.error(`Error converting image ${index + 1}:`, conversionError);
-        return NextResponse.json(
-          { 
-            error: 'Image processing failed', 
-            details: `Could not process image ${index + 1}` 
-          },
-          { status: 500 }
-        );
-      }
-    }
-
-    // Define tool schema for structured output (latest Claude approach)
-    const buildingAnalysisTool = {
-      name: "analyze_building",
-      description: "Extract and return structured building analysis data",
-      input_schema: {
-        type: "object",
-        properties: {
-          buildingLength: { type: ["number", "null"], description: "Estimated length in meters" },
-          buildingWidth: { type: ["number", "null"], description: "Estimated width in meters" },
-          buildingHeight: { type: ["number", "null"], description: "Estimated height in meters" },
-          numberOfStories: { type: ["integer", "null"], description: "Number of floors" },
-          structuralSystem: { type: "string", description: "Type of structural system" },
-          constructionPeriod: { type: "string", description: "Estimated construction decade" },
-          materialCondition: { 
-            type: "string", 
-            enum: ["excellent", "good", "fair", "poor", "unknown"],
-            description: "Overall material condition" 
-          },
-          irregularities: {
-            type: "object",
-            properties: {
-              plan: { type: "string", enum: ["regular", "irregular", "unknown"] },
-              vertical: { type: "string", enum: ["regular", "irregular", "unknown"] },
-              mass: { type: "string", enum: ["regular", "irregular", "unknown"] }
-            },
-            required: ["plan", "vertical", "mass"]
-          },
-          riskFactors: {
-            type: "object",
-            properties: {
-              softStory: { type: "string", enum: ["detected", "not detected", "unknown"] },
-              heavyOverhang: { type: "string", enum: ["detected", "not detected", "unknown"] },
-              adjacentBuilding: { type: "string", enum: ["close", "moderate", "far", "none"] },
-              foundation: { type: "string", enum: ["visible", "not visible", "unknown"] }
-            },
-            required: ["softStory", "heavyOverhang", "adjacentBuilding", "foundation"]
-          },
-          specialFeatures: {
-            type: "object",
-            properties: {
-              balconies: { type: "string", description: "Description of balconies" },
-              cantilevers: { type: "string", description: "Description of cantilevers" },
-              setbacks: { type: "string", description: "Description of setbacks" }
-            }
-          },
-          confidence: { 
-            type: "string", 
-            enum: ["high", "medium", "low"],
-            description: "Confidence level of analysis" 
-          },
-          recommendations: {
-            type: "array",
-            items: { type: "string" },
-            description: "List of safety recommendations"
-          }
-        },
-        required: ["structuralSystem", "materialCondition", "irregularities", "riskFactors", "confidence"]
-      }
-    };
-
-    // Build enhanced prompt with additional context
-    const buildContextualPrompt = (basePrompt, context) => {
-      if (!context || Object.keys(context).length === 0) return basePrompt;
-      
-      let enhancedPrompt = basePrompt;
-      
-      if (context.enhancedPrompt) {
-        enhancedPrompt = context.enhancedPrompt + '\n\n' + basePrompt;
-      }
-      
-      if (context.location) {
-        enhancedPrompt += `\n\nLocation Context:
+  if (context.location) {
+    enhancedPrompt += `\n\nLocation Context:
 - City: ${context.location.city || 'Unknown'}
 - Coordinates: ${context.location.latitude}, ${context.location.longitude}
 - Address: ${context.location.address || 'Not provided'}`;
-      }
-      
-      if (context.seismic) {
-        enhancedPrompt += `\n\nSeismic Context:
+  }
+
+  if (context.seismic) {
+    enhancedPrompt += `\n\nSeismic Context:
 - Zone: ${context.seismic.zone || 'Unknown'}
 - Soil Type: ${context.seismic.soilType || 'Unknown'}
 - Zone Description: ${context.seismic.zoneDescription || 'Not provided'}`;
-      }
-      
-      if (context.weather) {
-        enhancedPrompt += `\n\nEnvironmental Context:
+  }
+
+  if (context.weather) {
+    enhancedPrompt += `\n\nEnvironmental Context:
 - Climate: ${context.weather.current?.condition || 'Unknown'}
 - Average Temperature: ${context.weather.historical?.avgTemperature || 'Unknown'}°C
 - Annual Rainfall: ${context.weather.historical?.avgRainfall || 'Unknown'}mm`;
-      }
-      
-      return enhancedPrompt;
-    };
-    
-    // Simplified prompts when using tool schemas
-    const prompts = {
-      building: `You are an expert structural engineer analyzing building photos for earthquake safety assessment.
-      
-Please carefully examine these building photos and extract:
+  }
+
+  return enhancedPrompt;
+}
+
+// ============================================================================
+// System Prompts by Analysis Type
+// ============================================================================
+
+const SYSTEM_PROMPTS = {
+  building: `You are an expert structural engineer analyzing building photos for earthquake safety assessment.
+Analyze the provided images carefully and extract all relevant structural information.
+Be precise with your estimates and provide honest confidence levels.`,
+
+  floorPlan: `You are an expert structural engineer analyzing architectural floor plans.
+Extract precise measurements and structural details from the plans.
+Look for dimension lines, structural annotations, and material specifications.`,
+
+  architecturalPlan: `You are an expert structural engineer analyzing architectural plans, blueprints, and technical drawings.
+Conduct a comprehensive analysis for earthquake safety assessment.
+Extract ALL possible structural details including dimensions, materials, reinforcement patterns, and irregularities.`,
+
+  satellite: `You are an expert analyst examining satellite/aerial imagery of buildings.
+Estimate building dimensions, footprint shape, and surrounding conditions from the aerial view.`,
+};
+
+// ============================================================================
+// User Prompts by Analysis Type
+// ============================================================================
+
+const USER_PROMPTS = {
+  building: `Analyze these building photos for earthquake safety assessment and extract:
 - Building dimensions (estimate in meters)
 - Number of stories/floors
 - Structural system type (concrete frame, steel frame, masonry, timber, etc.)
@@ -487,500 +208,230 @@ Please carefully examine these building photos and extract:
 - Structural irregularities (plan, vertical, mass)
 - Risk factors (soft story, overhangs, adjacent buildings, foundation)
 - Special features (balconies, cantilevers, setbacks)
+- Safety recommendations`,
 
-Use the analyze_building tool to return your analysis.`,
-      
-      floorPlan: `Analyze this architectural floor plan/drawing and extract precise measurements and structural details:
-        1. Building dimensions (length x width in meters - look for dimension lines and measurements)
-        2. Number of floors indicated
-        3. Column/pillar spacing if visible
-        4. Room layout and counts
-        5. Structural system indicated (frame type, load-bearing walls, etc.)
-        6. Wall thicknesses if marked
-        7. Foundation type if shown
-        8. Any structural notes or specifications visible
-        
-        Be very precise with numbers visible on the plan. Return as JSON.`,
-      
-      architecturalPlan: `You are an expert structural engineer analyzing architectural plans, blueprints, and technical drawings for detailed structural assessment.
+  floorPlan: `Analyze this architectural floor plan and extract:
+1. Building dimensions (length x width in meters - look for dimension lines)
+2. Number of floors indicated
+3. Column/pillar spacing if visible
+4. Room layout and counts
+5. Structural system indicated (frame type, load-bearing walls, etc.)
+6. Wall thicknesses if marked
+7. Foundation type if shown
+8. Any structural notes or specifications visible`,
 
-CRITICAL TASK: Analyze these architectural plans and extract EVERY possible structural detail for earthquake safety assessment.
+  architecturalPlan: `Analyze these architectural plans and extract:
+1. Building dimensions (length, width in meters)
+2. Number of stories
+3. Structural system type
+4. Column spacing and grid layout
+5. Foundation type
+6. Wall thicknesses
+7. Room counts and layout
+8. Structural irregularities (plan and vertical)
+9. Any structural notes or specifications
+10. Quality assessment and confidence levels`,
 
-## PRIMARY ANALYSIS REQUIREMENTS - EXTRACT EVERYTHING POSSIBLE:
+  satellite: `Analyze this satellite/aerial view and extract:
+1. Building footprint dimensions (approximate length x width in meters)
+2. Roof type and condition
+3. Building shape (rectangular, L-shaped, irregular, etc.)
+4. Estimated number of stories (based on shadows and context)
+5. Adjacent buildings proximity
+6. Site conditions and surroundings`,
+};
 
-### 1. STRUCTURAL ELEMENTS IDENTIFICATION:
-- Column positions, dimensions, and grid layout
-- Beam locations, sizes, and spans  
-- Load-bearing walls vs partition walls
-- **REINFORCEMENT BAR (REBAR) ANALYSIS - CRITICAL FOR SEISMIC ASSESSMENT:**
-  - **EXACT REBAR POSITIONS IN BUILDING COORDINATE SYSTEM:**
-    - Column rebar positions relative to grid lines (e.g., "Column A1: 8Ø20mm at corners + 4Ø16mm on faces")
-    - Specific bar locations within each column cross-section (corner bars, face bars, center bars)
-    - Distance from column faces to rebar centerlines (cover distances)
-    - Rebar positioning in different building zones (perimeter vs interior columns)
-    - Vertical positioning of reinforcement (ground level, upper floors, roof level)
-  - **BEAM REBAR EXACT POSITIONING:**
-    - Top bar positions along beam length (support zones vs span zones)
-    - Bottom bar positioning and curtailment points
-    - Stirrup locations and spacing variations along beam length
-    - Beam-to-beam connection rebar positioning
-  - **SPATIAL REINFORCEMENT LAYOUT:**
-    - Rebar density maps across building plan (where reinforcement is heavy/light)
-    - Critical reinforcement concentration points (beam-column joints, shear walls)
-    - Reinforcement continuity paths through the structure
-    - Position of seismic reinforcement relative to building edges and openings
-  - **FOUNDATION REBAR POSITIONING:**
-    - Mat foundation top and bottom bar positions and grid layout
-    - Footing rebar positioning relative to column locations
-    - Tie beam reinforcement positions connecting footings
-  - **SLAB REINFORCEMENT SPATIAL LAYOUT:**
-    - Top and bottom mesh positioning across slab area
-    - Additional reinforcement around openings and edges
-    - Reinforcement positioning at slab-beam interfaces
-- Foundation type and layout
-- Slab thickness and type
-- Structural joints and connections
+// ============================================================================
+// Schema Mapping
+// ============================================================================
 
-### **COMPREHENSIVE ARCHITECTURAL LAYOUT EXTRACTION:**
-- **ROOM IDENTIFICATION & POSITIONING:**
-  - All room types and their exact locations (living rooms, bedrooms, kitchens, bathrooms, etc.)
-  - Room dimensions and areas (length x width x height if shown)
-  - Room positioning relative to structural grid
-  - Floor-by-floor room layout if multi-story
-  - Special rooms (mechanical rooms, storage, utility spaces)
-  - Ceiling heights and level changes between rooms
+const SCHEMA_MAP = {
+  building: BuildingAnalysisSchema,
+  floorPlan: FloorPlanAnalysisSchema,
+  architecturalPlan: FloorPlanAnalysisSchema,
+  satellite: SatelliteAnalysisSchema,
+};
 
-- **DOORS & WINDOWS POSITIONING:**
-  - All door locations and types (entry doors, interior doors, emergency exits)
-  - Door dimensions and swing directions
-  - Window positions, sizes, and types
-  - Opening positioning relative to structural elements
-  - Fire exits and emergency egress paths
+// ============================================================================
+// Main API Handler
+// ============================================================================
 
-- **VERTICAL CIRCULATION ELEMENTS:**
-  - Staircase locations, dimensions, and orientations
-  - Number of steps, riser/tread dimensions if visible
-  - Stair construction type (concrete, steel, wood)
-  - Elevator locations and shaft dimensions
-  - Elevator positioning relative to structural grid
-  - Emergency stair locations and fire safety features
+export async function POST(request) {
+  console.log('=== IMAGE ANALYSIS API CALLED ===');
 
-- **ARCHITECTURAL FEATURES & DETAILS:**
-  - Balcony locations, dimensions, and support systems
-  - Terrace and outdoor space positioning
-  - Architectural projections and setbacks
-  - Roof features (parapets, overhangs, mechanical equipment locations)
-  - Building entrances and their structural implications
+  try {
+    // Parse form data
+    if (!request.body) {
+      return NextResponse.json(
+        { error: 'Request body is empty', details: 'No data received' },
+        { status: 400 }
+      );
+    }
 
-### 2. DIMENSIONAL ANALYSIS & PRECISE POSITIONING:
-- Building length and width (in meters)
-- **STRUCTURAL GRID SYSTEM:**
-  - Exact column grid coordinates (A1, A2, B1, B2, etc.)
-  - Grid line spacing in both X and Y directions
-  - Column positioning relative to building perimeter
-  - Distance from building edges to first interior columns
-- **REINFORCEMENT POSITIONING COORDINATES:**
-  - Rebar positions referenced to structural grid system
-  - Distance measurements from grid lines to rebar centroids
-  - Elevation/level positioning of reinforcement layers
-  - Spatial relationships between different structural elements
-- Room dimensions and areas
-- Wall thicknesses (structural vs non-structural)
-- Floor-to-ceiling heights
-- Overall building footprint area
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch (formError) {
+      console.error('Failed to parse form data:', formError);
+      return NextResponse.json(
+        { error: 'Invalid form data', details: formError.message },
+        { status: 400 }
+      );
+    }
 
-### 3. TECHNICAL SPECIFICATIONS & ANNOTATIONS:
-- Structural system type (RC frame, steel frame, masonry, hybrid)
-- Foundation system (isolated footings, mat foundation, pile foundation)
-- Concrete grades/steel grades (if marked)
-- Load specifications (live loads, dead loads)
-- Structural notes and design criteria
-- **ALL TEXT ANNOTATIONS & LABELS:**
-  - Material specifications and grades
-  - Construction notes and special instructions
-  - Reference numbers and drawing symbols
-  - Level markings and elevation data
-  - Any codes or standards referenced
-  - Architect/engineer notes and calculations
-  - Revision marks and drawing dates
+    const images = formData.getAll('images');
+    const analysisType = formData.get('analysisType') || 'building';
+    const additionalContextString = formData.get('additionalContext');
 
-### 4. SEISMIC DESIGN FEATURES & REINFORCEMENT PATTERNS:
-- Shear walls presence and locations
-- **SEISMIC REINFORCEMENT DETAILING:**
-  - Confinement reinforcement in columns (hoop spacing, especially in plastic hinge regions)
-  - Beam-column joint reinforcement (stirrups through joints)
-  - Special seismic detailing requirements compliance
-  - Ductility reinforcement provisions
-  - Reinforcement continuity through joints
-  - Anchorage details in seismic zones
-- Structural irregularities (plan/vertical)
-- Expansion joints or seismic joints
-- Base isolation or seismic devices
-- Lateral force resisting system details
+    let additionalContext = {};
+    if (additionalContextString) {
+      try {
+        additionalContext = JSON.parse(additionalContextString);
+      } catch (e) {
+        console.error('Failed to parse additional context:', e);
+      }
+    }
 
-### **MEP SYSTEMS & INFRASTRUCTURE POSITIONING:**
-- **MECHANICAL SYSTEMS:**
-  - HVAC equipment locations and room positioning
-  - Ventilation shafts and duct routing
-  - Mechanical room locations and dimensions
-  - Air conditioning units and their structural support requirements
-- **ELECTRICAL SYSTEMS:**
-  - Electrical panels and switchgear locations
-  - Electrical room positioning
-  - Cable routing and conduit paths
-  - Emergency power systems locations
-- **PLUMBING & UTILITIES:**
-  - Water supply and drainage system routing
-  - Bathroom fixture locations and plumbing connections
-  - Utility connections and meter locations
-  - Fire protection systems (sprinklers, standpipes)
-- **COMMUNICATION SYSTEMS:**
-  - Telephone/data system locations
-  - Security system components
-  - Fire alarm system components
+    console.log('Images received:', images.length);
+    console.log('Analysis type:', analysisType);
 
-### 5. QUALITY & COMPLETENESS ASSESSMENT:
-Rate the plan quality and completeness:
-- Image clarity (poor/fair/good/excellent)
-- Technical detail level (basic/moderate/detailed/comprehensive)  
-- Measurable dimensions available (yes/no + percentage)
-- Structural information completeness (0-100%)
+    if (!images || images.length === 0) {
+      return NextResponse.json(
+        { error: 'No images provided', details: 'Please upload at least one image' },
+        { status: 400 }
+      );
+    }
 
-### 6. DECISION MAKING:
-Based on your analysis, provide a professional recommendation:
-- Is this plan sufficient for structural assessment? (yes/no)
-- What additional plans/information would improve the analysis?
-- Should the user upload clearer images or additional views?
-- Rate confidence in structural analysis (low/medium/high)
+    // Validate and convert images to base64
+    const imageBase64Array = [];
+    const maxImageSize = 10 * 1024 * 1024; // 10MB
 
-## OUTPUT FORMAT:
-Return comprehensive JSON with ALL extracted data organized by categories above.
-Include:
-- EVERY structural element with precise positioning
-- ALL reinforcement bar details with exact locations
-- COMPLETE room layout with dimensions and positioning
-- ALL doors, windows, stairs, elevators with coordinates
-- EVERY architectural feature and detail
-- ALL MEP system components and their locations
-- COMPLETE text annotations and technical specifications
-- DETAILED quality assessment and professional recommendations
+    for (const [index, image] of images.entries()) {
+      // Check file size
+      if (image.size > maxImageSize) {
+        return NextResponse.json(
+          { error: 'Image too large', details: `Image ${index + 1} exceeds 10MB limit` },
+          { status: 400 }
+        );
+      }
 
-**IMPORTANT:** Extract MAXIMUM possible information - assume this is the only chance to capture all details from this plan. Be thorough and comprehensive in analysis.`,
-      
-      satellite: `Analyze this satellite/aerial view of a building and extract:
-        1. Building footprint dimensions (approximate length x width in meters)
-        2. Roof type and condition
-        3. Building shape (rectangular, L-shaped, irregular, etc.)
-        4. Estimated number of stories (based on shadows and context)
-        5. Adjacent buildings proximity
-        6. Site conditions and surroundings
-        
-        Return as JSON with confidence levels.`
-    };
+      // Check file type
+      if (!image.type || !image.type.startsWith('image/')) {
+        return NextResponse.json(
+          { error: 'Invalid file type', details: `File ${index + 1} is not an image` },
+          { status: 400 }
+        );
+      }
 
-    const basePrompt = prompts[analysisType] || prompts.building;
-    const prompt = buildContextualPrompt(basePrompt, additionalContext);
+      try {
+        const bytes = await image.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const base64Data = buffer.toString('base64');
+
+        // Detect actual image format
+        const actualMediaType = detectImageType(buffer);
+        let finalMediaType = actualMediaType || image.type;
+
+        if (!finalMediaType || !finalMediaType.startsWith('image/')) {
+          finalMediaType = 'image/jpeg';
+        }
+
+        imageBase64Array.push({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: finalMediaType,
+            data: base64Data,
+          },
+        });
+      } catch (conversionError) {
+        console.error(`Error converting image ${index + 1}:`, conversionError);
+        return NextResponse.json(
+          { error: 'Image processing failed', details: `Could not process image ${index + 1}` },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Get schema and prompts for this analysis type
+    const schema = SCHEMA_MAP[analysisType] || BuildingAnalysisSchema;
+    const systemPrompt = SYSTEM_PROMPTS[analysisType] || SYSTEM_PROMPTS.building;
+    const baseUserPrompt = USER_PROMPTS[analysisType] || USER_PROMPTS.building;
+    const userPrompt = buildContextualPrompt(baseUserPrompt, additionalContext);
 
     // Check API key
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.error('ERROR: ANTHROPIC_API_KEY is not set');
       return NextResponse.json(
-        { 
-          error: 'API configuration error', 
-          details: 'Anthropic API key is not configured',
-          debug: {
-            hasApiKey: false,
-            timestamp: new Date().toISOString()
-          }
-        },
+        { error: 'API configuration error', details: 'Anthropic API key is not configured' },
         { status: 500 }
       );
     }
-    
-    console.log('API key found, length:', process.env.ANTHROPIC_API_KEY.length);
-    console.log('Preparing Claude API call...');
-    console.log('Prompt length:', prompt.length);
-    console.log('Number of images to analyze:', imageBase64Array.length);
-    
-    // Call Claude Vision API with retry logic for malformed responses
-    let response;
-    let lastApiError;
-    const maxApiRetries = 2;
-    
-    for (let apiAttempt = 0; apiAttempt <= maxApiRetries; apiAttempt++) {
-      try {
-        console.log(`Claude API attempt ${apiAttempt + 1}/${maxApiRetries + 1}`);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-        
-        console.log('Calling Claude API with model: claude-3-5-sonnet-20241022');
-        const startTime = Date.now();
-        
-        // Use tool-based approach for structured output (latest Claude best practice)
-        response = await anthropic.messages.create({
-          model: 'claude-3-5-sonnet-20241022', // Use correct model name
-          max_tokens: 2000,
-          temperature: 0.1, // Lower temperature for more consistent structured output
-          tools: analysisType === 'building' ? [buildingAnalysisTool] : undefined,
-          tool_choice: analysisType === 'building' ? { type: 'tool', name: 'analyze_building' } : undefined,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: prompt,
-                },
-                ...imageBase64Array,
-              ],
-            },
-          ],
-        });
-        
-        clearTimeout(timeoutId);
-        const endTime = Date.now();
-        console.log(`Claude API responded in ${endTime - startTime}ms`);
-        console.log('Response received:', {
-          id: response.id,
-          model: response.model,
-          usage: response.usage,
-          stop_reason: response.stop_reason
-        });
-        
-        // Validate response structure
-        if (!validateClaudeResponseStructure(response, analysisType)) {
-          console.error(`Claude API returned malformed response on attempt ${apiAttempt + 1}`);
-          throw new Error('Malformed response from Claude API - invalid structure');
-        }
-        
-        // If we got here, the response is valid
-        break;
-        
-      } catch (apiError) {
-        console.error(`CLAUDE API ERROR (attempt ${apiAttempt + 1}):`, apiError);
-        console.error('Error details:', {
-          name: apiError.name,
-          message: apiError.message,
-          status: apiError.status,
-          statusText: apiError.statusText,
-          type: apiError.type
-        });
-        
-        lastApiError = apiError;
-        
-        // Don't retry timeouts or client errors
-        if (apiError.message?.includes('abort') || apiError.status < 500) {
-          break;
-        }
-        
-        // Retry only for malformed responses or server errors
-        if (apiAttempt < maxApiRetries && 
-            (apiError.message?.includes('Malformed response') || apiError.status >= 500)) {
-          const waitTime = (apiAttempt + 1) * 1000; // 1s, 2s delay
-          console.log(`Retrying Claude API in ${waitTime}ms...`);
-          await new Promise(resolve => setTimeout(resolve, waitTime));
-          continue;
-        }
-        
-        break;
-      }
-    }
-    
-    // If all retries failed, handle the final error
-    if (lastApiError && !response) {
-      if (lastApiError.message?.includes('abort')) {
-        return NextResponse.json(
-          { 
-            error: 'Analysis timeout', 
-            details: 'The AI analysis took too long. Please try again with fewer or smaller images.' 
-          },
-          { status: 504 }
-        );
-      }
-      
-      return NextResponse.json(
-        { 
-          error: 'AI service error', 
-          details: lastApiError.message || 'Failed to analyze images after multiple attempts' 
-        },
-        { status: 503 }
-      );
-    }
 
-    // Parse Claude's response based on whether we used tools or not
-    let analysisResult;
-    
-    if (analysisType === 'building' && response.content) {
-      // Tool-based response parsing
-      console.log('Parsing tool-based response');
-      
-      // Find tool_use content block
-      const toolUseBlock = response.content.find(block => block.type === 'tool_use');
-      
-      if (toolUseBlock && toolUseBlock.input) {
-        console.log('Successfully extracted structured data from tool response');
-        analysisResult = toolUseBlock.input;
-        console.log('Tool response keys:', Object.keys(analysisResult));
-      } else {
-        console.error('ERROR: No tool_use block found in response');
-        console.error('Response content:', JSON.stringify(response.content, null, 2));
-        throw new Error('Invalid tool response from AI service');
-      }
-    } else {
-      // Fallback to text-based parsing for non-building analysis
-      if (!response || !response.content || !response.content[0]) {
-        console.error('ERROR: Invalid response structure from Claude');
-        console.error('Response object:', JSON.stringify(response, null, 2));
-        throw new Error('Invalid response from AI service');
-      }
-      
-      const analysisText = response.content[0].text || '';
-      console.log('Claude response text length:', analysisText.length);
-      console.log('First 500 chars of response:', analysisText.substring(0, 500));
-    
-      // Try to extract JSON from the response
-      try {
-        console.log('Attempting to extract JSON from response...');
-        // Look for JSON in the response
-        const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          console.log('JSON found in response, parsing...');
-          analysisResult = JSON.parse(jsonMatch[0]);
-          console.log('JSON parsed successfully:', Object.keys(analysisResult));
-        } else {
-          console.log('No JSON found in response, using raw text');
-          console.log('Raw text from Claude:', analysisText.substring(0, 500));
-          // If no JSON found, create a default structure with the raw text
-          analysisResult = { 
-            buildingLength: null,
-            buildingWidth: null,
-            buildingHeight: null,
-            numberOfStories: null,
-            structuralSystem: 'Unable to analyze - see raw response',
-            constructionPeriod: 'Unable to analyze',
-            materialCondition: 'Unable to analyze',
-            irregularities: {
-              plan: 'Unknown',
-              vertical: 'Unknown',
-              mass: 'Unknown'
-            },
-            riskFactors: {
-              softStory: 'Not analyzed',
-              heavyOverhang: 'Not analyzed',
-              adjacentBuilding: 'Unknown',
-              foundation: 'Unknown'
-            },
-            specialFeatures: {},
-            confidence: 'low',
-            recommendations: ['Manual analysis required - AI could not parse the image properly'],
-            rawAnalysis: analysisText,
-            needsManualReview: true,
-            debug: {
-              reason: 'No JSON structure found in Claude response',
-              textReceived: true,
-              textLength: analysisText.length
-            }
-          };
-        }
-      } catch (parseError) {
-      console.error('JSON parsing error:', parseError);
-      console.log('Failed JSON string:', jsonMatch ? jsonMatch[0].substring(0, 200) : 'No match');
-      analysisResult = { 
-        buildingLength: null,
-        buildingWidth: null,
-        buildingHeight: null,
-        numberOfStories: null,
-        structuralSystem: 'JSON parse error - see raw response',
-        constructionPeriod: 'Unable to analyze',
-        materialCondition: 'Unable to analyze',
-        irregularities: {
-          plan: 'Unknown',
-          vertical: 'Unknown',
-          mass: 'Unknown'
-        },
-        riskFactors: {
-          softStory: 'Not analyzed',
-          heavyOverhang: 'Not analyzed',
-          adjacentBuilding: 'Unknown',
-          foundation: 'Unknown'
-        },
-        specialFeatures: {},
-        confidence: 'low',
-        recommendations: ['JSON parsing failed - check raw response for details'],
-        rawAnalysis: analysisText,
-        needsManualReview: true,
-        debug: {
-          parseError: parseError.message,
-          textLength: analysisText.length
-        }
-      };
-    }
-    }
-    
-    // Ensure we have an analysis result
-    if (!analysisResult) {
-      console.error('ERROR: No analysis result obtained');
-      throw new Error('Failed to obtain analysis result from AI');
-    }
+    console.log('Calling Claude with structured outputs...');
+    const startTime = Date.now();
 
-    // Format the response for the application
-    console.log('Formatting analysis result for type:', analysisType);
+    // Call Claude with structured outputs - guaranteed schema compliance
+    const analysisResult = await analyzeImagesStructured({
+      systemPrompt,
+      userPrompt,
+      images: imageBase64Array,
+      schema,
+      maxTokens: 4000,
+    });
+
+    const elapsed = Date.now() - startTime;
+    console.log(`Analysis completed in ${elapsed}ms`);
+
+    // Format result for backward compatibility
     const formattedResult = formatAnalysisResult(analysisResult, analysisType);
-    console.log('Formatted result keys:', Object.keys(formattedResult));
-    
+
     const finalResponse = {
       success: true,
       analysis: formattedResult,
-      confidence: formattedResult.confidence || 'high',
+      confidence: formattedResult.confidence || analysisResult.confidence || 'high',
       imagesAnalyzed: images.length,
       debug: {
         timestamp: new Date().toISOString(),
-        processingTime: Date.now() - Date.parse(request.headers.get('date') || new Date().toISOString()),
+        processingTime: elapsed,
         analysisType: analysisType,
-        claudeModel: 'claude-3-5-sonnet-20241022',
-        rawResponseAvailable: !!formattedResult.rawData,
-        jsonExtracted: !(analysisResult && analysisResult.needsManualReview),
-        apiKeyPresent: !!process.env.ANTHROPIC_API_KEY
-      }
+        claudeModel: 'claude-sonnet-4-5',
+        structuredOutputs: true,
+      },
     };
-    
-    console.log('=== ANALYSIS COMPLETE ===');
-    console.log('Final response summary:', {
-      success: finalResponse.success,
-      confidence: finalResponse.confidence,
-      imagesAnalyzed: finalResponse.imagesAnalyzed,
-      hasAnalysisData: !!finalResponse.analysis
-    });
 
+    console.log('=== ANALYSIS COMPLETE ===');
     return NextResponse.json(finalResponse);
 
   } catch (error) {
     console.error('=== IMAGE ANALYSIS ERROR ===');
-    console.error('Error:', error);
-    console.error('Error stack:', error.stack);
-    
-    // Always return valid JSON
-    const errorResponse = {
-      error: 'Analysis failed',
-      details: error.message || 'An unexpected error occurred',
-      timestamp: new Date().toISOString(),
-      debug: {
-        errorType: error.name,
-        errorMessage: error.message,
-        hasApiKey: !!process.env.ANTHROPIC_API_KEY,
-        stackTrace: error.stack?.split('\n').slice(0, 5)
-      }
-    };
-    
+    console.error('Error:', error.message);
+
     // Determine appropriate status code
     let statusCode = 500;
-    if (error.message?.includes('API key')) {
-      statusCode = 401;
-    } else if (error.message?.includes('rate limit')) {
+    let errorMessage = 'Analysis failed';
+
+    if (error.message?.includes('refused')) {
+      statusCode = 422;
+      errorMessage = 'AI could not analyze the provided images';
+    } else if (error.message?.includes('Rate limit')) {
       statusCode = 429;
+      errorMessage = 'Service temporarily unavailable';
+    } else if (error.message?.includes('API key')) {
+      statusCode = 401;
+      errorMessage = 'API configuration error';
+    } else if (error.message?.includes('truncated')) {
+      statusCode = 413;
+      errorMessage = 'Content too complex for analysis';
     }
-    
-    return NextResponse.json(errorResponse, { status: statusCode });
+
+    return NextResponse.json(
+      {
+        error: errorMessage,
+        details: error.message || 'An unexpected error occurred',
+        timestamp: new Date().toISOString(),
+      },
+      { status: statusCode }
+    );
   }
 }
 
@@ -998,13 +449,13 @@ export async function OPTIONS(request) {
 
 // Handle GET requests for debugging
 export async function GET(request) {
-  console.log('GET request to analyze-image API');
   return NextResponse.json({
     status: 'API is running',
     message: 'This endpoint only accepts POST requests with image data',
     apiKeyConfigured: !!process.env.ANTHROPIC_API_KEY,
     timestamp: new Date().toISOString(),
     runtime: 'nodejs',
-    method: 'Use POST to submit images for analysis',
+    structuredOutputs: true,
+    supportedTypes: ['building', 'floorPlan', 'architecturalPlan', 'satellite'],
   });
 }

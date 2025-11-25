@@ -1,9 +1,11 @@
-import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+/**
+ * Building Photos Analysis API
+ * Uses Claude Structured Outputs for guaranteed schema compliance
+ */
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { NextResponse } from 'next/server';
+import { analyzeImagesStructured, createImageContent } from '@/lib/ai/structuredOutputs';
+import { BuildingPhotosAnalysisSchema } from '@/lib/schemas/aiAnalysisSchemas';
 
 export async function POST(request) {
   try {
@@ -14,19 +16,18 @@ export async function POST(request) {
     }
 
     // Prepare images for AI analysis
-    const imageContents = images.map(img => ({
-      type: 'image',
-      source: {
-        type: 'base64',
-        media_type: img.type || 'image/jpeg',
-        data: img.data
-      }
-    }));
+    const imageContents = images.map(img =>
+      createImageContent(img.data, img.type || 'image/jpeg')
+    );
 
-    const prompt = `
-You are an expert structural engineer analyzing building exterior photographs. 
+    const systemPrompt = `You are an expert structural engineer analyzing building exterior photographs.
+You must analyze the provided building photographs and extract detailed structural and safety information.
+Be thorough in your assessment and provide confidence scores (0-1) for all assessments.`;
 
-${planAnalysis ? `
+    // Build context from plan analysis if available
+    let planContext = '';
+    if (planAnalysis) {
+      planContext = `
 PREVIOUS PLAN ANALYSIS CONTEXT:
 Based on architectural plans, the following information was extracted:
 - Building dimensions: ${planAnalysis.dimensions?.length}m x ${planAnalysis.dimensions?.width}m
@@ -36,7 +37,11 @@ Based on architectural plans, the following information was extracted:
 - Material type: ${planAnalysis.structural?.materialType}
 
 Please cross-reference this information with the photos and identify any discrepancies.
-` : ''}
+`;
+    }
+
+    const userPrompt = `
+${planContext}
 
 Please analyze these building exterior photographs and provide:
 
@@ -84,115 +89,16 @@ DATA INTEGRATION:
 
 Context: This building is located in ${location?.city || 'Turkey'}, earthquake zone ${location?.earthquakeZone || 'unknown'}.
 
-Please provide your analysis in the following JSON format:
-{
-  "visual": {
-    "dimensions": {
-      "length": number,
-      "width": number,
-      "height": number,
-      "stories": number
-    },
-    "condition": "excellent/good/fair/poor",
-    "ageEstimate": number,
-    "maintenanceLevel": "excellent/good/fair/poor"
-  },
-  "structural": {
-    "system": "string",
-    "materialType": "string",
-    "structuralCondition": "string",
-    "visibleDamage": ["array"],
-    "irregularities": {
-      "plan": "regular/irregular",
-      "vertical": "regular/irregular",
-      "softStory": boolean,
-      "description": "string"
-    }
-  },
-  "construction": {
-    "wallMaterial": "string",
-    "roofType": "string",
-    "windowType": "string",
-    "foundationVisible": boolean
-  },
-  "seismic": {
-    "vulnerabilities": ["array"],
-    "riskFactors": ["array"],
-    "recommendations": ["array"]
-  },
-  "integration": {
-    "planPhotoConsistency": "high/medium/low",
-    "discrepancies": ["array"],
-    "combinedConfidence": {
-      "dimensions": number,
-      "structural": number,
-      "materials": number,
-      "overall": number
-    }
-  },
-  "combined": {
-    "finalDimensions": {
-      "length": number,
-      "width": number,
-      "height": number,
-      "stories": number,
-      "area": number
-    },
-    "finalStructuralSystem": "string",
-    "finalBuildingType": "string",
-    "finalMaterialType": "string",
-    "seismicRiskLevel": "low/medium/high/very_high"
-  },
-  "quality": {
-    "photoQuality": "excellent/good/fair/poor",
-    "analysisCompleteness": number,
-    "confidence": {
-      "visual": number,
-      "structural": number,
-      "integration": number,
-      "overall": number
-    }
-  },
-  "analysis": {
-    "keyFindings": ["array"],
-    "criticalIssues": ["array"],
-    "recommendations": ["array"]
-  }
-}
+Analyze thoroughly and provide your response.`;
 
-Be thorough in your analysis and provide confidence scores (0-1) for all assessments.
-`;
-
-    const message = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 4000,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            ...imageContents
-          ]
-        }
-      ]
+    // Call Claude with structured outputs - guaranteed schema compliance
+    const analysisData = await analyzeImagesStructured({
+      systemPrompt,
+      userPrompt,
+      images: imageContents,
+      schema: BuildingPhotosAnalysisSchema,
+      maxTokens: 4000,
     });
-
-    // Parse AI response
-    const content = message.content[0].text;
-    
-    // Extract JSON from response
-    let analysisData;
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        analysisData = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError);
-      return NextResponse.json({ error: 'Failed to parse analysis results' }, { status: 500 });
-    }
 
     // Add metadata
     analysisData.metadata = {
@@ -200,19 +106,41 @@ Be thorough in your analysis and provide confidence scores (0-1) for all assessm
       imagesAnalyzed: images.length,
       analysisType: 'building_photos',
       location: location,
-      hasPlanContext: !!planAnalysis
+      hasPlanContext: !!planAnalysis,
     };
 
     return NextResponse.json({
       success: true,
       analysis: analysisData,
-      rawResponse: content
     });
 
   } catch (error) {
     console.error('Building photo analysis error:', error);
+
+    // Handle specific error types
+    if (error.message.includes('refused')) {
+      return NextResponse.json(
+        { error: 'AI could not analyze the provided photos', details: error.message },
+        { status: 422 }
+      );
+    }
+
+    if (error.message.includes('Rate limit')) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable', details: 'Please try again in a moment' },
+        { status: 429 }
+      );
+    }
+
+    if (error.message.includes('API key')) {
+      return NextResponse.json(
+        { error: 'Service configuration error' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Failed to analyze building photos' },
+      { error: 'Failed to analyze building photos', details: error.message },
       { status: 500 }
     );
   }
