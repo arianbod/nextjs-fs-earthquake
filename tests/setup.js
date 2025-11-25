@@ -4,7 +4,7 @@
  */
 
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@/generated/prisma/client';
+import { PrismaClient } from '@/generated/client/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import crypto from 'crypto';

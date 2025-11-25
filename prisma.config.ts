@@ -1,5 +1,8 @@
 import "dotenv/config";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
+
+// Use POSTGRES_URL_NON_POOLING (Vercel/Neon) or fall back to DIRECT_URL (local)
+const directUrl = process.env.POSTGRES_URL_NON_POOLING || process.env.DIRECT_URL;
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -9,7 +12,7 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"), // Pooled connection (works everywhere)
-    directUrl: env("POSTGRES_URL_NON_POOLING"), // Direct connection for migrations
+    url: process.env.DATABASE_URL, // Pooled connection
+    directUrl: directUrl, // Direct connection for migrations
   },
 });

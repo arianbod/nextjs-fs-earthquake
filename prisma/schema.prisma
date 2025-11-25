@@ -2,8 +2,9 @@
 // PostgreSQL database schema for API usage tracking and analytics
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma/client"
+  provider            = "prisma-client"
+  output              = "../generated/client"
+  importFileExtension = ""
 }
 
 datasource db {

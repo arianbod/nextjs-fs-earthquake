@@ -11,11 +11,17 @@
  * 4. Sets appropriate tier and rate limits for each service
  */
 
-import { PrismaClient } from '@/generated/prisma/client';
+import 'dotenv/config';
+import { PrismaClient } from '../generated/client/client.js';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 import crypto from 'crypto';
 import { INTERNAL_SERVICES, SERVICE_TIERS, getServiceToken } from '../config/internal-services.js';
 
-const prisma = new PrismaClient();
+// Create PostgreSQL connection pool with adapter for Prisma 7
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 /**
  * Hash platform token for secure storage
