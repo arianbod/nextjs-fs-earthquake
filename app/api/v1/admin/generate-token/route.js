@@ -9,7 +9,7 @@ import crypto from 'crypto';
 import { currentUser } from '@clerk/nextjs/server';
 import { isAdmin } from '@/config/team-members';
 import { createSuccessResponse, createErrorResponse } from '@/lib/api/errorHandler';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma/client';
 
 const prisma = new PrismaClient();
 

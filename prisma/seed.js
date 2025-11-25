@@ -11,7 +11,7 @@
  * 4. Sets appropriate tier and rate limits for each service
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma/client';
 import crypto from 'crypto';
 import { INTERNAL_SERVICES, SERVICE_TIERS, getServiceToken } from '../config/internal-services.js';
 

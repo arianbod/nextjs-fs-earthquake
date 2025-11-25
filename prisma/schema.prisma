@@ -2,13 +2,12 @@
 // PostgreSQL database schema for API usage tracking and analytics
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") // For Neon direct connection (migrations)
 }
 
 // Internal services registry

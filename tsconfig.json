@@ -36,7 +36,8 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
-    "**/*.jsx"
+    "**/*.jsx",
+    "generated/**/*.ts"
   ],
   "exclude": [
     "node_modules"

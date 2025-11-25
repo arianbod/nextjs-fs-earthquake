@@ -4,16 +4,20 @@
  */
 
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 import crypto from 'crypto';
 
-// Initialize Prisma for test database
+// Initialize Prisma for test database with driver adapter
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL_TEST || process.env.DATABASE_URL,
+});
+
+const adapter = new PrismaPg(pool);
+
 const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL_TEST || process.env.DATABASE_URL,
-    },
-  },
+  adapter,
 });
 
 // Make prisma available globally in tests
