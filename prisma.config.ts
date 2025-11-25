@@ -9,7 +9,7 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"),
-    directUrl: env("DIRECT_URL"), // For Neon direct connection (migrations)
+    url: env("POSTGRES_PRISMA_URL"), // Neon pooled connection
+    directUrl: env("POSTGRES_URL_NON_POOLING"), // Neon direct connection (for migrations)
   },
 });
