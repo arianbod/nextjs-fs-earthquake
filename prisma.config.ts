@@ -9,7 +9,7 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: env("POSTGRES_PRISMA_URL"), // Neon pooled connection
-    directUrl: env("POSTGRES_URL_NON_POOLING"), // Neon direct connection (for migrations)
+    url: env("DATABASE_URL"), // Pooled connection (works everywhere)
+    directUrl: env("POSTGRES_URL_NON_POOLING"), // Direct connection for migrations
   },
 });
