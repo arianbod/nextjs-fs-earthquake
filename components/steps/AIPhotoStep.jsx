@@ -619,177 +619,69 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 				</Card>
 			)}
 
-			{/* Analysis Results */}
+			{/* Analysis Results - Simplified: Just show key detected data */}
 			{analysisResults && !analysisResults.error && (
 				<Card className='border-green-200 dark:border-green-800'>
-					<CardHeader className='bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'>
-						<CardTitle className='flex items-center gap-2 text-green-800 dark:text-green-200'>
-							<CheckCircle className='h-6 w-6' />
-							AI Analysis Complete - Review Extracted Information
-						</CardTitle>
-						<p className='text-sm text-green-600 dark:text-green-400'>
-							Successfully extracted building information from {uploadedImages.length} photo(s) • 
-							Confidence: <Badge variant='outline' className='ml-1'>
+					<CardContent className='pt-6'>
+						{/* Success Header */}
+						<div className='flex items-center gap-3 mb-4'>
+							<div className='p-2 bg-green-100 dark:bg-green-900/30 rounded-full'>
+								<CheckCircle className='h-6 w-6 text-green-600' />
+							</div>
+							<div>
+								<h3 className='font-semibold text-green-800 dark:text-green-200'>
+									AI Analysis Complete
+								</h3>
+								<p className='text-sm text-green-600 dark:text-green-400'>
+									Detected building info from {uploadedImages.length} photo(s)
+								</p>
+							</div>
+							<Badge variant='outline' className='ml-auto'>
 								{analysisResults.confidence?.toUpperCase() || 'MEDIUM'}
 							</Badge>
+						</div>
+
+						{/* Key Extracted Data - Simple Grid */}
+						<div className='grid grid-cols-2 md:grid-cols-4 gap-3 mb-4'>
+							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+								<div className='text-2xl font-bold text-gray-900 dark:text-white'>
+									{analysisResults.buildingCharacteristics?.stories || '?'}
+								</div>
+								<div className='text-xs text-gray-500'>Stories</div>
+							</div>
+							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+								<div className='text-sm font-medium text-gray-900 dark:text-white truncate'>
+									{analysisResults.buildingCharacteristics?.type?.split(' ')[0] || 'Unknown'}
+								</div>
+								<div className='text-xs text-gray-500'>Type</div>
+							</div>
+							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+								<div className='text-sm font-medium text-gray-900 dark:text-white'>
+									{analysisResults.buildingCharacteristics?.constructionPeriod || 'Unknown'}
+								</div>
+								<div className='text-xs text-gray-500'>Era</div>
+							</div>
+							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
+								<div className='text-sm font-medium text-gray-900 dark:text-white capitalize'>
+									{analysisResults.buildingCharacteristics?.materialCondition || 'Unknown'}
+								</div>
+								<div className='text-xs text-gray-500'>Condition</div>
+							</div>
+						</div>
+
+						{/* Simple info message */}
+						<p className='text-sm text-gray-600 dark:text-gray-400 text-center'>
+							You'll confirm these details in the next step
 						</p>
-						<div className='mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>
-							<p className='text-sm text-blue-800 dark:text-blue-200 flex items-start gap-2'>
-								<Info className='h-4 w-4 mt-0.5 flex-shrink-0' />
-								The information below has been automatically extracted from your photos. You can review and modify this data in the following steps if needed.
-							</p>
-						</div>
-					</CardHeader>
-					<CardContent className='space-y-6 pt-6'>
-						{/* Detected Building Characteristics */}
-						<div>
-							<h4 className='font-medium mb-3 flex items-center gap-2'>
-								<Building className='h-4 w-4 text-blue-600' />
-								Detected Building Characteristics
-							</h4>
-							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-								{Object.entries(analysisResults.buildingCharacteristics || {}).map(([key, value]) => (
-									<div key={key} className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg'>
-										<div className='flex justify-between items-center'>
-											<span className='text-sm text-gray-600 dark:text-gray-400 capitalize'>
-												{key.replace(/([A-Z])/g, ' $1').trim()}:
-											</span>
-											<Badge variant={value === 'Unknown' ? 'secondary' : 'default'}>
-												{value}
-											</Badge>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-
-						{/* Dimensions if available */}
-						{analysisResults.dimensions && Object.values(analysisResults.dimensions).some(v => v !== null) && (
-							<div>
-								<h4 className='font-medium mb-3 flex items-center gap-2'>
-									<Layers className='h-4 w-4 text-purple-600' />
-									Estimated Dimensions
-								</h4>
-								<div className='grid grid-cols-3 gap-4'>
-									{Object.entries(analysisResults.dimensions).map(([key, value]) => (
-										value !== null && (
-											<div key={key} className='text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg'>
-												<div className='text-2xl font-bold text-purple-900 dark:text-purple-200'>
-													{value}m
-												</div>
-												<div className='text-sm text-purple-700 dark:text-purple-300 capitalize'>
-													{key.replace('estimated', '')}
-												</div>
-											</div>
-										)
-									))}
-								</div>
-							</div>
-						)}
-
-						{/* Structural Irregularities */}
-						{analysisResults.structuralIrregularities && (
-							<div>
-								<h4 className='font-medium mb-3 flex items-center gap-2'>
-									<AlertTriangle className='h-4 w-4 text-amber-600' />
-									Structural Irregularities Assessment
-								</h4>
-								<div className='grid grid-cols-3 gap-4'>
-									{Object.entries(analysisResults.structuralIrregularities).map(([type, status]) => (
-										<div key={type} className='text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg'>
-											<div className='text-sm font-medium capitalize mb-1'>{type}</div>
-											<Badge 
-												variant={status === 'Regular' || status === 'Unknown' ? 'success' : 'warning'}
-											>
-												{status}
-											</Badge>
-										</div>
-									))}
-								</div>
-							</div>
-						)}
-
-						{/* AI Insights */}
-						{analysisResults.aiInsights && Object.keys(analysisResults.aiInsights).length > 0 && (
-							<div>
-								<h4 className='font-medium mb-3 flex items-center gap-2'>
-									<Eye className='h-4 w-4 text-indigo-600' />
-									AI Visual Insights
-								</h4>
-								<div className='space-y-2'>
-									{Object.entries(analysisResults.aiInsights).map(([feature, description]) => (
-										<div key={feature} className='p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg'>
-											<div className='font-medium text-indigo-900 dark:text-indigo-200 capitalize mb-1'>
-												{feature.replace(/([A-Z])/g, ' $1').trim()}
-											</div>
-											<div className='text-sm text-indigo-700 dark:text-indigo-300'>
-												{description}
-											</div>
-										</div>
-									))}
-								</div>
-							</div>
-						)}
-
-						{/* Recommendations */}
-						{analysisResults.recommendations && analysisResults.recommendations.length > 0 && (
-							<div>
-								<h4 className='font-medium mb-3 flex items-center gap-2'>
-									<Info className='h-4 w-4 text-blue-600' />
-									AI Recommendations
-								</h4>
-								<div className='space-y-2'>
-									{analysisResults.recommendations.map((rec, index) => (
-										<div key={index} className='flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>
-											<CheckCircle2 className='h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0' />
-											<span className='text-sm text-blue-800 dark:text-blue-200'>{rec}</span>
-										</div>
-									))}
-								</div>
-							</div>
-						)}
-
-						{/* Data Summary for Next Steps */}
-						<div className='p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg'>
-							<div className='flex items-start gap-3'>
-								<Sparkles className='h-5 w-5 text-purple-600 mt-0.5' />
-								<div className='w-full'>
-									<h4 className='font-medium text-purple-900 dark:text-purple-200 mb-3'>
-										Extracted Data Will Pre-fill Following Steps:
-									</h4>
-									<div className='grid grid-cols-1 md:grid-cols-2 gap-2 text-sm'>
-										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
-											<CheckCircle2 className='h-3 w-3' />
-											Number of Stories: {analysisResults.buildingCharacteristics?.stories || 'To be confirmed'}
-										</div>
-										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
-											<CheckCircle2 className='h-3 w-3' />
-											Structural System: {analysisResults.buildingCharacteristics?.structuralSystem || 'To be confirmed'}
-										</div>
-										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
-											<CheckCircle2 className='h-3 w-3' />
-											Building Type: {analysisResults.buildingCharacteristics?.type || 'To be confirmed'}
-										</div>
-										<div className='flex items-center gap-2 text-purple-700 dark:text-purple-300'>
-											<CheckCircle2 className='h-3 w-3' />
-											Material Condition: {analysisResults.buildingCharacteristics?.materialCondition || 'To be confirmed'}
-										</div>
-									</div>
-									<p className='text-xs text-purple-600 dark:text-purple-400 mt-3 italic'>
-										You can modify any of this information in the next steps if our AI made any mistakes.
-									</p>
-								</div>
-							</div>
-						</div>
 					</CardContent>
 				</Card>
 			)}
 
 			{/* Navigation */}
 			<div className='flex justify-between pt-4'>
-				<Link href='/assessment/2'>
+				<Link href='/assessment/1'>
 					<Button variant='outline' className='gap-2'>
-						<ArrowLeft className='h-4 w-4' /> Back to Plans Upload
+						<ArrowLeft className='h-4 w-4' /> Back
 					</Button>
 				</Link>
 
