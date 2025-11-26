@@ -62,6 +62,39 @@ const buildingTypes = [
 	{ value: 'mixed', label: 'Mixed Construction', description: 'Combination of materials' },
 ];
 
+// Map AI's descriptive building type to dropdown value
+const mapAiBuildingType = (aiType) => {
+	if (!aiType) return null;
+	const lower = aiType.toLowerCase();
+
+	// Check for timber/wood
+	if (lower.includes('timber') || lower.includes('wood') || lower.includes('wooden')) {
+		return 'timber';
+	}
+	// Check for steel
+	if (lower.includes('steel') && !lower.includes('reinforc')) {
+		return 'steel';
+	}
+	// Check for reinforced concrete
+	if (lower.includes('reinforced') || lower.includes('concrete') || lower.includes('rc ') || lower.includes('rcc')) {
+		return 'reinforced-concrete';
+	}
+	// Check for masonry/brick
+	if (lower.includes('masonry') || lower.includes('brick') || lower.includes('stone') || lower.includes('block')) {
+		return 'masonry';
+	}
+	// Check for mixed
+	if (lower.includes('mixed') || lower.includes('combination') || lower.includes('hybrid')) {
+		return 'mixed';
+	}
+	// If timber + masonry mentioned together, it's likely timber frame with masonry infill
+	if (lower.includes('frame') && lower.includes('infill')) {
+		return 'timber';
+	}
+
+	return null;
+};
+
 const BuildingInfoCombined = ({ onNext, onBack }) => {
 	const { userInput, updateUserInput } = useUserInput();
 	const [showAdvanced, setShowAdvanced] = useState(false);
@@ -74,13 +107,19 @@ const BuildingInfoCombined = ({ onNext, onBack }) => {
 	// Generate AI suggestion from ALL collected data
 	const getAiSuggestion = () => {
 		const suggestions = {};
+		let rawBuildingType = null; // Store raw AI description for display
 
 		// From AI photo analysis (primary source)
 		if (userInput.aiAnalysisData) {
 			const data = userInput.aiAnalysisData;
 
-			// Direct fields from AI
-			if (data.buildingType) suggestions.buildingType = data.buildingType;
+			// Get raw building type for display
+			rawBuildingType = data.buildingType || data.buildingCharacteristics?.type || data.buildingCharacteristics?.structuralSystem;
+
+			// Map AI building type to dropdown value
+			const mappedType = mapAiBuildingType(rawBuildingType);
+			if (mappedType) suggestions.buildingType = mappedType;
+
 			if (data.numberOfStories) suggestions.numberOfStories = data.numberOfStories;
 			if (data.structuralSystem) suggestions.structuralSystem = data.structuralSystem;
 			if (data.constructionPeriod) suggestions.constructionPeriod = data.constructionPeriod;
@@ -90,7 +129,10 @@ const BuildingInfoCombined = ({ onNext, onBack }) => {
 			if (data.buildingCharacteristics) {
 				const chars = data.buildingCharacteristics;
 				if (chars.stories && !suggestions.numberOfStories) suggestions.numberOfStories = chars.stories;
-				if (chars.structuralSystem && !suggestions.buildingType) suggestions.buildingType = chars.structuralSystem;
+				if (!suggestions.buildingType && chars.structuralSystem) {
+					const mappedFromChars = mapAiBuildingType(chars.structuralSystem);
+					if (mappedFromChars) suggestions.buildingType = mappedFromChars;
+				}
 				if (chars.constructionPeriod) {
 					const match = chars.constructionPeriod.match(/\d{4}/);
 					if (match) suggestions.yearOfConstruction = match[0];
@@ -101,7 +143,10 @@ const BuildingInfoCombined = ({ onNext, onBack }) => {
 		// From street view AI analysis (secondary)
 		if (userInput.streetViewData?.analysis?.estimatedCharacteristics) {
 			const sv = userInput.streetViewData.analysis.estimatedCharacteristics;
-			if (sv.estimatedType && !suggestions.buildingType) suggestions.buildingType = sv.estimatedType;
+			if (sv.estimatedType && !suggestions.buildingType) {
+				const mappedFromSv = mapAiBuildingType(sv.estimatedType);
+				if (mappedFromSv) suggestions.buildingType = mappedFromSv;
+			}
 			if (sv.ageEstimationContext && !suggestions.constructionPeriod) suggestions.constructionPeriod = sv.ageEstimationContext;
 		}
 
@@ -110,8 +155,18 @@ const BuildingInfoCombined = ({ onNext, onBack }) => {
 			suggestions.numberOfStories = userInput.numberOfStories;
 		}
 		if (userInput.buildingType && !suggestions.buildingType) {
-			suggestions.buildingType = userInput.buildingType;
+			// Check if it's already a valid dropdown value
+			const isValidValue = buildingTypes.some(t => t.value === userInput.buildingType);
+			if (isValidValue) {
+				suggestions.buildingType = userInput.buildingType;
+			} else {
+				const mapped = mapAiBuildingType(userInput.buildingType);
+				if (mapped) suggestions.buildingType = mapped;
+			}
 		}
+
+		// Store raw description for display in suggestion box
+		if (rawBuildingType) suggestions.rawBuildingTypeDescription = rawBuildingType;
 
 		return Object.keys(suggestions).length > 0 ? suggestions : null;
 	};
