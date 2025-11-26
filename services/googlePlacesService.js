@@ -20,10 +20,13 @@ export class GooglePlacesService {
 	 */
 	async getEnhancedLocationData(latitude, longitude) {
 		try {
-			const [geocodeData, nearbyPlaces] = await Promise.all([
+			const [geocodeResult, nearbyResult] = await Promise.allSettled([
 				this.reverseGeocode(latitude, longitude),
 				this.getNearbyBuildings(latitude, longitude)
 			]);
+
+			const geocodeData = geocodeResult.status === 'fulfilled' ? geocodeResult.value : [];
+			const nearbyPlaces = nearbyResult.status === 'fulfilled' ? nearbyResult.value : [];
 
 			return {
 				success: true,
@@ -34,13 +37,27 @@ export class GooglePlacesService {
 					metadata: {
 						source: 'google_places_api',
 						timestamp: new Date().toISOString(),
-						confidence: 'high'
+						confidence: nearbyPlaces.length > 0 ? 'medium' : 'low'
 					}
 				}
 			};
 		} catch (error) {
 			console.error('Error fetching enhanced location data:', error);
-			throw new Error('Failed to fetch enhanced location data');
+			// Return a graceful fallback instead of throwing
+			return {
+				success: false,
+				data: {
+					address: null,
+					buildingInfo: null,
+					neighborhood: null,
+					metadata: {
+						source: 'fallback',
+						timestamp: new Date().toISOString(),
+						confidence: 'none',
+						error: error.message
+					}
+				}
+			};
 		}
 	}
 
@@ -96,28 +113,42 @@ export class GooglePlacesService {
 
 	/**
 	 * Search for nearby places of a specific type
+	 * NOTE: Google Places REST API cannot be called from browser due to CORS
+	 * This is a no-op in browser context - use Google Maps JS API PlacesService instead
 	 * @param {number} latitude - Latitude coordinate
 	 * @param {number} longitude - Longitude coordinate
 	 * @param {string} type - Place type to search for
 	 * @param {number} radius - Search radius in meters
-	 * @returns {Promise<Array>} Places array
+	 * @returns {Promise<Array>} Places array (empty in browser)
 	 */
 	async searchNearbyPlaces(latitude, longitude, type, radius = 100) {
-		const response = await fetch(
-			`${this.baseUrl}/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${this.apiKey}`
-		);
-
-		if (!response.ok) {
-			throw new Error(`Places API error: ${response.status}`);
+		// Google Places REST API requires server-side proxy due to CORS
+		// Return empty array in browser context - this data is optional/supplementary
+		if (typeof window !== 'undefined') {
+			console.log('[GooglePlaces] Skipping REST API call (CORS restriction) - using fallback');
+			return [];
 		}
 
-		const data = await response.json();
-		
-		if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-			throw new Error(`Places search failed: ${data.status}`);
-		}
+		try {
+			const response = await fetch(
+				`${this.baseUrl}/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=${type}&key=${this.apiKey}`
+			);
 
-		return data.results || [];
+			if (!response.ok) {
+				return [];
+			}
+
+			const data = await response.json();
+
+			if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+				return [];
+			}
+
+			return data.results || [];
+		} catch (error) {
+			console.warn('[GooglePlaces] API call failed:', error.message);
+			return [];
+		}
 	}
 
 	/**

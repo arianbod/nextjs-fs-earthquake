@@ -199,19 +199,46 @@ const LocationStepSimple = ({ onNext }) => {
 
 					// Try reverse geocoding for city
 					let detectedCity = 'Unknown Location';
-					try {
-						const response = await fetch(
-							`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${process.env.NEXT_PUBLIC_OPENCAGE_API_KEY || 'demo'}`
-						);
-						if (response.ok) {
-							const data = await response.json();
-							if (data.results && data.results[0]) {
-								const c = data.results[0].components;
-								detectedCity = c.city || c.town || c.village || c.county || 'Unknown Location';
+					const opencageKey = process.env.NEXT_PUBLIC_OPENCAGE_API_KEY;
+
+					// Only call OpenCage if we have a valid API key (not demo)
+					if (opencageKey && opencageKey !== 'demo') {
+						try {
+							const response = await fetch(
+								`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${opencageKey}`
+							);
+							if (response.ok) {
+								const data = await response.json();
+								if (data.results && data.results[0]) {
+									const c = data.results[0].components;
+									detectedCity = c.city || c.town || c.village || c.county || 'Unknown Location';
+								}
+							}
+						} catch (e) {
+							console.warn('OpenCage geocoding failed:', e);
+						}
+					} else {
+						// Fallback: try Google Geocoding API
+						const googleKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+						if (googleKey) {
+							try {
+								const response = await fetch(
+									`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleKey}`
+								);
+								if (response.ok) {
+									const data = await response.json();
+									if (data.results && data.results[0]) {
+										const components = data.results[0].address_components || [];
+										const cityComponent = components.find(c =>
+											c.types.includes('locality') || c.types.includes('administrative_area_level_1')
+										);
+										detectedCity = cityComponent?.long_name || 'Unknown Location';
+									}
+								}
+							} catch (e) {
+								console.warn('Google geocoding failed:', e);
 							}
 						}
-					} catch (e) {
-						console.warn('Geocoding failed:', e);
 					}
 
 					// Update basic location data (this is what user sees)

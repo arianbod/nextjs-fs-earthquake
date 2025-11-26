@@ -216,7 +216,7 @@ export function MyMapComponent({
 							position={marker}
 							draggable={true}
 							onDragEnd={onMarkerDragEnd}
-							icon={{
+							icon={window.google?.maps?.Size ? {
 								url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
 									<svg width="30" height="40" xmlns="http://www.w3.org/2000/svg">
 										<path d="M15 0C6.7 0 0 6.7 0 15c0 15 15 25 15 25s15-10 15-25C30 6.7 23.3 0 15 0z" fill="#dc2626"/>
@@ -224,11 +224,9 @@ export function MyMapComponent({
 										<circle cx="15" cy="15" r="5" fill="#dc2626"/>
 									</svg>
 								`),
-								...(window.google?.maps && {
-									scaledSize: new window.google.maps.Size(30, 40),
-									anchor: new window.google.maps.Point(15, 40)
-								})
-							}}
+								scaledSize: new window.google.maps.Size(30, 40),
+								anchor: new window.google.maps.Point(15, 40)
+							} : undefined}
 						>
 							{showInfo && (
 								<InfoWindow onCloseClick={() => setShowInfo(false)}>
@@ -277,12 +275,10 @@ export function MyMapComponent({
 							<Marker
 								key={place.place_id}
 								position={place.geometry.location}
-								icon={{
+								icon={window.google?.maps?.Size ? {
 									url: getPlaceIcon(place.types[0]),
-									...(window.google?.maps && {
-										scaledSize: new window.google.maps.Size(20, 20)
-									})
-								}}
+									scaledSize: new window.google.maps.Size(20, 20)
+								} : undefined}
 								title={place.name}
 							/>
 						))}
