@@ -138,7 +138,7 @@ export default function AssessmentCard({
             {/* Progress indicator for drafts */}
             {isDraft && (
               <div className="text-xs text-muted-foreground">
-                Step {assessment.currentStep || 1} of 11
+                Step {Math.min(assessment.currentStep || 1, 4)} of 4
               </div>
             )}
           </div>
@@ -154,7 +154,7 @@ export default function AssessmentCard({
                 </Button>
               </Link>
             ) : (
-              <Link href={`/assessment/${assessment.currentStep || 1}?id=${assessment.id}`}>
+              <Link href={`/assessment/${Math.min(assessment.currentStep || 1, 4)}?id=${assessment.id}`}>
                 <Button size="sm">
                   <Play className="w-4 h-4 mr-1" />
                   Continue
