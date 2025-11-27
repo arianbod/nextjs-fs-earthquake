@@ -300,8 +300,23 @@ const LocationStepSimple = ({ onNext }) => {
 	};
 
 	useEffect(() => {
+		// Check if we already have location data (e.g., loaded from database)
+		if (userInput.latitude && userInput.longitude) {
+			console.log('Location data already exists, skipping GPS request');
+
+			// Set seismic zone info from existing data
+			const zoneInfo = getZoneByCoordinates(userInput.latitude, userInput.longitude);
+			setSeismicZone(zoneInfo);
+
+			// Mark as ready
+			setIsLoading(false);
+			setBackgroundDataCollected(true);
+			return;
+		}
+
+		// No existing data, request fresh location
 		requestLocationPermission();
-	}, []);
+	}, [userInput.latitude, userInput.longitude]);
 
 	// Get zone description for tooltip
 	const getZoneDescription = (zone) => {

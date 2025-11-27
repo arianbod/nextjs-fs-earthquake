@@ -308,8 +308,29 @@ const LocationStep = ({ onNext }) => {
 	};
 
 	useEffect(() => {
+		// Check if we already have location data (e.g., loaded from database)
+		if (userInput.latitude && userInput.longitude) {
+			console.log('Location data already exists, skipping GPS request');
+
+			// Set seismic zone info from existing data
+			const zoneInfo = getZoneByCoordinates(userInput.latitude, userInput.longitude);
+			setSeismicZoneInfo(zoneInfo);
+
+			// If we have enhanced data stored, restore it
+			if (userInput.streetViewImages || userInput.satelliteImage) {
+				setEnhancedData({
+					streetViewImages: userInput.streetViewImages,
+					satelliteImage: userInput.satelliteImage,
+				});
+			}
+
+			setIsLoading(false);
+			return;
+		}
+
+		// No existing data, request fresh location
 		requestLocationPermission();
-	}, []);
+	}, [userInput.latitude, userInput.longitude]);
 
 	const stepOneData = Data.steps.find((step) => step.step === 1);
 
