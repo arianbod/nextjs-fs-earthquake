@@ -1,57 +1,57 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+'use client';
 
-const metrics = [
-  { title: "Total Assessments", value: 120 },
-  { title: "Pending Reviews", value: 15 },
-  { title: "Completed Reports", value: 80 },
-  { title: "Average Score", value: "B+" },
-];
-
-const recentAssessments = [
-  { id: 1, building: "Building A", date: "2024-05-01", status: "Completed" },
-  { id: 2, building: "Building B", date: "2024-05-03", status: "In Progress" },
-  { id: 3, building: "Building C", date: "2024-05-05", status: "Pending" },
-];
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { DashboardStats, AssessmentList } from '@/components/dashboard';
+import { getDashboardStats } from '@/lib/actions/assessment';
+import { Plus } from 'lucide-react';
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const result = await getDashboardStats();
+        if (result.success) {
+          setStats(result.stats);
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      } finally {
+        setIsLoadingStats(false);
+      }
+    }
+    loadStats();
+  }, []);
+
   return (
-    <div className="space-y-6 p-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((metric) => (
-          <Card key={metric.title}>
-            <CardHeader>
-              <CardTitle>{metric.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{metric.value}</p>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="container mx-auto px-4 py-6 max-w-4xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">My Assessments</h1>
+          <p className="text-muted-foreground text-sm">
+            View and manage your earthquake safety assessments
+          </p>
+        </div>
+        <Link href="/assessment/1">
+          <Button className="gap-2">
+            <Plus className="w-4 h-4" />
+            New Assessment
+          </Button>
+        </Link>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-max text-left border-collapse">
-          <thead>
-            <tr>
-              <th className="border-b p-2">ID</th>
-              <th className="border-b p-2">Building</th>
-              <th className="border-b p-2">Date</th>
-              <th className="border-b p-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recentAssessments.map((row) => (
-              <tr key={row.id}>
-                <td className="border-b p-2">{row.id}</td>
-                <td className="border-b p-2">{row.building}</td>
-                <td className="border-b p-2">{row.date}</td>
-                <td className="border-b p-2">{row.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Stats */}
+      <div className="mb-8">
+        <DashboardStats stats={stats} isLoading={isLoadingStats} />
       </div>
+
+      {/* Assessment List */}
+      <AssessmentList />
     </div>
   );
 }
-

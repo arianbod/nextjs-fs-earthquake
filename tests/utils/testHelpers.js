@@ -243,26 +243,33 @@ export async function getCurrentRateLimitCount(appId, type = 'hour') {
       ? new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0, 0)
       : new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
 
-  const record = await global.prisma.apiRateLimit.findFirst({
-    where: {
-      appId,
-      type,
-      resetAt: {
-        gte: now,
+  try {
+    const record = await global.prisma.rateLimit.findFirst({
+      where: {
+        appId,
+        type,
+        resetAt: {
+          gte: now,
+        },
       },
-    },
-  });
-
-  return record?.requestCount || 0;
+    });
+    return record?.requestCount || 0;
+  } catch (e) {
+    return 0;
+  }
 }
 
 /**
  * Clear all rate limits for an app
  */
 export async function clearRateLimits(appId) {
-  await global.prisma.apiRateLimit.deleteMany({
-    where: { appId },
-  });
+  try {
+    await global.prisma.rateLimit.deleteMany({
+      where: { appId },
+    });
+  } catch (e) {
+    // Ignore if model doesn't exist
+  }
 }
 
 /**

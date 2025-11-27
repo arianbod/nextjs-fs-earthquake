@@ -176,8 +176,19 @@ export const AssessmentScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   completedAt: 'completedAt',
+  status: 'status',
+  currentStep: 'currentStep',
   assessmentType: 'assessmentType',
-  version: 'version'
+  version: 'version',
+  title: 'title',
+  weather: 'weather',
+  structuralSystem: 'structuralSystem',
+  irregularities: 'irregularities',
+  planDefinition: 'planDefinition',
+  manipulations: 'manipulations',
+  specificConditions: 'specificConditions',
+  extraLoad: 'extraLoad',
+  neighborBuildings: 'neighborBuildings'
 } as const
 
 export type AssessmentScalarFieldEnum = (typeof AssessmentScalarFieldEnum)[keyof typeof AssessmentScalarFieldEnum]

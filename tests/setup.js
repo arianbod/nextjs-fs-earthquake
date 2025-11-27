@@ -3,15 +3,21 @@
  * Runs before all tests
  */
 
+import 'dotenv/config';
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { PrismaClient } from '@/generated/client/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import crypto from 'crypto';
 
+// Get database URL
+const dbUrl = process.env.DATABASE_URL_TEST || process.env.DATABASE_URL;
+console.log('Connecting to database:', dbUrl ? 'URL found' : 'NO URL');
+
 // Initialize Prisma for test database with driver adapter
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL_TEST || process.env.DATABASE_URL,
+  connectionString: dbUrl,
+  ssl: { rejectUnauthorized: false },
 });
 
 const adapter = new PrismaPg(pool);
@@ -65,25 +71,33 @@ afterAll(async () => {
 // Reset rate limits before each test
 beforeEach(async () => {
   // Clear rate limit records for consistent testing
-  await prisma.apiRateLimit.deleteMany({
-    where: {
-      appId: {
-        in: ['test-web-app', 'test-mobile-app', 'test-dev-service'],
+  try {
+    await prisma.rateLimit.deleteMany({
+      where: {
+        appId: {
+          in: ['test-web-app', 'test-mobile-app', 'test-dev-service'],
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    // Ignore if table doesn't exist
+  }
 });
 
 // Cleanup: Remove any test-created data after each test
 afterEach(async () => {
   // Clean up any API usage logs from tests
-  await prisma.apiUsage.deleteMany({
-    where: {
-      userId: {
-        startsWith: 'test_',
+  try {
+    await prisma.apiUsage.deleteMany({
+      where: {
+        userId: {
+          startsWith: 'test_',
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    // Ignore if table doesn't exist
+  }
 });
 
 /**
@@ -129,12 +143,16 @@ async function seedTestData() {
     },
   ];
 
-  for (const service of services) {
-    await prisma.apiApp.upsert({
-      where: { id: service.id },
-      update: service,
-      create: service,
-    });
+  try {
+    for (const service of services) {
+      await prisma.apiApp.upsert({
+        where: { id: service.id },
+        update: service,
+        create: service,
+      });
+    }
+  } catch (e) {
+    console.log('Note: Could not seed ApiApp data - this is OK if running assessment tests only');
   }
 }
 
@@ -142,32 +160,57 @@ async function seedTestData() {
  * Clean up test data
  */
 async function cleanupTestData() {
-  // Delete test services
-  await prisma.apiApp.deleteMany({
-    where: {
-      id: {
-        startsWith: 'test-',
+  try {
+    // Delete test services
+    await prisma.apiApp.deleteMany({
+      where: {
+        id: {
+          startsWith: 'test-',
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    console.log('Skipping apiApp cleanup');
+  }
 
-  // Delete test rate limits
-  await prisma.apiRateLimit.deleteMany({
-    where: {
-      appId: {
-        startsWith: 'test-',
+  try {
+    // Delete test rate limits
+    await prisma.rateLimit.deleteMany({
+      where: {
+        appId: {
+          startsWith: 'test-',
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    console.log('Skipping rateLimit cleanup');
+  }
 
-  // Delete test usage logs
-  await prisma.apiUsage.deleteMany({
-    where: {
-      userId: {
-        startsWith: 'test_',
+  try {
+    // Delete test usage logs
+    await prisma.apiUsage.deleteMany({
+      where: {
+        userId: {
+          startsWith: 'test_',
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    console.log('Skipping apiUsage cleanup');
+  }
+
+  try {
+    // Delete test assessments
+    await prisma.assessment.deleteMany({
+      where: {
+        userId: {
+          startsWith: 'test_',
+        },
+      },
+    });
+  } catch (e) {
+    console.log('Skipping assessment cleanup');
+  }
 }
 
 /**

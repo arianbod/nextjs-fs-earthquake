@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { usePathname } from 'next/navigation';
 import AssessmentSteps from '@/components/AssessmentSteps';
+import { Toaster } from 'sonner';
 import "./globals.css"
 import './voice-assistant-bundle.css'
 const MainLayout = ({ children }) => {
@@ -141,6 +142,7 @@ Based on your assessment results, we provide:
               </main>
             </div>
           </div>
+          <Toaster position="top-right" richColors />
         </Providers>
       </body>
     </html>

@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
+const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => {
 	const [uploadedImages, setUploadedImages] = useState([]);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
 	const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -43,6 +43,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 	const [dragOver, setDragOver] = useState(false);
 	const [error, setError] = useState(null);
 	const [detailedError, setDetailedError] = useState(null);
+	const [isSavingImages, setIsSavingImages] = useState(false);
 
 	// Analysis stages for better feedback
 	const stages = [
@@ -206,7 +207,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 				if (typeof stories === 'string' && !isNaN(parseInt(stories))) {
 					stories = parseInt(stories);
 				}
-				
+
 				// Map AI data to form fields
 				const mappedData = {
 					aiAnalysisData: processedResults,
@@ -225,9 +226,30 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext }) => {
 					// Construction period (try to extract year)
 					constructionPeriod: processedResults.buildingCharacteristics?.constructionPeriod || null,
 				};
-				
+
 				console.log('Updating user input with AI data:', mappedData);
 				updateUserInput(mappedData);
+
+				// Save images to database if saveImagesToDb is available
+				if (saveImagesToDb && preparedImages.length > 0) {
+					setIsSavingImages(true);
+					try {
+						const imageDataForDb = preparedImages.map((img, index) => ({
+							imageData: img.base64 || img.data,
+							mimeType: img.mimeType || 'image/jpeg',
+							fileName: uploadedImages[index]?.name || `photo-${index + 1}.jpg`,
+							fileSize: uploadedImages[index]?.size,
+							aiAnalysis: processedResults,
+						}));
+						await saveImagesToDb(imageDataForDb, 'USER_UPLOAD');
+						console.log('Images saved to database');
+					} catch (dbError) {
+						console.error('Failed to save images to DB:', dbError);
+						// Don't fail the whole analysis - localStorage backup exists
+					} finally {
+						setIsSavingImages(false);
+					}
+				}
 			}
 
 		} catch (error) {

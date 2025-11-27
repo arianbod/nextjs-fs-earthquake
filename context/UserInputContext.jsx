@@ -1,8 +1,18 @@
 // File: /context/UserInputContext.js
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { imageStorageManager, createImageGallery } from '@/lib/imageStorage';
+import {
+	createAssessment,
+	getAssessment,
+	updateAssessment,
+	saveLocation,
+	saveBuildingInfo,
+	saveSafetyResult,
+} from '@/lib/actions/assessment';
+import { saveImages, getAssessmentImages } from '@/lib/actions/file';
 
 const UserInputContext = createContext();
 
@@ -10,6 +20,12 @@ const STORAGE_KEY = 'quakewise_assessment_data';
 
 export const UserInputProvider = ({ children }) => {
 	const getDefaultState = () => ({
+		// Database tracking
+		assessmentId: null,
+		dbSyncStatus: 'idle', // 'idle', 'saving', 'saved', 'error'
+		lastSavedAt: null,
+
+		// Location data
 		location: null,
 		address: '',
 		latitude: null,
@@ -51,10 +67,13 @@ export const UserInputProvider = ({ children }) => {
 		// Structural notes and AI insights
 		structuralNotes: '',
 		aiInsights: null,
+		// Weather data
+		weather: null,
 	});
 
 	const [userInput, setUserInput] = useState(getDefaultState);
 	const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
+	const [isLoadingFromDb, setIsLoadingFromDb] = useState(false);
 
 	// Load data from localStorage on mount (client-side only)
 	useEffect(() => {
@@ -79,7 +98,7 @@ export const UserInputProvider = ({ children }) => {
 
 		try {
 			// Only save if we have some meaningful data
-			if (userInput && (userInput.numberOfStories > 0 || userInput.address || userInput.structuralSystem)) {
+			if (userInput && (userInput.numberOfStories > 0 || userInput.address || userInput.structuralSystem || userInput.assessmentId)) {
 				console.log('Saving data to localStorage:', userInput);
 				localStorage.setItem(STORAGE_KEY, JSON.stringify(userInput));
 			}
@@ -91,6 +110,406 @@ export const UserInputProvider = ({ children }) => {
 	const updateUserInput = (newData) => {
 		setUserInput((prevData) => ({ ...prevData, ...newData }));
 	};
+
+	// ============================================
+	// DATABASE SYNC FUNCTIONS
+	// ============================================
+
+	/**
+	 * Start a new assessment in the database
+	 * @returns {Promise<string|null>} Assessment ID or null on error
+	 */
+	const startNewAssessment = useCallback(async () => {
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+			const result = await createAssessment();
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					assessmentId: result.assessmentId,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+				}));
+				return result.assessmentId;
+			} else {
+				console.error('Failed to create assessment:', result.error);
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return null;
+			}
+		} catch (error) {
+			console.error('Error creating assessment:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return null;
+		}
+	}, []);
+
+	/**
+	 * Load an existing assessment from the database
+	 * @param {string} id - Assessment ID
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const loadAssessment = useCallback(async (id) => {
+		if (!id) return false;
+
+		try {
+			setIsLoadingFromDb(true);
+			const result = await getAssessment(id, true);
+
+			if (!result.success) {
+				console.error('Failed to load assessment:', result.error);
+				return false;
+			}
+
+			const { assessment } = result;
+
+			// Map database fields to context state
+			const mappedData = {
+				assessmentId: assessment.id,
+				dbSyncStatus: 'saved',
+				lastSavedAt: assessment.updatedAt,
+
+				// Location data
+				...(assessment.location && {
+					latitude: assessment.location.latitude,
+					longitude: assessment.location.longitude,
+					address: assessment.location.fullAddress || '',
+					city: assessment.location.city,
+					neighborhood: assessment.location.neighborhood,
+					country: assessment.location.country || 'Turkey',
+					earthquakeZone: assessment.location.earthquakeZone,
+					soilType: assessment.location.soilType,
+				}),
+
+				// Weather data
+				weather: assessment.weather,
+
+				// Building info
+				...(assessment.buildingInfo && {
+					numberOfStories: assessment.buildingInfo.numberOfFloors,
+					yearOfConstruction: assessment.buildingInfo.constructionYear?.toString() || '',
+					structuralSystem: assessment.buildingInfo.structuralSystem,
+					buildingType: assessment.buildingInfo.buildingType,
+					irregularity: assessment.buildingInfo.hasVerticalIrregularity || assessment.buildingInfo.hasPlanIrregularity ? 'yes' : 'no',
+				}),
+
+				// Structural data from JSON fields
+				structuralSystemData: assessment.structuralSystem,
+				irregularities: assessment.irregularities,
+				planDefinition: assessment.planDefinition,
+				manipulations: assessment.manipulations,
+				specificConditions: assessment.specificConditions,
+				extraLoad: assessment.extraLoad,
+				neighborBuildings: assessment.neighborBuildings,
+
+				// AI insights from safety result
+				...(assessment.safetyResult && {
+					aiInsights: assessment.safetyResult.aiAnalysis,
+				}),
+			};
+
+			setUserInput((prev) => ({
+				...getDefaultState(),
+				...mappedData,
+			}));
+
+			return true;
+		} catch (error) {
+			console.error('Error loading assessment:', error);
+			return false;
+		} finally {
+			setIsLoadingFromDb(false);
+		}
+	}, []);
+
+	/**
+	 * Save location data to database (Step 1)
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveLocationToDb = useCallback(async () => {
+		let assessmentId = userInput.assessmentId;
+
+		// Create assessment if doesn't exist
+		if (!assessmentId) {
+			assessmentId = await startNewAssessment();
+			if (!assessmentId) return false;
+		}
+
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+
+			const locationData = {
+				latitude: userInput.latitude,
+				longitude: userInput.longitude,
+				fullAddress: userInput.address,
+				city: userInput.city,
+				neighborhood: userInput.neighborhood,
+				country: userInput.country,
+				earthquakeZone: userInput.earthquakeZone,
+				soilType: userInput.soilType,
+				placeId: userInput.enhancedData?.placeId,
+				placeName: userInput.enhancedData?.name,
+			};
+
+			const result = await saveLocation(assessmentId, locationData);
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+				}));
+				return true;
+			} else {
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving location:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput, startNewAssessment]);
+
+	/**
+	 * Save weather and street view data to database (Step 2)
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveWeatherToDb = useCallback(async () => {
+		if (!userInput.assessmentId) return false;
+
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+
+			const result = await updateAssessment(userInput.assessmentId, {
+				weather: userInput.weather || userInput.environmentalData,
+				currentStep: 3,
+			});
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+				}));
+				return true;
+			} else {
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving weather:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput.assessmentId, userInput.weather, userInput.environmentalData]);
+
+	/**
+	 * Save building info to database (Step 4)
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveBuildingInfoToDb = useCallback(async () => {
+		if (!userInput.assessmentId) return false;
+
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+
+			const buildingData = {
+				buildingType: userInput.buildingType,
+				numberOfFloors: parseInt(userInput.numberOfStories) || 1,
+				constructionYear: userInput.yearOfConstruction ? parseInt(userInput.yearOfConstruction) : null,
+				structuralSystem: userInput.structuralSystem,
+				buildingAge: userInput.yearOfConstruction
+					? new Date().getFullYear() - parseInt(userInput.yearOfConstruction)
+					: null,
+				hasVerticalIrregularity: userInput.irregularity === 'yes' || userInput.irregularity?.includes('vertical'),
+				hasPlanIrregularity: userInput.irregularity === 'yes' || userInput.irregularity?.includes('plan'),
+				soilType: userInput.soilType,
+				floorArea: userInput.buildingLength && userInput.buildingWidth
+					? parseFloat(userInput.buildingLength) * parseFloat(userInput.buildingWidth)
+					: null,
+			};
+
+			const result = await saveBuildingInfo(userInput.assessmentId, buildingData);
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+				}));
+				return true;
+			} else {
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving building info:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput]);
+
+	/**
+	 * Save structural data to database (Steps 5-11)
+	 * @param {number} step - Current step number
+	 * @param {object} data - Step data to save
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveStructuralDataToDb = useCallback(async (step, data) => {
+		if (!userInput.assessmentId) return false;
+
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+
+			const updateData = { currentStep: step + 1 };
+
+			// Map step to database field
+			switch (step) {
+				case 5:
+					updateData.structuralSystem = data;
+					break;
+				case 6:
+					updateData.irregularities = data;
+					break;
+				case 7:
+					updateData.planDefinition = data;
+					break;
+				case 8:
+					updateData.manipulations = data;
+					break;
+				case 9:
+					updateData.specificConditions = data;
+					break;
+				case 10:
+					updateData.extraLoad = data;
+					break;
+				case 11:
+					updateData.neighborBuildings = data;
+					break;
+			}
+
+			const result = await updateAssessment(userInput.assessmentId, updateData);
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+				}));
+				return true;
+			} else {
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving structural data:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput.assessmentId]);
+
+	/**
+	 * Save final safety results to database
+	 * @param {object} results - Safety calculation results
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveSafetyResultToDb = useCallback(async (results) => {
+		if (!userInput.assessmentId) return false;
+
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+
+			const resultData = {
+				overallScore: results.score || results.overallScore,
+				riskLevel: results.riskLevel,
+				safetyRating: results.grade || results.safetyRating,
+				structuralScore: results.structuralScore,
+				foundationScore: results.foundationScore,
+				materialScore: results.materialScore,
+				irregularityScore: results.irregularityScore,
+				siteScore: results.siteScore,
+				femaScore: results.femaScore,
+				tbdyScore: results.tbdyScore,
+				vulnerabilityIndex: results.vulnerabilityIndex,
+				mainRiskFactors: results.riskFactors || results.mainRiskFactors,
+				criticalIssues: results.criticalIssues,
+				immediateActions: results.immediateActions,
+				shortTermActions: results.shortTermActions,
+				longTermActions: results.longTermActions,
+				aiAnalysis: results.aiAnalysis || userInput.aiInsights,
+				aiConfidence: results.confidence,
+				calculationMethod: results.calculationMethod || 'TBDY-2018',
+			};
+
+			const result = await saveSafetyResult(userInput.assessmentId, resultData);
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+				}));
+				return true;
+			} else {
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving safety result:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput.assessmentId, userInput.aiInsights]);
+
+	/**
+	 * Save images to database
+	 * @param {array} images - Array of image objects with base64 data
+	 * @param {string} imageType - Type of images (USER_UPLOAD, STREET_VIEW, etc.)
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveImagesToDb = useCallback(async (images, imageType = 'USER_UPLOAD') => {
+		if (!userInput.assessmentId || !images?.length) return false;
+
+		try {
+			const imageData = images.map((img) => ({
+				imageType,
+				imageData: img.data || img.base64 || img.imageData,
+				thumbnailData: img.thumbnail || img.thumbnailData,
+				fileName: img.name || img.fileName,
+				mimeType: img.type || img.mimeType || 'image/jpeg',
+				fileSize: img.size || img.fileSize,
+				description: img.description,
+				angle: img.angle,
+				aiAnalysis: img.aiAnalysis,
+			}));
+
+			const result = await saveImages(userInput.assessmentId, imageData);
+
+			if (result.success) {
+				console.log(`Saved ${result.count} images to database`);
+				return true;
+			} else {
+				console.error('Failed to save images:', result.error);
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving images:', error);
+			return false;
+		}
+	}, [userInput.assessmentId]);
+
+	/**
+	 * Reset assessment and start fresh
+	 */
+	const resetAssessment = useCallback(() => {
+		setUserInput(getDefaultState());
+		try {
+			localStorage.removeItem(STORAGE_KEY);
+		} catch (error) {
+			console.warn('Failed to clear localStorage:', error);
+		}
+	}, []);
 
 	// Image management functions
 	const storeGoogleImages = async (streetViewUrls, satelliteUrl, location) => {
@@ -149,6 +568,17 @@ export const UserInputProvider = ({ children }) => {
 		storeGoogleImages,
 		storeUserImages,
 		getImageGallery,
+		// Database sync functions
+		isLoadingFromDb,
+		startNewAssessment,
+		loadAssessment,
+		saveLocationToDb,
+		saveWeatherToDb,
+		saveBuildingInfoToDb,
+		saveStructuralDataToDb,
+		saveSafetyResultToDb,
+		saveImagesToDb,
+		resetAssessment,
 	};
 
 	return (

@@ -18,7 +18,7 @@ describe('[AI] Structured Outputs Helper', () => {
     });
 
     it('should export correct default model', () => {
-      expect(DEFAULT_MODEL).toBe('claude-sonnet-4-5-20250514');
+      expect(DEFAULT_MODEL).toBe('claude-sonnet-4-5-20250929');
     });
   });
 

@@ -358,6 +358,23 @@ export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedBigIntFilter<$PrismaModel>
 }
 
+export type EnumAssessmentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentStatus | Prisma.EnumAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel> | $Enums.AssessmentStatus
+}
+
+export type EnumAssessmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentStatus | Prisma.EnumAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssessmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.AssessmentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
+}
+
 export type FloatFilter<$PrismaModel = never> = {
   equals?: number | Prisma.FloatFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListFloatFieldRefInput<$PrismaModel>
@@ -719,6 +736,23 @@ export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
   _sum?: Prisma.NestedBigIntFilter<$PrismaModel>
   _min?: Prisma.NestedBigIntFilter<$PrismaModel>
   _max?: Prisma.NestedBigIntFilter<$PrismaModel>
+}
+
+export type NestedEnumAssessmentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentStatus | Prisma.EnumAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel> | $Enums.AssessmentStatus
+}
+
+export type NestedEnumAssessmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssessmentStatus | Prisma.EnumAssessmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssessmentStatus[] | Prisma.ListEnumAssessmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssessmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.AssessmentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssessmentStatusFilter<$PrismaModel>
 }
 
 export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {

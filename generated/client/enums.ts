@@ -36,6 +36,16 @@ export const WindowType = {
 export type WindowType = (typeof WindowType)[keyof typeof WindowType]
 
 
+export const AssessmentStatus = {
+  DRAFT: 'DRAFT',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETE: 'COMPLETE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type AssessmentStatus = (typeof AssessmentStatus)[keyof typeof AssessmentStatus]
+
+
 export const ImageType = {
   STREET_VIEW: 'STREET_VIEW',
   SATELLITE: 'SATELLITE',

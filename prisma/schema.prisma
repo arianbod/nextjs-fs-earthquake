@@ -186,9 +186,26 @@ model Assessment {
   updatedAt           DateTime            @updatedAt @map("updated_at")
   completedAt         DateTime?           @map("completed_at")
 
+  // Progress tracking
+  status              AssessmentStatus    @default(DRAFT)
+  currentStep         Int                 @default(1) @map("current_step")
+
   // Assessment metadata
   assessmentType      String              @default("complete") @map("assessment_type") // complete, quick, detailed
   version             String              @default("1.0") // App version for tracking
+  title               String?             // User-friendly name (auto-generated from address)
+
+  // Weather data (from step 2)
+  weather             Json?               // { temperature, humidity, conditions, fetchedAt }
+
+  // Structural assessment data (steps 5-11)
+  structuralSystem    Json?               @map("structural_system_data") // Step 5: framework definition
+  irregularities      Json?               // Step 6: structural irregularities
+  planDefinition      Json?               @map("plan_definition") // Step 7: building plan details
+  manipulations       Json?               // Step 8: modifications review
+  specificConditions  Json?               @map("specific_conditions") // Step 9: special conditions
+  extraLoad           Json?               @map("extra_load") // Step 10: additional load factors
+  neighborBuildings   Json?               @map("neighbor_buildings") // Step 11: adjacent buildings
 
   // Relations
   location            Location?
@@ -197,9 +214,21 @@ model Assessment {
   images              AssessmentImage[]
 
   @@index([userId])
+  @@index([status])
   @@index([createdAt])
   @@index([userId, createdAt])
+  @@index([userId, status])
   @@map("assessments")
+}
+
+// Assessment status enum
+enum AssessmentStatus {
+  DRAFT        // Started but not completed any step
+  IN_PROGRESS  // At least one step completed
+  COMPLETE     // All steps done, results calculated
+  ARCHIVED     // Soft deleted
+
+  @@map("assessment_status")
 }
 
 // Location and address information

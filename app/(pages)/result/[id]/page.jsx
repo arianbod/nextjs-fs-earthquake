@@ -2,14 +2,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useUserInput } from '@/context/UserInputContext';
-import { saveAssessment, formatAssessmentForSaving } from '@/lib/assessmentService';
 import { imageStorageManager } from '@/lib/imageStorage';
 import EnhancedCertificate from '@/components/EnhancedCertificate';
 import SafetyCalculator from '@/components/SafetyCalculator';
 import PerformanceSummaryCard from '@/components/results/PerformanceSummaryCard';
 import SuccessAnimation from '@/components/results/SuccessAnimation';
+import { getAssessment } from '@/lib/actions/assessment';
+import { toast } from 'sonner';
 
 // New simplified components
 import { ExpertModeToggle } from '@/components/results/ExpertModeToggle';
@@ -29,7 +31,10 @@ import {
 	Phone,
 	ArrowRight,
 	Wrench,
-	Users
+	Users,
+	Copy,
+	Loader2,
+	LayoutDashboard,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -44,18 +49,69 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ResultPage = () => {
+	const params = useParams();
+	const assessmentId = params.id;
 	const { user, isLoaded: isUserLoaded } = useUser();
-	const { userInput, clearSavedData, getImageGallery } = useUserInput();
+	const { userInput, clearSavedData, getImageGallery, saveSafetyResultToDb, loadAssessment } = useUserInput();
 	const [safetyResult, setSafetyResult] = useState(null);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 	const [dataLoaded, setDataLoaded] = useState(false);
 	const [assessmentSaved, setAssessmentSaved] = useState(false);
-	const [savedAssessmentId, setSavedAssessmentId] = useState(null);
+	const [savedAssessmentId, setSavedAssessmentId] = useState(assessmentId !== 'preview' ? assessmentId : null);
+	const [isOwner, setIsOwner] = useState(true);
+	const [loadedFromDb, setLoadedFromDb] = useState(false);
 
 	// Expert mode toggle state - simple by default
 	const [expertMode, setExpertMode] = useState(false);
+
+	// Load assessment from database if ID provided and not 'preview'
+	useEffect(() => {
+		const loadFromDatabase = async () => {
+			if (assessmentId && assessmentId !== 'preview' && !loadedFromDb) {
+				try {
+					setLoading(true);
+					const result = await getAssessment(assessmentId, true);
+
+					if (result.success && result.assessment) {
+						setIsOwner(result.isOwner);
+						setLoadedFromDb(true);
+
+						// If assessment has safety results, use them directly
+						if (result.assessment.safetyResult) {
+							setSafetyResult({
+								overallScore: result.assessment.safetyResult.overallScore,
+								structuralIntegrity: result.assessment.safetyResult.structuralScore,
+								earthquakeImpact: result.assessment.safetyResult.riskLevel,
+								interpretation: `Safety Rating: ${result.assessment.safetyResult.safetyRating}`,
+								...result.assessment.safetyResult,
+							});
+							setAssessmentSaved(true);
+							setDataLoaded(true);
+							setLoading(false);
+							return;
+						}
+
+						// Otherwise load assessment data into context for calculation
+						await loadAssessment(assessmentId);
+					}
+				} catch (err) {
+					console.error('Error loading from database:', err);
+				}
+			}
+			setDataLoaded(true);
+		};
+
+		loadFromDatabase();
+	}, [assessmentId]);
+
+	// Copy shareable link
+	const copyShareableLink = () => {
+		const url = `${window.location.origin}/result/${savedAssessmentId || assessmentId}`;
+		navigator.clipboard.writeText(url);
+		toast.success('Link copied to clipboard');
+	};
 
 	useEffect(() => {
 		try {
@@ -87,32 +143,42 @@ const ResultPage = () => {
 		}
 	}, [userInput, clearSavedData]);
 
-	// Auto-save assessment to database
+	// Auto-save safety results to database using Server Actions
 	useEffect(() => {
-		const autoSaveAssessment = async () => {
-			if (!isUserLoaded || !user || !safetyResult || assessmentSaved) {
+		const autoSaveResults = async () => {
+			// Skip if not loaded, no result, already saved, or loaded from DB
+			if (!isUserLoaded || !user || !safetyResult || assessmentSaved || loadedFromDb) {
+				return;
+			}
+
+			// Only save if we have an assessment ID from the flow
+			const currentAssessmentId = userInput.assessmentId || savedAssessmentId;
+			if (!currentAssessmentId || currentAssessmentId === 'preview') {
+				console.log('No assessment ID - skipping auto-save');
 				return;
 			}
 
 			try {
-				console.log('Auto-saving assessment...');
-				const storedImages = imageStorageManager.getAllImages();
-				const assessmentData = formatAssessmentForSaving(
-					userInput,
-					safetyResult,
-					storedImages
-				);
-				const result = await saveAssessment(assessmentData);
-				console.log('Assessment saved successfully:', result.assessmentId);
-				setAssessmentSaved(true);
-				setSavedAssessmentId(result.assessmentId);
+				console.log('Auto-saving safety results...');
+				const saved = await saveSafetyResultToDb(safetyResult);
+
+				if (saved) {
+					console.log('Safety results saved successfully');
+					setAssessmentSaved(true);
+					setSavedAssessmentId(currentAssessmentId);
+
+					// Clear localStorage after successful save
+					setTimeout(() => {
+						clearSavedData();
+					}, 1000);
+				}
 			} catch (error) {
-				console.error('Failed to auto-save assessment:', error);
+				console.error('Failed to auto-save results:', error);
 			}
 		};
 
-		autoSaveAssessment();
-	}, [isUserLoaded, user, safetyResult, userInput, assessmentSaved]);
+		autoSaveResults();
+	}, [isUserLoaded, user, safetyResult, userInput.assessmentId, assessmentSaved, loadedFromDb, saveSafetyResultToDb]);
 
 	// Wait for localStorage to restore data
 	useEffect(() => {
@@ -202,14 +268,24 @@ const ResultPage = () => {
 				</Link>
 				<div className='flex items-center gap-3'>
 					{assessmentSaved && user && (
-						<Link href='/history'>
+						<Link href='/dashboard'>
 							<Button
 								variant='outline'
 								size='sm'
 								className='gap-1 border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'>
-								<CheckCircle2 className='h-4 w-4' /> Saved!
+								<LayoutDashboard className='h-4 w-4' /> Dashboard
 							</Button>
 						</Link>
+					)}
+					{savedAssessmentId && savedAssessmentId !== 'preview' && (
+						<Button
+							variant='outline'
+							size='sm'
+							className='gap-1'
+							onClick={copyShareableLink}
+						>
+							<Copy className='h-4 w-4' /> Copy Link
+						</Button>
 					)}
 					<Link href='/assessment/1'>
 						<Button variant='outline' size='sm'>
@@ -277,9 +353,14 @@ const ResultPage = () => {
 								<Download className='h-4 w-4' />
 								Download Report
 							</Button>
-							<Button variant='outline' className='gap-2'>
+							<Button
+								variant='outline'
+								className='gap-2'
+								onClick={copyShareableLink}
+								disabled={!savedAssessmentId || savedAssessmentId === 'preview'}
+							>
 								<Share2 className='h-4 w-4' />
-								Share Results
+								{savedAssessmentId && savedAssessmentId !== 'preview' ? 'Share Results' : 'Save to Share'}
 							</Button>
 						</div>
 
@@ -498,7 +579,11 @@ const ResultPage = () => {
 									<Download className='h-4 w-4' />
 									Download {isPassingScore ? 'Certificate' : 'Report'}
 								</Button>
-								<Button className='gap-2'>
+								<Button
+									className='gap-2'
+									onClick={copyShareableLink}
+									disabled={!savedAssessmentId || savedAssessmentId === 'preview'}
+								>
 									<Share2 className='h-4 w-4' /> Share
 								</Button>
 							</CardFooter>
