@@ -174,10 +174,43 @@
 
 **Files Modified:**
 - `app/(pages)/assessment/[step]/page.js` - Comprehensive error handling
+- `lib/actions/assessment.js` - Fixed saveLocation to filter invalid fields
+- `components/steps/LocationStep.jsx` - Check for existing data before GPS request
+- `components/steps/LocationStepSimple.jsx` - Same fix (this is the active component)
 
 **Commits:**
 - `8ae9733` - fix: Redirect old assessments with step > 4 to results page
 - `0181b25` - feat: Add comprehensive error handling to assessment flow
+- `98d176e` - fix: Filter invalid fields in saveLocation to match Prisma schema
+- `917db57` - fix: Preserve loaded location data on page reload
+
+**Analysis: Page Reload Behavior**
+
+When user reloads a step page (`/assessment/[step]?id=xxx`):
+
+1. **page.js behavior:**
+   - Shows loading spinner while `isInitializing = true`
+   - Calls `loadAssessment(id)` which fetches from DB
+   - Maps DB fields to context: location, buildingInfo, etc.
+   - Only then renders the step component
+
+2. **LocationStepSimple behavior (FIXED):**
+   - Now checks `if (userInput.latitude && userInput.longitude)` first
+   - If data exists → uses it, skips GPS request
+   - If no data → requests fresh GPS location
+
+3. **BuildingInfoCombined behavior (OK):**
+   - AI suggestions only applied if `aiAnalysisData` exists in context
+   - After reload, `aiAnalysisData` is NOT loaded from DB (intentional)
+   - Form displays DB-loaded values correctly
+
+4. **Data Flow Summary:**
+   ```
+   Reload → page.js loads from DB → context populated → step renders
+                                                          ↓
+   Step checks: has data? → YES → use existing data
+                          → NO → request fresh data
+   ```
 
 **Next:**
 - Manual testing of full flow
