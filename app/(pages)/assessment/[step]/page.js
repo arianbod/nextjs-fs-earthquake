@@ -76,8 +76,16 @@ export default function AssessmentStep({ params }) {
 
     const StepComponent = AssessmentSteps[currentStep - 1]?.component;
 
-    if (!StepComponent) {
-        return <div>Invalid step</div>;
+    // Redirect to results if step exceeds total steps (handles old assessments with more steps)
+    if (!StepComponent || currentStep > AssessmentSteps.length) {
+        const resultId = assessmentIdFromUrl || userInput.assessmentId || 'preview';
+        router.replace(`/result/${resultId}`);
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500 mb-4" />
+                <p className="text-muted-foreground">Redirecting to results...</p>
+            </div>
+        );
     }
 
     // Show loading while initializing from DB
