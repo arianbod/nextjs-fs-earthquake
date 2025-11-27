@@ -198,6 +198,9 @@ model Assessment {
   // Weather data (from step 2)
   weather             Json?               // { temperature, humidity, conditions, fetchedAt }
 
+  // AI Photo Analysis (from step 3)
+  aiPhotoAnalysis     Json?               @map("ai_photo_analysis") // AI analysis results from user photos
+
   // Structural assessment data (steps 5-11)
   structuralSystem    Json?               @map("structural_system_data") // Step 5: framework definition
   irregularities      Json?               // Step 6: structural irregularities

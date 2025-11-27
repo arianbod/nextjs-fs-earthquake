@@ -222,6 +222,56 @@ When user reloads a step page (`/assessment/[step]?id=xxx`):
 
 ---
 
+### Session 3
+**Date:** November 27, 2025
+**Duration:** ~1 hour
+**Completed:**
+- [x] Photo persistence fix - photos now persist in database
+- [x] Added `aiPhotoAnalysis` field to Assessment model for AI analysis results
+- [x] Photos saved to DB immediately on upload (not after analysis)
+- [x] Photos loaded from DB when resuming assessment
+- [x] AI analysis results saved to DB after analysis completes
+- [x] Photos and AI results persist across page reload and browser back
+
+**Files Modified:**
+- `prisma/schema.prisma` - Added `aiPhotoAnalysis` JSON field
+- `lib/actions/assessment.js` - Added `aiPhotoAnalysis` to updateAssessment allowed fields
+- `context/UserInputContext.jsx` - Added:
+  - `uploadedPhotos`, `aiAnalysisData`, `aiAnalysisComplete` to default state
+  - `loadAssessment` now loads images from DB via `getAssessmentImages`
+  - `saveAiPhotoAnalysisToDb` function for saving AI results
+  - `storeUploadedPhotos`, `clearUploadedPhotos` for context sync
+- `components/steps/AIPhotoStep.jsx` - Major updates:
+  - Saves photos to DB immediately on upload
+  - Restores photos from context (loaded from DB) on mount
+  - Saves AI analysis to DB after analysis completes
+  - Removed redundant post-analysis save-to-DB code
+
+**Data Flow:**
+```
+Upload → Convert to base64 → Save to DB immediately
+Reload → loadAssessment → getAssessmentImages → Restore to state
+Analysis → Save AI results to assessment.aiPhotoAnalysis
+Back button → Photos persist in DB, restored on return
+```
+
+**Schema Change:**
+- Added `aiPhotoAnalysis Json? @map("ai_photo_analysis")` to Assessment model
+- Photos grouped by `assessmentId` (foreign key serves as group ID)
+
+**Commits:**
+- (pending commit)
+
+**Next:**
+- Full manual testing
+- Verify photo persistence on various scenarios
+- Mobile testing
+
+**Blockers:**
+- (none)
+
+---
+
 ## Notes
 
 ### Decisions Made During Implementation

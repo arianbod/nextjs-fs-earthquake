@@ -12,7 +12,7 @@ import {
 	saveBuildingInfo,
 	saveSafetyResult,
 } from '@/lib/actions/assessment';
-import { saveImages, getAssessmentImages } from '@/lib/actions/file';
+import { saveImages, getAssessmentImages, saveImage } from '@/lib/actions/file';
 
 const UserInputContext = createContext();
 
@@ -69,6 +69,10 @@ export const UserInputProvider = ({ children }) => {
 		aiInsights: null,
 		// Weather data
 		weather: null,
+		// User uploaded photos (preserved for navigation)
+		uploadedPhotos: [], // Array of { id, base64, name, size, type, analyzed }
+		aiAnalysisData: null,
+		aiAnalysisComplete: false,
 	});
 
 	const [userInput, setUserInput] = useState(getDefaultState);
@@ -163,6 +167,26 @@ export const UserInputProvider = ({ children }) => {
 
 			const { assessment } = result;
 
+			// Load AI photo analysis from assessment (primary source)
+			let aiAnalysisData = assessment.aiPhotoAnalysis || null;
+			let aiAnalysisComplete = !!assessment.aiPhotoAnalysis;
+
+			// Also fetch user-uploaded images from DB
+			let uploadedPhotos = [];
+
+			const imagesResult = await getAssessmentImages(id, 'USER_UPLOAD', true);
+			if (imagesResult.success && imagesResult.images?.length > 0) {
+				uploadedPhotos = imagesResult.images.map((img) => ({
+					id: img.id,
+					base64: img.imageData,
+					name: img.fileName || 'photo.jpg',
+					size: img.fileSize,
+					type: img.mimeType || 'image/jpeg',
+					analyzed: aiAnalysisComplete, // Mark as analyzed if we have analysis data
+					aiAnalysis: img.aiAnalysis,
+				}));
+			}
+
 			// Map database fields to context state
 			const mappedData = {
 				assessmentId: assessment.id,
@@ -206,6 +230,11 @@ export const UserInputProvider = ({ children }) => {
 				...(assessment.safetyResult && {
 					aiInsights: assessment.safetyResult.aiAnalysis,
 				}),
+
+				// Uploaded photos from DB
+				uploadedPhotos,
+				aiAnalysisData,
+				aiAnalysisComplete,
 			};
 
 			setUserInput((prev) => ({
@@ -303,6 +332,42 @@ export const UserInputProvider = ({ children }) => {
 			return false;
 		}
 	}, [userInput.assessmentId, userInput.weather, userInput.environmentalData]);
+
+	/**
+	 * Save AI photo analysis results to database (Step 3)
+	 * @param {object} analysisData - AI analysis results
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveAiPhotoAnalysisToDb = useCallback(async (analysisData) => {
+		if (!userInput.assessmentId) return false;
+
+		try {
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
+
+			const result = await updateAssessment(userInput.assessmentId, {
+				aiPhotoAnalysis: analysisData,
+				currentStep: 4,
+			});
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					dbSyncStatus: 'saved',
+					lastSavedAt: new Date().toISOString(),
+					aiAnalysisData: analysisData,
+					aiAnalysisComplete: true,
+				}));
+				return true;
+			} else {
+				setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+				return false;
+			}
+		} catch (error) {
+			console.error('Error saving AI photo analysis:', error);
+			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput.assessmentId]);
 
 	/**
 	 * Save building info to database (Step 4)
@@ -552,6 +617,29 @@ export const UserInputProvider = ({ children }) => {
 		return createImageGallery(imageStorageManager.getAllImages());
 	};
 
+	/**
+	 * Store uploaded photos to context (for preservation during navigation)
+	 * @param {Array} photos - Array of photo objects with file data
+	 */
+	const storeUploadedPhotos = useCallback((photos) => {
+		setUserInput((prev) => ({
+			...prev,
+			uploadedPhotos: photos,
+		}));
+	}, []);
+
+	/**
+	 * Clear uploaded photos from context
+	 */
+	const clearUploadedPhotos = useCallback(() => {
+		setUserInput((prev) => ({
+			...prev,
+			uploadedPhotos: [],
+			aiAnalysisData: null,
+			aiAnalysisComplete: false,
+		}));
+	}, []);
+
 	const clearSavedData = () => {
 		try {
 			localStorage.removeItem(STORAGE_KEY);
@@ -568,12 +656,15 @@ export const UserInputProvider = ({ children }) => {
 		storeGoogleImages,
 		storeUserImages,
 		getImageGallery,
+		storeUploadedPhotos,
+		clearUploadedPhotos,
 		// Database sync functions
 		isLoadingFromDb,
 		startNewAssessment,
 		loadAssessment,
 		saveLocationToDb,
 		saveWeatherToDb,
+		saveAiPhotoAnalysisToDb,
 		saveBuildingInfoToDb,
 		saveStructuralDataToDb,
 		saveSafetyResultToDb,

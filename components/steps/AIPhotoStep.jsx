@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useUserInput } from '@/context/UserInputContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -35,6 +36,7 @@ import {
 import Link from 'next/link';
 
 const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => {
+	const { storeUploadedPhotos, clearUploadedPhotos, saveAiPhotoAnalysisToDb } = useUserInput();
 	const [uploadedImages, setUploadedImages] = useState([]);
 	const [isAnalyzing, setIsAnalyzing] = useState(false);
 	const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -44,6 +46,49 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 	const [error, setError] = useState(null);
 	const [detailedError, setDetailedError] = useState(null);
 	const [isSavingImages, setIsSavingImages] = useState(false);
+	const [isRestoring, setIsRestoring] = useState(true);
+
+	// Helper: Convert file to base64
+	const fileToBase64 = (file) => {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result);
+			reader.onerror = reject;
+			reader.readAsDataURL(file);
+		});
+	};
+
+	// Restore photos from context (loaded from DB) on mount or when context updates
+	useEffect(() => {
+		// Only restore if we have photos in context and haven't loaded them yet
+		if (userInput.uploadedPhotos?.length > 0 && uploadedImages.length === 0 && isRestoring) {
+			console.log('Restoring photos from DB via context:', userInput.uploadedPhotos.length);
+			setUploadedImages(userInput.uploadedPhotos.map(photo => ({
+				...photo,
+				url: photo.base64, // Use base64 as URL for display
+			})));
+			// Restore analysis results if available
+			if (userInput.aiAnalysisComplete && userInput.aiAnalysisData) {
+				setAnalysisResults(userInput.aiAnalysisData);
+			}
+		}
+		setIsRestoring(false);
+	}, [userInput.uploadedPhotos, userInput.aiAnalysisComplete, userInput.aiAnalysisData]);
+
+	// Sync local state to context (for localStorage backup)
+	useEffect(() => {
+		if (!isRestoring && uploadedImages.length > 0) {
+			const photosForContext = uploadedImages.map(img => ({
+				id: img.id,
+				base64: img.base64 || img.url,
+				name: img.name,
+				size: img.size,
+				type: img.type,
+				analyzed: img.analyzed || false,
+			}));
+			storeUploadedPhotos(photosForContext);
+		}
+	}, [uploadedImages, isRestoring, storeUploadedPhotos]);
 
 	// Analysis stages for better feedback
 	const stages = [
@@ -85,19 +130,42 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 			setError(errors.join(', '));
 		}
 
-		const newImages = validFiles.map(file => ({
-			id: Math.random().toString(36).substr(2, 9),
-			file,
-			url: URL.createObjectURL(file),
-			name: file.name,
-			size: file.size,
-			type: file.type,
-			analyzed: false,
-			uploadProgress: 0,
+		// Convert files to base64 for persistence
+		const newImages = await Promise.all(validFiles.map(async (file) => {
+			const base64 = await fileToBase64(file);
+			return {
+				id: Math.random().toString(36).substr(2, 9),
+				file, // Keep file reference for analysis
+				base64, // Store base64 for persistence
+				url: base64, // Use base64 as URL for display
+				name: file.name,
+				size: file.size,
+				type: file.type,
+				analyzed: false,
+				uploadProgress: 0,
+			};
 		}));
 
 		setUploadedImages(prev => [...prev, ...newImages]);
-	}, [uploadedImages.length]);
+
+		// Save to database immediately for persistence
+		if (saveImagesToDb && userInput.assessmentId) {
+			try {
+				const imageDataForDb = newImages.map((img) => ({
+					imageData: img.base64,
+					mimeType: img.type || 'image/jpeg',
+					fileName: img.name,
+					fileSize: img.size,
+					analyzed: false,
+				}));
+				await saveImagesToDb(imageDataForDb, 'USER_UPLOAD');
+				console.log('Images saved to database on upload');
+			} catch (dbError) {
+				console.error('Failed to save images to DB on upload:', dbError);
+				// Don't fail - images are still in local state
+			}
+		}
+	}, [uploadedImages.length, saveImagesToDb, userInput.assessmentId]);
 
 	// Handle drag and drop
 	const handleDrop = useCallback((e) => {
@@ -230,24 +298,14 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 				console.log('Updating user input with AI data:', mappedData);
 				updateUserInput(mappedData);
 
-				// Save images to database if saveImagesToDb is available
-				if (saveImagesToDb && preparedImages.length > 0) {
-					setIsSavingImages(true);
+				// Save AI analysis to database
+				if (saveAiPhotoAnalysisToDb) {
 					try {
-						const imageDataForDb = preparedImages.map((img, index) => ({
-							imageData: img.base64 || img.data,
-							mimeType: img.mimeType || 'image/jpeg',
-							fileName: uploadedImages[index]?.name || `photo-${index + 1}.jpg`,
-							fileSize: uploadedImages[index]?.size,
-							aiAnalysis: processedResults,
-						}));
-						await saveImagesToDb(imageDataForDb, 'USER_UPLOAD');
-						console.log('Images saved to database');
+						await saveAiPhotoAnalysisToDb(processedResults);
+						console.log('AI photo analysis saved to database');
 					} catch (dbError) {
-						console.error('Failed to save images to DB:', dbError);
-						// Don't fail the whole analysis - localStorage backup exists
-					} finally {
-						setIsSavingImages(false);
+						console.error('Failed to save AI analysis to DB:', dbError);
+						// Don't fail - context/localStorage has the data
 					}
 				}
 			}
