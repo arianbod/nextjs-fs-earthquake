@@ -260,7 +260,7 @@ Back button → Photos persist in DB, restored on return
 - Photos grouped by `assessmentId` (foreign key serves as group ID)
 
 **Commits:**
-- (pending commit)
+- `914b69a` - feat: Persist photos and AI analysis in database
 
 **Next:**
 - Full manual testing
@@ -269,6 +269,30 @@ Back button → Photos persist in DB, restored on return
 
 **Blockers:**
 - (none)
+
+---
+
+### Session 3 (continued)
+**Additional Changes:**
+- [x] Removed localStorage as data persistence layer
+- [x] Database is now the single source of truth
+- [x] Context is now a pure client-side cache backed by DB
+
+**Files Modified:**
+- `context/UserInputContext.jsx` - Removed localStorage read/write, removed `clearSavedData`
+- `app/(pages)/result/[id]/page.jsx` - Removed `clearSavedData` calls
+
+**Architecture Decision:**
+- All assessment data persisted in database
+- Context serves as in-memory cache during session
+- No localStorage dependency (except cookies for auth)
+
+**Data Flow:**
+```
+New Assessment: createAssessment → DB creates record → context gets ID
+Resume Assessment: loadAssessment → DB fetch → context populated
+Updates: updateUserInput → context updated → saveXxxToDb → DB persisted
+```
 
 ---
 

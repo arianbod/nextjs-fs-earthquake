@@ -16,8 +16,18 @@ import { saveImages, getAssessmentImages, saveImage } from '@/lib/actions/file';
 
 const UserInputContext = createContext();
 
-const STORAGE_KEY = 'quakewise_assessment_data';
-
+/**
+ * UserInputProvider - Client-side cache backed by database
+ *
+ * All data is persisted in the database. Context serves as:
+ * 1. In-memory cache during active session
+ * 2. State management for React components
+ *
+ * Data flow:
+ * - New assessment: createAssessment → DB creates record → context gets ID
+ * - Resume assessment: loadAssessment → DB fetch → context populated
+ * - Updates: updateUserInput → context updated → saveXxxToDb → DB persisted
+ */
 export const UserInputProvider = ({ children }) => {
 	const getDefaultState = () => ({
 		// Database tracking
@@ -69,47 +79,14 @@ export const UserInputProvider = ({ children }) => {
 		aiInsights: null,
 		// Weather data
 		weather: null,
-		// User uploaded photos (preserved for navigation)
+		// User uploaded photos (loaded from DB)
 		uploadedPhotos: [], // Array of { id, base64, name, size, type, analyzed }
 		aiAnalysisData: null,
 		aiAnalysisComplete: false,
 	});
 
 	const [userInput, setUserInput] = useState(getDefaultState);
-	const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
 	const [isLoadingFromDb, setIsLoadingFromDb] = useState(false);
-
-	// Load data from localStorage on mount (client-side only)
-	useEffect(() => {
-		try {
-			const savedData = localStorage.getItem(STORAGE_KEY);
-			if (savedData) {
-				const parsedData = JSON.parse(savedData);
-				console.log('Loaded data from localStorage:', parsedData);
-				setUserInput(parsedData);
-			}
-		} catch (error) {
-			console.warn('Failed to load saved assessment data:', error);
-		} finally {
-			setHasLoadedFromStorage(true);
-		}
-	}, []);
-
-	// Save to localStorage whenever userInput changes (but only after initial load)
-	useEffect(() => {
-		// Don't save until we've loaded from storage first
-		if (!hasLoadedFromStorage) return;
-
-		try {
-			// Only save if we have some meaningful data
-			if (userInput && (userInput.numberOfStories > 0 || userInput.address || userInput.structuralSystem || userInput.assessmentId)) {
-				console.log('Saving data to localStorage:', userInput);
-				localStorage.setItem(STORAGE_KEY, JSON.stringify(userInput));
-			}
-		} catch (error) {
-			console.warn('Failed to save assessment data:', error);
-		}
-	}, [userInput, hasLoadedFromStorage]);
 
 	const updateUserInput = (newData) => {
 		setUserInput((prevData) => ({ ...prevData, ...newData }));
@@ -640,18 +617,9 @@ export const UserInputProvider = ({ children }) => {
 		}));
 	}, []);
 
-	const clearSavedData = () => {
-		try {
-			localStorage.removeItem(STORAGE_KEY);
-		} catch (error) {
-			console.warn('Failed to clear saved assessment data:', error);
-		}
-	};
-
 	const value = {
 		userInput,
 		updateUserInput,
-		clearSavedData,
 		// Image management functions
 		storeGoogleImages,
 		storeUserImages,

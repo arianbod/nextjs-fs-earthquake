@@ -75,7 +75,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 		setIsRestoring(false);
 	}, [userInput.uploadedPhotos, userInput.aiAnalysisComplete, userInput.aiAnalysisData]);
 
-	// Sync local state to context (for localStorage backup)
+	// Sync local state to context (keeps context state current for other components)
 	useEffect(() => {
 		if (!isRestoring && uploadedImages.length > 0) {
 			const photosForContext = uploadedImages.map(img => ({

@@ -52,7 +52,7 @@ const ResultPage = () => {
 	const params = useParams();
 	const assessmentId = params.id;
 	const { user, isLoaded: isUserLoaded } = useUser();
-	const { userInput, clearSavedData, getImageGallery, saveSafetyResultToDb, loadAssessment } = useUserInput();
+	const { userInput, getImageGallery, saveSafetyResultToDb, loadAssessment, resetAssessment } = useUserInput();
 	const [safetyResult, setSafetyResult] = useState(null);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -131,17 +131,12 @@ const ResultPage = () => {
 				}, 500);
 			}
 
-			// Clear saved data after calculation
-			setTimeout(() => {
-				clearSavedData();
-			}, 1000);
-
 		} catch (err) {
 			console.error('Error calculating safety score:', err);
 			setError('An error occurred while calculating the safety score.');
 			setLoading(false);
 		}
-	}, [userInput, clearSavedData]);
+	}, [userInput]);
 
 	// Auto-save safety results to database using Server Actions
 	useEffect(() => {
@@ -166,11 +161,6 @@ const ResultPage = () => {
 					console.log('Safety results saved successfully');
 					setAssessmentSaved(true);
 					setSavedAssessmentId(currentAssessmentId);
-
-					// Clear localStorage after successful save
-					setTimeout(() => {
-						clearSavedData();
-					}, 1000);
 				}
 			} catch (error) {
 				console.error('Failed to auto-save results:', error);
