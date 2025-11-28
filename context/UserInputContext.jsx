@@ -13,6 +13,7 @@ import {
 	saveSafetyResult,
 } from '@/lib/actions/assessment';
 import { saveImages, getAssessmentImages, saveImage } from '@/lib/actions/file';
+import { saveGoogleImagery, getGoogleImagery } from '@/lib/actions/imagery';
 
 const UserInputContext = createContext();
 
@@ -164,6 +165,16 @@ export const UserInputProvider = ({ children }) => {
 				}));
 			}
 
+			// Fetch Google imagery from DB
+			let streetViewImages = [];
+			let satelliteViewUrl = null;
+
+			const googleImageryResult = await getGoogleImagery(id);
+			if (googleImageryResult.success) {
+				streetViewImages = googleImageryResult.streetViewImages || [];
+				satelliteViewUrl = googleImageryResult.satelliteUrl;
+			}
+
 			// Map database fields to context state
 			const mappedData = {
 				assessmentId: assessment.id,
@@ -212,6 +223,11 @@ export const UserInputProvider = ({ children }) => {
 				uploadedPhotos,
 				aiAnalysisData,
 				aiAnalysisComplete,
+
+				// Google imagery from DB
+				streetViewImages,
+				satelliteViewUrl,
+				googleImagesStored: streetViewImages.length > 0 || !!satelliteViewUrl,
 			};
 
 			setUserInput((prev) => ({
@@ -558,13 +574,41 @@ export const UserInputProvider = ({ children }) => {
 		try {
 			const imageData = await imageStorageManager.storeGoogleImages(streetViewUrls, satelliteUrl, location);
 			const gallery = createImageGallery(imageStorageManager.getAllImages());
-			
+
 			updateUserInput({
 				imageGallery: gallery,
 				googleImagesStored: true,
-				googleImagesStoredAt: new Date().toISOString()
+				googleImagesStoredAt: new Date().toISOString(),
+				// Also store the raw URLs for easy access
+				streetViewImages: streetViewUrls?.filter(img => img.url) || [],
+				satelliteViewUrl: satelliteUrl,
 			});
-			
+
+			// Save to database if we have an assessment ID
+			if (userInput.assessmentId) {
+				try {
+					const dbResult = await saveGoogleImagery(userInput.assessmentId, {
+						streetViewImages: streetViewUrls?.map(sv => ({
+							url: sv.url,
+							heading: sv.angle || sv.heading,
+							angle: sv.description || `Street View ${sv.angle || 0}°`,
+							available: true,
+						})) || [],
+						satelliteUrl,
+						latitude: location?.lat || userInput.latitude,
+						longitude: location?.lng || userInput.longitude,
+					});
+
+					if (dbResult.success) {
+						console.log(`Saved Google imagery to DB: ${dbResult.streetViewCount} street views, satellite: ${dbResult.hasSatellite}`);
+					} else {
+						console.warn('Failed to save Google imagery to DB:', dbResult.error);
+					}
+				} catch (dbError) {
+					console.warn('Error saving Google imagery to database:', dbError);
+				}
+			}
+
 			return imageData;
 		} catch (error) {
 			console.error('Error storing Google images:', error);
