@@ -1,781 +1,479 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useUserInput } from '@/context/UserInputContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert-dialog';
 import {
 	analyzeImagesWithAI,
 	processBuildingPhotoAnalysis,
 	prepareImageForAnalysis,
 } from '@/lib/imageAnalysis';
 import {
-	Upload,
 	Camera,
 	X,
-	CheckCircle,
-	CheckCircle2,
-	AlertCircle,
-	Loader2,
-	Image as ImageIcon,
-	Zap,
-	Building,
-	Eye,
-	ArrowLeft,
-	ArrowRight,
+	Check,
 	Sparkles,
-	FileImage,
-	CloudUpload,
-	Brain,
-	FileCheck,
-	Info,
-	AlertTriangle,
-	Layers,
+	ArrowRight,
+	Plus,
+	Loader2,
+	RotateCcw,
 } from 'lucide-react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => {
-	const { storeUploadedPhotos, clearUploadedPhotos, saveAiPhotoAnalysisToDb } = useUserInput();
-	const [uploadedImages, setUploadedImages] = useState([]);
-	const [isAnalyzing, setIsAnalyzing] = useState(false);
-	const [analysisProgress, setAnalysisProgress] = useState(0);
-	const [analysisStage, setAnalysisStage] = useState('');
-	const [analysisResults, setAnalysisResults] = useState(null);
-	const [dragOver, setDragOver] = useState(false);
+	const { storeUploadedPhotos, saveAiPhotoAnalysisToDb } = useUserInput();
+	const [images, setImages] = useState([]);
+	const [analyzing, setAnalyzing] = useState(false);
+	const [progress, setProgress] = useState(0);
+	const [results, setResults] = useState(null);
 	const [error, setError] = useState(null);
-	const [detailedError, setDetailedError] = useState(null);
-	const [isSavingImages, setIsSavingImages] = useState(false);
+	const [showCelebration, setShowCelebration] = useState(false);
 	const [isRestoring, setIsRestoring] = useState(true);
+	const fileRef = useRef(null);
+	const cameraRef = useRef(null);
 
-	// Helper: Convert file to base64
-	const fileToBase64 = (file) => {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result);
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
-		});
-	};
-
-	// Restore photos from context (loaded from DB) on mount or when context updates
+	// Restore from context
 	useEffect(() => {
-		// Only restore if we have photos in context and haven't loaded them yet
-		if (userInput.uploadedPhotos?.length > 0 && uploadedImages.length === 0 && isRestoring) {
-			console.log('Restoring photos from DB via context:', userInput.uploadedPhotos.length);
-			setUploadedImages(userInput.uploadedPhotos.map(photo => ({
-				...photo,
-				url: photo.base64, // Use base64 as URL for display
-			})));
-			// Restore analysis results if available
+		if (userInput.uploadedPhotos?.length > 0 && images.length === 0 && isRestoring) {
+			setImages(userInput.uploadedPhotos.map(p => ({ ...p, url: p.base64 })));
 			if (userInput.aiAnalysisComplete && userInput.aiAnalysisData) {
-				setAnalysisResults(userInput.aiAnalysisData);
+				setResults(userInput.aiAnalysisData);
 			}
 		}
 		setIsRestoring(false);
 	}, [userInput.uploadedPhotos, userInput.aiAnalysisComplete, userInput.aiAnalysisData]);
 
-	// Sync local state to context (keeps context state current for other components)
+	// Sync to context
 	useEffect(() => {
-		if (!isRestoring && uploadedImages.length > 0) {
-			const photosForContext = uploadedImages.map(img => ({
-				id: img.id,
-				base64: img.base64 || img.url,
-				name: img.name,
-				size: img.size,
-				type: img.type,
-				analyzed: img.analyzed || false,
-			}));
-			storeUploadedPhotos(photosForContext);
+		if (!isRestoring && images.length > 0) {
+			storeUploadedPhotos(images.map(img => ({
+				id: img.id, base64: img.base64 || img.url, name: img.name,
+				size: img.size, type: img.type, analyzed: img.analyzed || false,
+			})));
 		}
-	}, [uploadedImages, isRestoring, storeUploadedPhotos]);
+	}, [images, isRestoring, storeUploadedPhotos]);
 
-	// Analysis stages for better feedback
-	const stages = [
-		{ id: 'upload', label: 'Uploading Images', icon: CloudUpload },
-		{ id: 'prepare', label: 'Preparing for Analysis', icon: FileImage },
-		{ id: 'analyze', label: 'AI Analysis in Progress', icon: Brain },
-		{ id: 'process', label: 'Processing Results', icon: FileCheck },
-		{ id: 'complete', label: 'Analysis Complete', icon: CheckCircle2 },
-	];
+	const toBase64 = (file) => new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => resolve(reader.result);
+		reader.onerror = reject;
+		reader.readAsDataURL(file);
+	});
 
-	// Handle file upload with validation
-	const handleFileUpload = useCallback(async (files) => {
+	const handleUpload = useCallback(async (files) => {
 		setError(null);
-		const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
-		const maxSize = 10 * 1024 * 1024; // 10MB
-		const maxFiles = 10;
+		const valid = Array.from(files).filter(f =>
+			f.type.startsWith('image/') && f.size <= 10 * 1024 * 1024
+		).slice(0, 10 - images.length);
 
-		const validFiles = [];
-		const errors = [];
+		const newImages = await Promise.all(valid.map(async (file) => ({
+			id: Math.random().toString(36).substr(2, 9),
+			file, base64: await toBase64(file), url: await toBase64(file),
+			name: file.name, size: file.size, type: file.type, analyzed: false,
+		})));
 
-		for (const file of Array.from(files)) {
-			if (!validTypes.includes(file.type)) {
-				errors.push(`${file.name}: Invalid file type`);
-				continue;
-			}
-			if (file.size > maxSize) {
-				errors.push(`${file.name}: File too large (max 10MB)`);
-				continue;
-			}
-			validFiles.push(file);
-		}
+		setImages(prev => [...prev, ...newImages]);
 
-		if (uploadedImages.length + validFiles.length > maxFiles) {
-			errors.push(`Maximum ${maxFiles} images allowed`);
-			validFiles.splice(maxFiles - uploadedImages.length);
-		}
-
-		if (errors.length > 0) {
-			setError(errors.join(', '));
-		}
-
-		// Convert files to base64 for persistence
-		const newImages = await Promise.all(validFiles.map(async (file) => {
-			const base64 = await fileToBase64(file);
-			return {
-				id: Math.random().toString(36).substr(2, 9),
-				file, // Keep file reference for analysis
-				base64, // Store base64 for persistence
-				url: base64, // Use base64 as URL for display
-				name: file.name,
-				size: file.size,
-				type: file.type,
-				analyzed: false,
-				uploadProgress: 0,
-			};
-		}));
-
-		setUploadedImages(prev => [...prev, ...newImages]);
-
-		// Save to database immediately for persistence
-		if (saveImagesToDb && userInput.assessmentId) {
+		if (saveImagesToDb && userInput.assessmentId && newImages.length > 0) {
 			try {
-				const imageDataForDb = newImages.map((img) => ({
-					imageData: img.base64,
-					mimeType: img.type || 'image/jpeg',
-					fileName: img.name,
-					fileSize: img.size,
-					analyzed: false,
-				}));
-				await saveImagesToDb(imageDataForDb, 'USER_UPLOAD');
-				console.log('Images saved to database on upload');
-			} catch (dbError) {
-				console.error('Failed to save images to DB on upload:', dbError);
-				// Don't fail - images are still in local state
-			}
+				await saveImagesToDb(newImages.map(img => ({
+					imageData: img.base64, mimeType: img.type || 'image/jpeg',
+					fileName: img.name, fileSize: img.size, analyzed: false,
+				})), 'USER_UPLOAD');
+			} catch (e) { console.error('DB save failed:', e); }
 		}
-	}, [uploadedImages.length, saveImagesToDb, userInput.assessmentId]);
+	}, [images.length, saveImagesToDb, userInput.assessmentId]);
 
-	// Handle drag and drop
-	const handleDrop = useCallback((e) => {
-		e.preventDefault();
-		setDragOver(false);
-		
-		const files = Array.from(e.dataTransfer.files).filter(file => 
-			file.type.startsWith('image/')
-		);
-		
-		if (files.length > 0) {
-			handleFileUpload(files);
-		}
-	}, [handleFileUpload]);
-
-	const handleDragOver = useCallback((e) => {
-		e.preventDefault();
-		setDragOver(true);
-	}, []);
-
-	const handleDragLeave = useCallback((e) => {
-		e.preventDefault();
-		setDragOver(false);
-	}, []);
-
-	// Remove uploaded image
-	const removeImage = (imageId) => {
-		setUploadedImages(prev => {
-			const updated = prev.filter(img => img.id !== imageId);
-			const imageToRemove = prev.find(img => img.id === imageId);
-			if (imageToRemove) {
-				URL.revokeObjectURL(imageToRemove.url);
-			}
-			return updated;
-		});
-	};
-
-	// Enhanced analyze function with detailed progress
-	const analyzeImages = async () => {
-		if (uploadedImages.length === 0) return;
-
-		setIsAnalyzing(true);
-		setAnalysisProgress(0);
-		setAnalysisResults(null);
+	const analyze = async () => {
+		if (images.length === 0) return;
+		setAnalyzing(true);
+		setProgress(0);
+		setResults(null);
 		setError(null);
-		setDetailedError(null);
-		setAnalysisStage('upload');
 
 		try {
-			// Stage 1: Upload (0-25%)
-			setAnalysisStage('upload');
-			setAnalysisProgress(10);
-			
-			// Stage 2: Prepare (25-40%)
-			setAnalysisStage('prepare');
-			setAnalysisProgress(25);
-			
-			const preparedImages = await Promise.all(
-				uploadedImages.map(async (img) => {
-					try {
-						return await prepareImageForAnalysis(img.file);
-					} catch (err) {
-						console.error(`Error preparing ${img.name}:`, err);
-						throw new Error(`Failed to prepare ${img.name}: ${err.message}`);
-					}
-				})
-			);
-			
-			setAnalysisProgress(40);
+			setProgress(20);
+			const prepared = await Promise.all(images.map(img => prepareImageForAnalysis(img.file)));
+			setProgress(40);
+			const result = await analyzeImagesWithAI(prepared, 'building');
+			setProgress(80);
 
-			// Stage 3: Analyze (40-80%)
-			setAnalysisStage('analyze');
-			setAnalysisProgress(50);
-			
-			const result = await analyzeImagesWithAI(preparedImages, 'building');
-			
-			setAnalysisProgress(80);
+			if (!result?.analysis) throw new Error('Analysis failed');
 
-			// Stage 4: Process (80-95%)
-			setAnalysisStage('process');
-			setAnalysisProgress(85);
-			
-			// Check if result and result.analysis exist before processing
-			if (!result || !result.analysis) {
-				throw new Error('Invalid response from AI analysis');
-			}
-			
-			const processedResults = processBuildingPhotoAnalysis(result);
-			
-			setAnalysisProgress(95);
+			const processed = processBuildingPhotoAnalysis(result);
+			setProgress(100);
+			setResults(processed);
+			setShowCelebration(true);
+			setImages(prev => prev.map(img => ({ ...img, analyzed: true })));
 
-			// Stage 5: Complete (95-100%)
-			setAnalysisStage('complete');
-			setAnalysisProgress(100);
-			
-			setAnalysisResults(processedResults);
+			if (processed) {
+				let stories = processed.buildingCharacteristics?.stories;
+				if (typeof stories === 'string') stories = parseInt(stories) || null;
 
-			// Mark images as analyzed
-			setUploadedImages(prev => 
-				prev.map(img => ({ ...img, analyzed: true }))
-			);
+				updateUserInput({
+					aiAnalysisData: processed, aiAnalysisComplete: true,
+					numberOfStories: stories,
+					structuralSystem: processed.buildingCharacteristics?.structuralSystem || null,
+					buildingType: processed.buildingCharacteristics?.type || null,
+					materialCondition: processed.buildingCharacteristics?.materialCondition || null,
+					constructionPeriod: processed.buildingCharacteristics?.constructionPeriod || null,
+				});
 
-			// Save to user context with proper field mapping
-			if (processedResults) {
-				// Parse number of stories if it's a string
-				let stories = processedResults.buildingCharacteristics?.stories;
-				if (typeof stories === 'string' && !isNaN(parseInt(stories))) {
-					stories = parseInt(stories);
-				}
-
-				// Map AI data to form fields
-				const mappedData = {
-					aiAnalysisData: processedResults,
-					aiAnalysisComplete: true,
-					// Building Info fields
-					numberOfStories: stories || null,
-					// Structural System fields (for later steps)
-					structuralSystem: processedResults.buildingCharacteristics?.structuralSystem || null,
-					buildingType: processedResults.buildingCharacteristics?.type || null,
-					// Dimensions
-					buildingLength: processedResults.dimensions?.length || null,
-					buildingWidth: processedResults.dimensions?.width || null,
-					buildingHeight: processedResults.dimensions?.height || null,
-					// Material condition
-					materialCondition: processedResults.buildingCharacteristics?.materialCondition || null,
-					// Construction period (try to extract year)
-					constructionPeriod: processedResults.buildingCharacteristics?.constructionPeriod || null,
-				};
-
-				console.log('Updating user input with AI data:', mappedData);
-				updateUserInput(mappedData);
-
-				// Save AI analysis to database
 				if (saveAiPhotoAnalysisToDb) {
-					try {
-						await saveAiPhotoAnalysisToDb(processedResults);
-						console.log('AI photo analysis saved to database');
-					} catch (dbError) {
-						console.error('Failed to save AI analysis to DB:', dbError);
-						// Don't fail - context/localStorage has the data
-					}
+					try { await saveAiPhotoAnalysisToDb(processed); } catch (e) { console.error(e); }
 				}
 			}
 
-		} catch (error) {
-			console.error('Analysis error:', error);
-			
-			// Detailed error information for development
-			setDetailedError({
-				message: error.message || 'Unknown error occurred',
-				stack: error.stack,
-				timestamp: new Date().toISOString(),
-				stage: analysisStage,
-				images: uploadedImages.length,
-			});
-			
-			// User-friendly error message
-			if (error.message?.includes('Cannot read properties of undefined')) {
-				setError('The AI analysis returned incomplete data. Please try again with clearer photos.');
-			} else if (error.message?.includes('Failed to prepare')) {
-				setError('Some images could not be processed. Please check the file formats.');
-			} else if (error.message?.includes('Failed to analyze')) {
-				setError('AI analysis failed. Please check your internet connection and try again.');
-			} else {
-				setError(error.message || 'Failed to analyze images. Please try again.');
-			}
-			
-			setAnalysisResults(null);
-			setAnalysisStage('');
+			setTimeout(() => setShowCelebration(false), 2500);
+		} catch (err) {
+			setError(err.message || 'Analysis failed');
+			setResults(null);
 		} finally {
-			setIsAnalyzing(false);
+			setAnalyzing(false);
 		}
 	};
 
-	const canProceed = analysisResults && !analysisResults.error;
+	const skip = () => {
+		updateUserInput({ aiAnalysisData: null, aiAnalysisComplete: false });
+		onNext();
+	};
+
+	const hasPhotos = images.length > 0;
+	const isComplete = results && !results.error;
+
+	// Celebration burst
+	const Celebration = () => (
+		<AnimatePresence>
+			{showCelebration && (
+				<div className="fixed inset-0 pointer-events-none z-50">
+					{[...Array(40)].map((_, i) => (
+						<motion.div
+							key={i}
+							initial={{ x: '50vw', y: '50vh', scale: 0 }}
+							animate={{
+								x: `${50 + (Math.random() - 0.5) * 100}vw`,
+								y: `${50 + (Math.random() - 0.5) * 100}vh`,
+								scale: [0, 1.5, 0],
+								rotate: Math.random() * 720,
+							}}
+							transition={{ duration: 1.2 + Math.random() * 0.5, ease: "easeOut" }}
+							className={`absolute w-2 h-2 rounded-full ${
+								['bg-emerald-400', 'bg-blue-400', 'bg-violet-400', 'bg-amber-400', 'bg-rose-400'][i % 5]
+							}`}
+						/>
+					))}
+				</div>
+			)}
+		</AnimatePresence>
+	);
 
 	return (
-		<div className='max-w-6xl mx-auto space-y-6'>
-			{/* Header */}
-			<div className='text-center mb-8'>
-				<div className='inline-flex items-center justify-center p-3 bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 rounded-full mb-4'>
-					<Sparkles className='h-8 w-8 text-purple-600 dark:text-purple-400' />
-				</div>
-				<h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-					AI-Powered Building Analysis
-				</h1>
-				<p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
-					Our AI will analyze your photos combined with location and environmental data for comprehensive assessment
-				</p>
-				<div className='mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto'>
-					<div className='p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg'>
-						<CheckCircle className='h-5 w-5 text-green-600 dark:text-green-400 mb-1' />
-						<p className='text-sm font-medium text-green-800 dark:text-green-200'>Save Time</p>
-						<p className='text-xs text-green-600 dark:text-green-400'>Skip manual form filling</p>
-					</div>
-					<div className='p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg'>
-						<Brain className='h-5 w-5 text-blue-600 dark:text-blue-400 mb-1' />
-						<p className='text-sm font-medium text-blue-800 dark:text-blue-200'>AI Accuracy</p>
-						<p className='text-xs text-blue-600 dark:text-blue-400'>Advanced vision analysis</p>
-					</div>
-					<div className='p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg'>
-						<Eye className='h-5 w-5 text-purple-600 dark:text-purple-400 mb-1' />
-						<p className='text-sm font-medium text-purple-800 dark:text-purple-200'>Transparency</p>
-						<p className='text-xs text-purple-600 dark:text-purple-400'>Review detected data</p>
-					</div>
-				</div>
-			</div>
+		<div className="min-h-[60vh] flex flex-col">
+			<Celebration />
 
-			{/* Uploaded Images Preview - Above Upload Area */}
-			{uploadedImages.length > 0 && (
-				<Card>
-					<CardHeader>
-						<CardTitle className='flex items-center justify-between'>
-							<span className='flex items-center gap-2'>
-								<ImageIcon className='h-5 w-5' />
-								Uploaded Photos ({uploadedImages.length}/10)
-							</span>
-							{uploadedImages.length > 0 && !isAnalyzing && (
-								<Button
-									size='sm'
-									variant='outline'
-									onClick={() => setUploadedImages([])}
-									className='text-red-600 hover:text-red-700'
+			{/* Hidden inputs */}
+			<input ref={fileRef} type="file" multiple accept="image/*" className="hidden"
+				onChange={(e) => handleUpload(e.target.files)} />
+			<input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden"
+				onChange={(e) => handleUpload(e.target.files)} />
+
+			{/* EMPTY STATE - Big bold camera */}
+			{!hasPhotos && !analyzing && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex-1 flex flex-col items-center justify-center px-4"
+				>
+					<motion.button
+						onClick={() => cameraRef.current?.click()}
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}
+						className="relative mb-8 group"
+					>
+						{/* Pulsing rings */}
+						<motion.div
+							animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+							transition={{ duration: 2, repeat: Infinity }}
+							className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-violet-500"
+						/>
+						<motion.div
+							animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0, 0.2] }}
+							transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+							className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-violet-500"
+						/>
+						{/* Main button */}
+						<div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 via-violet-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-violet-500/30 group-hover:shadow-violet-500/50 transition-shadow">
+							<Camera className="w-14 h-14 text-white" />
+						</div>
+					</motion.button>
+
+					<motion.h1
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.2 }}
+						className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
+					>
+						Snap your building
+					</motion.h1>
+
+					<motion.p
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.3 }}
+						className="text-gray-500 dark:text-gray-400 mb-8"
+					>
+						AI detects everything
+					</motion.p>
+
+					<motion.button
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.4 }}
+						onClick={() => fileRef.current?.click()}
+						className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4"
+					>
+						or upload from gallery
+					</motion.button>
+
+					<motion.button
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.5 }}
+						onClick={skip}
+						className="text-xs text-gray-400 hover:text-gray-600"
+					>
+						skip for now
+					</motion.button>
+				</motion.div>
+			)}
+
+			{/* PHOTOS STATE */}
+			{hasPhotos && !analyzing && !isComplete && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex-1 flex flex-col p-4"
+				>
+					{/* Photo grid */}
+					<div className="grid grid-cols-3 gap-2 mb-6">
+						{images.map((img, i) => (
+							<motion.div
+								key={img.id}
+								initial={{ scale: 0, rotate: -10 }}
+								animate={{ scale: 1, rotate: 0 }}
+								transition={{ delay: i * 0.05, type: "spring", stiffness: 400 }}
+								className="relative aspect-square rounded-2xl overflow-hidden group"
+							>
+								<img src={img.url} alt="" className="w-full h-full object-cover" />
+								<button
+									onClick={() => setImages(prev => prev.filter(p => p.id !== img.id))}
+									className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/70 hover:bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
 								>
-									Clear All
-								</Button>
-							)}
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4'>
-							{uploadedImages.map((image) => (
-								<div key={image.id} className='relative group'>
-									<div className='aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700'>
-										<img
-											src={image.url}
-											alt={image.name}
-											className='w-full h-full object-cover'
-										/>
-									</div>
-									<div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded-lg flex items-center justify-center'>
-										{!isAnalyzing && (
-											<Button
-												variant='destructive'
-												size='sm'
-												className='opacity-0 group-hover:opacity-100 transition-opacity'
-												onClick={() => removeImage(image.id)}
-											>
-												<X className='h-4 w-4' />
-											</Button>
-										)}
-									</div>
-									{image.analyzed && (
-										<div className='absolute top-2 right-2'>
-											<Badge variant='success' className='text-xs bg-green-600'>
-												<CheckCircle className='h-3 w-3 mr-1' />
-												Analyzed
-											</Badge>
-										</div>
-									)}
-									<div className='mt-2'>
-										<p className='text-xs text-gray-600 dark:text-gray-400 truncate'>
-											{image.name}
-										</p>
-										<p className='text-xs text-gray-500'>
-											{(image.size / 1024 / 1024).toFixed(1)}MB
-										</p>
-									</div>
+									<X className="w-3 h-3 text-white" />
+								</button>
+							</motion.div>
+						))}
+						{images.length < 10 && (
+							<motion.button
+								initial={{ scale: 0 }}
+								animate={{ scale: 1 }}
+								whileHover={{ scale: 1.05 }}
+								whileTap={{ scale: 0.95 }}
+								onClick={() => fileRef.current?.click()}
+								className="aspect-square rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-violet-400 flex items-center justify-center transition-colors"
+							>
+								<Plus className="w-8 h-8 text-gray-400" />
+							</motion.button>
+						)}
+					</div>
+
+					{/* Analyze button */}
+					<motion.div
+						initial={{ y: 20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.3 }}
+						className="mt-auto"
+					>
+						<Button
+							onClick={analyze}
+							size="lg"
+							className="w-full h-14 text-lg gap-3 bg-gradient-to-r from-blue-500 via-violet-500 to-purple-600 hover:opacity-90 shadow-xl shadow-violet-500/25"
+						>
+							<Sparkles className="w-5 h-5" />
+							Analyze with AI
+						</Button>
+					</motion.div>
+				</motion.div>
+			)}
+
+			{/* ANALYZING STATE */}
+			{analyzing && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex-1 flex flex-col items-center justify-center p-4"
+				>
+					{/* Scanning animation over photos */}
+					<div className="relative w-full max-w-xs mb-8">
+						<div className="grid grid-cols-3 gap-1.5 rounded-2xl overflow-hidden">
+							{images.slice(0, 6).map((img) => (
+								<div key={img.id} className="aspect-square relative overflow-hidden">
+									<img src={img.url} alt="" className="w-full h-full object-cover" />
 								</div>
 							))}
 						</div>
+						{/* Scan line */}
+						<motion.div
+							animate={{ top: ['0%', '100%', '0%'] }}
+							transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+							className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-violet-400 to-transparent shadow-lg shadow-violet-400"
+							style={{ filter: 'blur(2px)' }}
+						/>
+						{/* Glow overlay */}
+						<motion.div
+							animate={{ opacity: [0.1, 0.3, 0.1] }}
+							transition={{ duration: 1.5, repeat: Infinity }}
+							className="absolute inset-0 bg-gradient-to-b from-violet-500/20 to-blue-500/20 rounded-2xl"
+						/>
+					</div>
 
-						<div className='mt-6 flex justify-center'>
-							<Button
-								onClick={analyzeImages}
-								disabled={isAnalyzing || uploadedImages.length === 0}
-								size='lg'
-								className='gap-2'
-							>
-								{isAnalyzing ? (
-									<>
-										<Loader2 className='h-4 w-4 animate-spin' />
-										Analyzing...
-									</>
-								) : (
-									<>
-										<Zap className='h-4 w-4' />
-										Analyze with AI
-									</>
-								)}
-							</Button>
-						</div>
-					</CardContent>
-				</Card>
+					<motion.div
+						animate={{ scale: [1, 1.1, 1] }}
+						transition={{ duration: 1, repeat: Infinity }}
+						className="flex items-center gap-2 text-violet-600 dark:text-violet-400 mb-4"
+					>
+						<Loader2 className="w-5 h-5 animate-spin" />
+						<span className="font-medium">Analyzing...</span>
+					</motion.div>
+
+					{/* Progress bar */}
+					<div className="w-full max-w-xs h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+						<motion.div
+							className="h-full bg-gradient-to-r from-blue-500 to-violet-500"
+							initial={{ width: 0 }}
+							animate={{ width: `${progress}%` }}
+						/>
+					</div>
+				</motion.div>
 			)}
 
-			{/* Upload Area */}
-			<Card className='border-dashed border-2 border-gray-300 dark:border-gray-600'>
-				<CardHeader>
-					<CardTitle className='flex items-center gap-2'>
-						<Camera className='h-5 w-5 text-blue-600' />
-						{uploadedImages.length > 0 ? 'Add More Photos' : 'Upload Building Photos'}
-					</CardTitle>
-					<p className='text-sm text-gray-600 dark:text-gray-400'>
-						{uploadedImages.length > 0 
-							? `You've uploaded ${uploadedImages.length} photo${uploadedImages.length !== 1 ? 's' : ''}. Add more angles for better analysis.`
-							: 'Upload multiple angles of your building for comprehensive analysis. The more photos you provide, the more accurate our AI analysis will be.'
-						}
-					</p>
-				</CardHeader>
-				<CardContent>
-					<div
-						className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-							dragOver 
-								? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-105' 
-								: 'border-gray-300 dark:border-gray-600 hover:border-gray-400'
-						}`}
-						onDrop={handleDrop}
-						onDragOver={handleDragOver}
-						onDragLeave={handleDragLeave}
+			{/* COMPLETE STATE */}
+			{isComplete && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex-1 flex flex-col p-4"
+				>
+					{/* Success header */}
+					<motion.div
+						initial={{ scale: 0 }}
+						animate={{ scale: 1 }}
+						transition={{ type: "spring", stiffness: 300 }}
+						className="flex items-center justify-center gap-3 mb-6"
 					>
-						<div className='space-y-4'>
-							<div className='flex justify-center'>
-								<div className='p-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full'>
-									<Upload className='h-12 w-12 text-blue-600 dark:text-blue-400' />
-								</div>
-							</div>
-							<div>
-								<h3 className='text-lg font-medium text-gray-900 dark:text-white'>
-									Upload photos from different angles
-								</h3>
-								<p className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-									Supports JPG, PNG, WEBP, HEIC formats • Maximum 10MB per file • Up to 10 photos
-								</p>
-								<div className='grid grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-xs text-gray-600 dark:text-gray-400'>
-									<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded flex items-center gap-1'>
-										<Building className='h-3 w-3' /> Front View
-									</div>
-									<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded flex items-center gap-1'>
-										<Building className='h-3 w-3' /> Side Views
-									</div>
-									<div className='p-2 bg-gray-50 dark:bg-gray-800 rounded flex items-center gap-1'>
-										<Building className='h-3 w-3' /> Corner/Details
-									</div>
-								</div>
-							</div>
-							<div className='flex justify-center gap-3'>
-								<Button
-									variant='default'
-									onClick={() => document.getElementById('photo-upload').click()}
-									className='gap-2'
-								>
-									<Camera className='h-4 w-4' />
-									Choose Photos
-								</Button>
-								<Button
-									variant='outline'
-									onClick={() => document.getElementById('photo-upload').click()}
-									className='gap-2'
-								>
-									<FileImage className='h-4 w-4' />
-									Browse Files
-								</Button>
-							</div>
-							<input
-								id='photo-upload'
-								type='file'
-								multiple
-								accept='image/*'
-								className='hidden'
-								onChange={(e) => handleFileUpload(e.target.files)}
+						<div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+							<Check className="w-6 h-6 text-white" strokeWidth={3} />
+						</div>
+						<span className="text-xl font-bold text-gray-900 dark:text-white">Done!</span>
+					</motion.div>
+
+					{/* Results card */}
+					<motion.div
+						initial={{ y: 40, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.2 }}
+						className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-5 mb-6"
+					>
+						<div className="grid grid-cols-2 gap-4">
+							<ResultItem
+								label="Stories"
+								value={results?.buildingCharacteristics?.stories || '?'}
+								large
+							/>
+							<ResultItem
+								label="Type"
+								value={results?.buildingCharacteristics?.type?.split(' ')[0] || '?'}
+							/>
+							<ResultItem
+								label="Era"
+								value={results?.buildingCharacteristics?.constructionPeriod || '?'}
+							/>
+							<ResultItem
+								label="Condition"
+								value={results?.buildingCharacteristics?.materialCondition || '?'}
 							/>
 						</div>
-					</div>
+					</motion.div>
 
-					{/* Photo Guidelines */}
-					<div className='mt-6 grid grid-cols-1 md:grid-cols-2 gap-4'>
-						<div className='p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg'>
-							<h4 className='font-medium text-blue-900 dark:text-blue-200 mb-3 flex items-center gap-2'>
-								<Camera className='h-4 w-4' />
-								Recommended Photos
-							</h4>
-							<ul className='space-y-1.5 text-sm text-blue-800 dark:text-blue-300'>
-								<li className='flex items-center gap-2'>
-									<CheckCircle2 className='h-3 w-3 flex-shrink-0' />
-									Full building facade (front view)
-								</li>
-								<li className='flex items-center gap-2'>
-									<CheckCircle2 className='h-3 w-3 flex-shrink-0' />
-									Side views showing full height
-								</li>
-								<li className='flex items-center gap-2'>
-									<CheckCircle2 className='h-3 w-3 flex-shrink-0' />
-									Ground floor and foundation
-								</li>
-								<li className='flex items-center gap-2'>
-									<CheckCircle2 className='h-3 w-3 flex-shrink-0' />
-									Building corners and joints
-								</li>
-								<li className='flex items-center gap-2'>
-									<CheckCircle2 className='h-3 w-3 flex-shrink-0' />
-									Adjacent buildings (if any)
-								</li>
-								<li className='flex items-center gap-2'>
-									<CheckCircle2 className='h-3 w-3 flex-shrink-0' />
-									Visible structural elements
-								</li>
-							</ul>
-						</div>
-						<div className='p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg'>
-							<h4 className='font-medium text-amber-900 dark:text-amber-200 mb-3 flex items-center gap-2'>
-								<AlertTriangle className='h-4 w-4' />
-								Photo Tips for Best Results
-							</h4>
-							<ul className='space-y-1.5 text-sm text-amber-800 dark:text-amber-300'>
-								<li className='flex items-center gap-2'>
-									<Info className='h-3 w-3 flex-shrink-0' />
-									Take photos during daylight
-								</li>
-								<li className='flex items-center gap-2'>
-									<Info className='h-3 w-3 flex-shrink-0' />
-									Include entire building in frame
-								</li>
-								<li className='flex items-center gap-2'>
-									<Info className='h-3 w-3 flex-shrink-0' />
-									Avoid extreme angles or distortion
-								</li>
-								<li className='flex items-center gap-2'>
-									<Info className='h-3 w-3 flex-shrink-0' />
-									Clear photos without obstructions
-								</li>
-								<li className='flex items-center gap-2'>
-									<Info className='h-3 w-3 flex-shrink-0' />
-									Multiple angles for accuracy
-								</li>
-								<li className='flex items-center gap-2'>
-									<Info className='h-3 w-3 flex-shrink-0' />
-									High resolution preferred
-								</li>
-							</ul>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
+					{/* Actions */}
+					<motion.div
+						initial={{ y: 20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.4 }}
+						className="mt-auto space-y-3"
+					>
+						<Button
+							onClick={onNext}
+							size="lg"
+							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-emerald-500 to-green-500 hover:opacity-90 shadow-xl shadow-emerald-500/25"
+						>
+							Continue
+							<ArrowRight className="w-5 h-5" />
+						</Button>
+						<button
+							onClick={() => { setResults(null); setImages(prev => prev.map(img => ({ ...img, analyzed: false }))); }}
+							className="w-full text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center justify-center gap-1.5"
+						>
+							<RotateCcw className="w-3.5 h-3.5" />
+							Re-analyze
+						</button>
+					</motion.div>
+				</motion.div>
+			)}
 
-			{/* Error Display */}
+			{/* ERROR STATE */}
 			{error && (
-				<Card className='border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'>
-					<CardContent className='pt-6'>
-						<div className='flex items-start gap-3'>
-							<AlertCircle className='h-5 w-5 text-red-600 mt-0.5 flex-shrink-0' />
-							<div className='flex-1'>
-								<h4 className='font-medium text-red-800 dark:text-red-200'>
-									Error Occurred
-								</h4>
-								<p className='text-sm text-red-600 dark:text-red-400 mt-1'>
-									{error}
-								</p>
-								{detailedError && (
-									<details className='mt-3'>
-										<summary className='text-xs text-red-500 cursor-pointer hover:text-red-600'>
-											Show technical details (for developers)
-										</summary>
-										<pre className='mt-2 p-2 bg-red-100 dark:bg-red-900/30 rounded text-xs overflow-auto'>
-											{JSON.stringify(detailedError, null, 2)}
-										</pre>
-									</details>
-								)}
-							</div>
-						</div>
-					</CardContent>
-				</Card>
-			)}
-
-
-			{/* Analysis Progress with Stages */}
-			{isAnalyzing && (
-				<Card className='border-blue-200 dark:border-blue-800'>
-					<CardContent className='pt-6'>
-						<div className='space-y-4'>
-							<div className='flex items-center justify-between mb-2'>
-								<span className='font-medium text-blue-900 dark:text-blue-200'>
-									AI Analysis in Progress
-								</span>
-								<Badge variant='outline' className='gap-1'>
-									<Loader2 className='h-3 w-3 animate-spin' />
-									{analysisProgress}%
-								</Badge>
-							</div>
-							
-							<Progress value={analysisProgress} className='h-3' />
-							
-							{/* Stage Indicators */}
-							<div className='flex justify-between mt-4'>
-								{stages.map((stage, index) => {
-									const Icon = stage.icon;
-									const isActive = stage.id === analysisStage;
-									const isComplete = stages.findIndex(s => s.id === analysisStage) > index;
-									
-									return (
-										<div 
-											key={stage.id} 
-											className={`flex flex-col items-center text-xs ${
-												isActive ? 'text-blue-600 dark:text-blue-400' : 
-												isComplete ? 'text-green-600 dark:text-green-400' : 
-												'text-gray-400'
-											}`}
-										>
-											<div className={`p-2 rounded-full mb-1 ${
-												isActive ? 'bg-blue-100 dark:bg-blue-900/30' : 
-												isComplete ? 'bg-green-100 dark:bg-green-900/30' : 
-												'bg-gray-100 dark:bg-gray-800'
-											}`}>
-												<Icon className='h-4 w-4' />
-											</div>
-											<span className='text-center max-w-[80px]'>{stage.label}</span>
-										</div>
-									);
-								})}
-							</div>
-							
-							<p className='text-sm text-center text-gray-600 dark:text-gray-400 mt-2'>
-								{analysisStage === 'upload' && 'Uploading your images securely...'}
-								{analysisStage === 'prepare' && 'Optimizing images for AI analysis...'}
-								{analysisStage === 'analyze' && 'AI is analyzing your photos + Google Street View + environmental data...'}
-								{analysisStage === 'process' && 'Processing and structuring results...'}
-								{analysisStage === 'complete' && 'Finalizing analysis results...'}
-							</p>
-						</div>
-					</CardContent>
-				</Card>
-			)}
-
-			{/* Analysis Results - Simplified: Just show key detected data */}
-			{analysisResults && !analysisResults.error && (
-				<Card className='border-green-200 dark:border-green-800'>
-					<CardContent className='pt-6'>
-						{/* Success Header */}
-						<div className='flex items-center gap-3 mb-4'>
-							<div className='p-2 bg-green-100 dark:bg-green-900/30 rounded-full'>
-								<CheckCircle className='h-6 w-6 text-green-600' />
-							</div>
-							<div>
-								<h3 className='font-semibold text-green-800 dark:text-green-200'>
-									AI Analysis Complete
-								</h3>
-								<p className='text-sm text-green-600 dark:text-green-400'>
-									Detected building info from {uploadedImages.length} photo(s)
-								</p>
-							</div>
-							<Badge variant='outline' className='ml-auto'>
-								{analysisResults.confidence?.toUpperCase() || 'MEDIUM'}
-							</Badge>
-						</div>
-
-						{/* Key Extracted Data - Simple Grid */}
-						<div className='grid grid-cols-2 md:grid-cols-4 gap-3 mb-4'>
-							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
-								<div className='text-2xl font-bold text-gray-900 dark:text-white'>
-									{analysisResults.buildingCharacteristics?.stories || '?'}
-								</div>
-								<div className='text-xs text-gray-500'>Stories</div>
-							</div>
-							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
-								<div className='text-sm font-medium text-gray-900 dark:text-white truncate'>
-									{analysisResults.buildingCharacteristics?.type?.split(' ')[0] || 'Unknown'}
-								</div>
-								<div className='text-xs text-gray-500'>Type</div>
-							</div>
-							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
-								<div className='text-sm font-medium text-gray-900 dark:text-white'>
-									{analysisResults.buildingCharacteristics?.constructionPeriod || 'Unknown'}
-								</div>
-								<div className='text-xs text-gray-500'>Era</div>
-							</div>
-							<div className='p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-center'>
-								<div className='text-sm font-medium text-gray-900 dark:text-white capitalize'>
-									{analysisResults.buildingCharacteristics?.materialCondition || 'Unknown'}
-								</div>
-								<div className='text-xs text-gray-500'>Condition</div>
-							</div>
-						</div>
-
-						{/* Simple info message */}
-						<p className='text-sm text-gray-600 dark:text-gray-400 text-center'>
-							You'll confirm these details in the next step
-						</p>
-					</CardContent>
-				</Card>
-			)}
-
-			{/* Navigation */}
-			<div className='flex justify-between pt-4'>
-				<Link href='/assessment/1'>
-					<Button variant='outline' className='gap-2'>
-						<ArrowLeft className='h-4 w-4' /> Back
-					</Button>
-				</Link>
-
-				<Button
-					onClick={onNext}
-					disabled={!canProceed}
-					className='gap-2'
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					className="mx-4 mb-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800"
 				>
-					{canProceed ? 'Continue with AI Data' : 'Analyze Photos First'}
-					<ArrowRight className='h-4 w-4' />
-				</Button>
-			</div>
+					<p className="text-sm text-red-600 dark:text-red-400 mb-3">{error}</p>
+					<div className="flex gap-2">
+						<Button size="sm" variant="outline" onClick={() => setError(null)}>
+							Try again
+						</Button>
+						<Button size="sm" variant="ghost" onClick={skip}>
+							Skip
+						</Button>
+					</div>
+				</motion.div>
+			)}
+
+			{/* Minimal footer nav */}
+			{!analyzing && (
+				<div className="flex justify-between items-center px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+					<Link href="/assessment/2" className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+						Back
+					</Link>
+					{!isComplete && hasPhotos && (
+						<button onClick={skip} className="text-sm text-gray-400 hover:text-gray-600">
+							Skip
+						</button>
+					)}
+				</div>
+			)}
 		</div>
 	);
 };
+
+// Simple result item component
+const ResultItem = ({ label, value, large }) => (
+	<div className="text-center">
+		<div className={`font-bold text-gray-900 dark:text-white ${large ? 'text-3xl' : 'text-lg'} capitalize`}>
+			{value}
+		</div>
+		<div className="text-xs text-gray-500 uppercase tracking-wide">{label}</div>
+	</div>
+);
 
 export default AIPhotoStep;
