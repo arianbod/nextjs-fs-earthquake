@@ -5,437 +5,352 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useUserInput } from '@/context/UserInputContext';
 import {
-	Building,
-	Layers,
-	Calendar,
-	ArrowRight,
-	ArrowLeft,
-	CheckCircle2,
-	Sparkles,
-	ChevronDown,
-	HelpCircle
+	Building2, Layers, Calendar, ArrowRight, Check, Pencil,
+	ChevronDown, ChevronUp
 } from 'lucide-react';
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-} from '@/components/ui/card';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+	Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
-/**
- * BuildingInfoCombined - Single form combining building type, stories, year, modifications
- *
- * Combines old steps 4 (BuildingInfo), 5 (StructuralSystem), and 6 (Irregularity)
- * into one clean, simple form with AI suggestions.
- */
-
-// Building types as simple options (not cards)
 const buildingTypes = [
-	{ value: 'reinforced-concrete', label: 'Reinforced Concrete', description: 'Concrete with steel reinforcement' },
-	{ value: 'steel', label: 'Steel Structure', description: 'Steel frame construction' },
-	{ value: 'masonry', label: 'Masonry/Brick', description: 'Brick, stone, or block construction' },
-	{ value: 'timber', label: 'Timber/Wood', description: 'Wooden frame construction' },
-	{ value: 'mixed', label: 'Mixed Construction', description: 'Combination of materials' },
+	{ value: 'reinforced-concrete', label: 'Reinforced Concrete' },
+	{ value: 'steel', label: 'Steel Structure' },
+	{ value: 'masonry', label: 'Masonry/Brick' },
+	{ value: 'timber', label: 'Timber/Wood' },
+	{ value: 'mixed', label: 'Mixed Construction' },
 ];
 
-// Map AI's descriptive building type to dropdown value
 const mapAiBuildingType = (aiType) => {
 	if (!aiType) return null;
 	const lower = aiType.toLowerCase();
-
-	// Check for timber/wood
-	if (lower.includes('timber') || lower.includes('wood') || lower.includes('wooden')) {
-		return 'timber';
-	}
-	// Check for steel
-	if (lower.includes('steel') && !lower.includes('reinforc')) {
-		return 'steel';
-	}
-	// Check for reinforced concrete
-	if (lower.includes('reinforced') || lower.includes('concrete') || lower.includes('rc ') || lower.includes('rcc')) {
-		return 'reinforced-concrete';
-	}
-	// Check for masonry/brick
-	if (lower.includes('masonry') || lower.includes('brick') || lower.includes('stone') || lower.includes('block')) {
-		return 'masonry';
-	}
-	// Check for mixed
-	if (lower.includes('mixed') || lower.includes('combination') || lower.includes('hybrid')) {
-		return 'mixed';
-	}
-	// If timber + masonry mentioned together, it's likely timber frame with masonry infill
-	if (lower.includes('frame') && lower.includes('infill')) {
-		return 'timber';
-	}
-
+	if (lower.includes('timber') || lower.includes('wood')) return 'timber';
+	if (lower.includes('steel') && !lower.includes('reinforc')) return 'steel';
+	if (lower.includes('reinforced') || lower.includes('concrete') || lower.includes('rc')) return 'reinforced-concrete';
+	if (lower.includes('masonry') || lower.includes('brick') || lower.includes('stone')) return 'masonry';
+	if (lower.includes('mixed') || lower.includes('hybrid')) return 'mixed';
 	return null;
 };
 
-const BuildingInfoCombined = ({ onNext, onBack }) => {
+const BuildingInfoCombined = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
+	const [mode, setMode] = useState('confirm'); // confirm, edit
 	const [showAdvanced, setShowAdvanced] = useState(false);
-	const [aiSuggestionAccepted, setAiSuggestionAccepted] = useState(false);
 
-	// Check if we have AI-detected data from photo analysis or location
 	const hasAiData = userInput.aiAnalysisData || userInput.aiAnalysisComplete;
-	const hasLocationData = userInput.streetViewData || userInput.structuralNotes;
 
-	// Generate AI suggestion from ALL collected data
-	const getAiSuggestion = () => {
-		const suggestions = {};
-		let rawBuildingType = null; // Store raw AI description for display
-
-		// From AI photo analysis (primary source)
+	// Get AI suggestions
+	const getAiData = () => {
+		const data = {};
 		if (userInput.aiAnalysisData) {
-			const data = userInput.aiAnalysisData;
-
-			// Get raw building type for display
-			rawBuildingType = data.buildingType || data.buildingCharacteristics?.type || data.buildingCharacteristics?.structuralSystem;
-
-			// Map AI building type to dropdown value
-			const mappedType = mapAiBuildingType(rawBuildingType);
-			if (mappedType) suggestions.buildingType = mappedType;
-
-			if (data.numberOfStories) suggestions.numberOfStories = data.numberOfStories;
-			if (data.structuralSystem) suggestions.structuralSystem = data.structuralSystem;
-			if (data.constructionPeriod) suggestions.constructionPeriod = data.constructionPeriod;
-			if (data.materialCondition) suggestions.materialCondition = data.materialCondition;
-
-			// From buildingCharacteristics nested object
-			if (data.buildingCharacteristics) {
-				const chars = data.buildingCharacteristics;
-				if (chars.stories && !suggestions.numberOfStories) suggestions.numberOfStories = chars.stories;
-				if (!suggestions.buildingType && chars.structuralSystem) {
-					const mappedFromChars = mapAiBuildingType(chars.structuralSystem);
-					if (mappedFromChars) suggestions.buildingType = mappedFromChars;
-				}
-				if (chars.constructionPeriod) {
-					const match = chars.constructionPeriod.match(/\d{4}/);
-					if (match) suggestions.yearOfConstruction = match[0];
-				}
+			const ai = userInput.aiAnalysisData;
+			const rawType = ai.buildingType || ai.buildingCharacteristics?.type;
+			data.buildingType = mapAiBuildingType(rawType);
+			data.numberOfStories = ai.numberOfStories || ai.buildingCharacteristics?.stories;
+			data.constructionPeriod = ai.constructionPeriod || ai.buildingCharacteristics?.constructionPeriod;
+			if (data.constructionPeriod) {
+				const match = data.constructionPeriod.match(/\d{4}/);
+				if (match) data.yearOfConstruction = match[0];
 			}
 		}
-
-		// From street view AI analysis (secondary)
-		if (userInput.streetViewData?.analysis?.estimatedCharacteristics) {
-			const sv = userInput.streetViewData.analysis.estimatedCharacteristics;
-			if (sv.estimatedType && !suggestions.buildingType) {
-				const mappedFromSv = mapAiBuildingType(sv.estimatedType);
-				if (mappedFromSv) suggestions.buildingType = mappedFromSv;
-			}
-			if (sv.ageEstimationContext && !suggestions.constructionPeriod) suggestions.constructionPeriod = sv.ageEstimationContext;
+		if (userInput.numberOfStories && !data.numberOfStories) {
+			data.numberOfStories = userInput.numberOfStories;
 		}
-
-		// From location-based detection (fallback)
-		if (userInput.numberOfStories && !suggestions.numberOfStories) {
-			suggestions.numberOfStories = userInput.numberOfStories;
-		}
-		if (userInput.buildingType && !suggestions.buildingType) {
-			// Check if it's already a valid dropdown value
-			const isValidValue = buildingTypes.some(t => t.value === userInput.buildingType);
-			if (isValidValue) {
-				suggestions.buildingType = userInput.buildingType;
-			} else {
-				const mapped = mapAiBuildingType(userInput.buildingType);
-				if (mapped) suggestions.buildingType = mapped;
-			}
-		}
-
-		// Store raw description for display in suggestion box
-		if (rawBuildingType) suggestions.rawBuildingTypeDescription = rawBuildingType;
-
-		return Object.keys(suggestions).length > 0 ? suggestions : null;
+		return data;
 	};
 
-	const aiSuggestion = getAiSuggestion();
+	const aiData = getAiData();
 
-	// Auto-apply AI suggestions on mount if available
+	// Auto-apply AI data on mount
 	useEffect(() => {
-		if (aiSuggestion && !aiSuggestionAccepted && !userInput.aiSuggestionApplied) {
-			// Auto-fill form with AI data
-			updateUserInput({
-				...aiSuggestion,
-				aiSuggestionApplied: true
-			});
+		if (hasAiData && !userInput.aiDataApplied) {
+			const data = getAiData();
+			if (Object.keys(data).length > 0) {
+				updateUserInput({ ...data, aiDataApplied: true });
+			}
 		}
 	}, []);
 
-	// Accept AI suggestion (explicit confirmation)
-	const acceptAiSuggestion = () => {
-		if (aiSuggestion) {
-			updateUserInput({
-				...aiSuggestion,
-				aiSuggestionAccepted: true
-			});
-			setAiSuggestionAccepted(true);
-		}
-	};
-
-	// Handle form field changes
 	const handleChange = (field, value) => {
 		updateUserInput({ [field]: value });
 	};
 
-	// Validate form
-	const isValid = userInput.buildingType && userInput.numberOfStories;
+	const handleConfirm = () => {
+		onNext();
+	};
 
-	// Check if AI has populated the data
-	const hasAiPopulatedData = hasAiData && (userInput.buildingType || userInput.numberOfStories);
+	const isValid = userInput.buildingType && userInput.numberOfStories;
+	const displayStories = userInput.numberOfStories || aiData.numberOfStories || '?';
+	const displayType = buildingTypes.find(t => t.value === (userInput.buildingType || aiData.buildingType))?.label || 'Unknown';
+	const displayYear = userInput.yearOfConstruction || aiData.yearOfConstruction || '?';
 
 	return (
-		<div className="max-w-xl mx-auto">
-			{/* Header */}
-			<div className="text-center mb-6">
-				<div className="inline-flex items-center justify-center p-2 bg-green-100 dark:bg-green-900/30 rounded-full mb-3">
-					{hasAiPopulatedData ? (
-						<CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-					) : (
-						<Building className="h-6 w-6 text-green-600 dark:text-green-400" />
-					)}
-				</div>
-				<h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-					{hasAiPopulatedData ? 'Confirm Building Details' : 'Tell us about your building'}
-				</h1>
-				<p className="text-gray-600 dark:text-gray-400">
-					{hasAiPopulatedData
-						? 'We detected these details from your photos - please verify'
-						: 'A few quick questions for an accurate assessment'
-					}
-				</p>
-			</div>
+		<div className="min-h-[60vh] flex flex-col">
+			{/* AI CONFIRMATION MODE */}
+			{hasAiData && mode === 'confirm' && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex-1 flex flex-col items-center justify-center px-4 py-8"
+				>
+					{/* Success icon */}
+					<motion.div
+						initial={{ scale: 0 }}
+						animate={{ scale: 1 }}
+						transition={{ type: "spring", stiffness: 300 }}
+						className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mb-6 shadow-xl shadow-violet-500/30"
+					>
+						<Check className="w-10 h-10 text-white" strokeWidth={3} />
+					</motion.div>
 
-			<Card className="shadow-sm">
-				<CardContent className="pt-6 space-y-6">
-					{/* AI Suggestion Box (if available) */}
-					{aiSuggestion && !aiSuggestionAccepted && (
-						<div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-							<div className="flex items-start gap-3">
-								<Sparkles className="h-5 w-5 text-purple-500 mt-0.5" />
-								<div className="flex-1">
-									<h3 className="font-medium text-purple-900 dark:text-purple-200 mb-1">
-										AI Detected Your Building
-									</h3>
-									<p className="text-sm text-purple-700 dark:text-purple-300 mb-3">
-										Based on location and photos, we detected:
-										{aiSuggestion.numberOfStories && ` ${aiSuggestion.numberOfStories} stories`}
-										{aiSuggestion.buildingType && `, ${aiSuggestion.buildingType}`}
-										{aiSuggestion.yearOfConstruction && `, built ~${aiSuggestion.yearOfConstruction}`}
-									</p>
-									<div className="flex gap-2">
-										<Button
-											size="sm"
-											onClick={acceptAiSuggestion}
-											className="bg-purple-600 hover:bg-purple-700"
-										>
-											<CheckCircle2 className="h-4 w-4 mr-1" />
-											Accept
-										</Button>
-										<Button
-											size="sm"
-											variant="outline"
-											onClick={() => setAiSuggestionAccepted(true)}
-										>
-											Edit Manually
-										</Button>
-									</div>
+					<motion.h1
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.1 }}
+						className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
+					>
+						AI detected your building
+					</motion.h1>
+
+					<motion.p
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.2 }}
+						className="text-gray-500 dark:text-gray-400 mb-8"
+					>
+						Does this look right?
+					</motion.p>
+
+					{/* Detection card */}
+					<motion.div
+						initial={{ y: 30, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.3 }}
+						className="w-full max-w-sm bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-6 mb-8"
+					>
+						<div className="grid grid-cols-3 gap-4 text-center">
+							<div>
+								<Layers className="w-6 h-6 mx-auto mb-2 text-violet-500" />
+								<div className="text-2xl font-bold text-gray-900 dark:text-white">
+									{displayStories}
 								</div>
+								<div className="text-xs text-gray-500 uppercase">Stories</div>
+							</div>
+							<div>
+								<Building2 className="w-6 h-6 mx-auto mb-2 text-violet-500" />
+								<div className="text-sm font-bold text-gray-900 dark:text-white">
+									{displayType.split(' ')[0]}
+								</div>
+								<div className="text-xs text-gray-500 uppercase">Type</div>
+							</div>
+							<div>
+								<Calendar className="w-6 h-6 mx-auto mb-2 text-violet-500" />
+								<div className="text-lg font-bold text-gray-900 dark:text-white">
+									{displayYear}
+								</div>
+								<div className="text-xs text-gray-500 uppercase">Built</div>
 							</div>
 						</div>
-					)}
+					</motion.div>
 
-					{/* Building Type */}
-					<div className="space-y-2">
-						<Label htmlFor="buildingType" className="flex items-center gap-2">
-							Building Type
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger>
-										<HelpCircle className="h-4 w-4 text-gray-400" />
-									</TooltipTrigger>
-									<TooltipContent>
-										<p className="max-w-xs">Select the main structural material of your building</p>
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-						</Label>
-						<Select
-							value={userInput.buildingType || ''}
-							onValueChange={(value) => handleChange('buildingType', value)}
-						>
-							<SelectTrigger id="buildingType">
-								<SelectValue placeholder="Select building type" />
-							</SelectTrigger>
-							<SelectContent>
-								{buildingTypes.map((type) => (
-									<SelectItem key={type.value} value={type.value}>
-										<div className="flex flex-col">
-											<span>{type.label}</span>
-											<span className="text-xs text-gray-500">{type.description}</span>
-										</div>
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</div>
-
-					{/* Number of Stories */}
-					<div className="space-y-2">
-						<Label htmlFor="numberOfStories" className="flex items-center gap-2">
-							<Layers className="h-4 w-4 text-gray-500" />
-							Number of Stories
-						</Label>
-						<Input
-							id="numberOfStories"
-							type="number"
-							min="1"
-							max="100"
-							placeholder="e.g., 4"
-							value={userInput.numberOfStories || ''}
-							onChange={(e) => handleChange('numberOfStories', e.target.value)}
-							className="w-full"
-						/>
-					</div>
-
-					{/* Year Built */}
-					<div className="space-y-2">
-						<Label htmlFor="yearOfConstruction" className="flex items-center gap-2">
-							<Calendar className="h-4 w-4 text-gray-500" />
-							Year Built (approximate)
-						</Label>
-						<Input
-							id="yearOfConstruction"
-							type="number"
-							min="1900"
-							max={new Date().getFullYear()}
-							placeholder="e.g., 2005"
-							value={userInput.yearOfConstruction || ''}
-							onChange={(e) => handleChange('yearOfConstruction', e.target.value)}
-							className="w-full"
-						/>
-					</div>
-
-					{/* Modifications Question */}
-					<div className="space-y-2">
-						<Label className="flex items-center gap-2">
-							Any structural modifications?
-							<TooltipProvider>
-								<Tooltip>
-									<TooltipTrigger>
-										<HelpCircle className="h-4 w-4 text-gray-400" />
-									</TooltipTrigger>
-									<TooltipContent>
-										<p className="max-w-xs">Additions, floor removals, or major renovations</p>
-									</TooltipContent>
-								</Tooltip>
-							</TooltipProvider>
-						</Label>
-						<RadioGroup
-							value={userInput.hasModifications || 'no'}
-							onValueChange={(value) => handleChange('hasModifications', value)}
-							className="flex gap-4"
-						>
-							<div className="flex items-center space-x-2">
-								<RadioGroupItem value="no" id="mod-no" />
-								<Label htmlFor="mod-no" className="font-normal cursor-pointer">No</Label>
-							</div>
-							<div className="flex items-center space-x-2">
-								<RadioGroupItem value="yes" id="mod-yes" />
-								<Label htmlFor="mod-yes" className="font-normal cursor-pointer">Yes</Label>
-							</div>
-						</RadioGroup>
-					</div>
-
-					{/* Advanced Options (collapsed by default) */}
-					<Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-						<CollapsibleTrigger asChild>
-							<Button variant="ghost" className="w-full justify-between px-0 hover:bg-transparent">
-								<span className="text-sm text-gray-500">
-									Advanced options (optional)
-								</span>
-								<ChevronDown className={`h-4 w-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
-							</Button>
-						</CollapsibleTrigger>
-						<CollapsibleContent className="space-y-4 pt-4">
-							{/* Irregularity */}
-							<div className="space-y-2">
-								<Label>Plan Shape Irregularity</Label>
-								<Select
-									value={userInput.planIrregularity || ''}
-									onValueChange={(value) => handleChange('planIrregularity', value)}
-								>
-									<SelectTrigger>
-										<SelectValue placeholder="Select if applicable" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="regular">Regular (rectangular)</SelectItem>
-										<SelectItem value="l-shaped">L-Shaped</SelectItem>
-										<SelectItem value="u-shaped">U-Shaped</SelectItem>
-										<SelectItem value="irregular">Irregular/Complex</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-
-							{/* Basement */}
-							<div className="space-y-2">
-								<Label htmlFor="numberOfBasement">Basement Floors</Label>
-								<Input
-									id="numberOfBasement"
-									type="number"
-									min="0"
-									max="10"
-									placeholder="e.g., 1"
-									value={userInput.numberOfBasement || ''}
-									onChange={(e) => handleChange('numberOfBasement', e.target.value)}
-								/>
-							</div>
-						</CollapsibleContent>
-					</Collapsible>
-				</CardContent>
-
-				<CardFooter className="flex justify-between border-t pt-4">
-					<Link href="/assessment/2">
-						<Button variant="outline" className="gap-1">
-							<ArrowLeft className="h-4 w-4" /> Back to Photos
-						</Button>
-					</Link>
-					<Button
-						onClick={onNext}
-						disabled={!isValid}
-						className="gap-2"
+					{/* Action buttons */}
+					<motion.div
+						initial={{ y: 20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.4 }}
+						className="w-full max-w-sm space-y-3"
 					>
-						{hasAiPopulatedData ? 'Confirm & Continue' : 'Continue'} <ArrowRight className="h-4 w-4" />
-					</Button>
-				</CardFooter>
-			</Card>
+						<Button
+							onClick={handleConfirm}
+							disabled={!isValid}
+							size="lg"
+							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:opacity-90 shadow-xl shadow-violet-500/25"
+						>
+							<Check className="w-5 h-5" />
+							Looks right
+						</Button>
+						<button
+							onClick={() => setMode('edit')}
+							className="w-full text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center justify-center gap-1.5 py-2"
+						>
+							<Pencil className="w-3.5 h-3.5" />
+							Edit details
+						</button>
+					</motion.div>
+				</motion.div>
+			)}
 
-			{/* Progress indicator */}
-			<p className="text-center text-xs text-gray-500 mt-4">
-				Step 3 of 4
-			</p>
+			{/* EDIT MODE (or no AI data) */}
+			{(!hasAiData || mode === 'edit') && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="flex-1 flex flex-col p-4"
+				>
+					{/* Header */}
+					<div className="text-center mb-6">
+						<motion.div
+							initial={{ scale: 0 }}
+							animate={{ scale: 1 }}
+							className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/25"
+						>
+							<Building2 className="w-8 h-8 text-white" />
+						</motion.div>
+						<h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+							Building details
+						</h1>
+						<p className="text-sm text-gray-500">
+							{hasAiData ? 'Correct any details below' : 'Tell us about your building'}
+						</p>
+					</div>
+
+					{/* Form */}
+					<div className="space-y-4 mb-6">
+						{/* Building Type */}
+						<div>
+							<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+								Building Type
+							</label>
+							<Select
+								value={userInput.buildingType || ''}
+								onValueChange={(v) => handleChange('buildingType', v)}
+							>
+								<SelectTrigger className="h-12">
+									<SelectValue placeholder="Select type" />
+								</SelectTrigger>
+								<SelectContent>
+									{buildingTypes.map((type) => (
+										<SelectItem key={type.value} value={type.value}>
+											{type.label}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+						</div>
+
+						{/* Stories */}
+						<div>
+							<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+								Number of Stories
+							</label>
+							<Input
+								type="number"
+								min="1"
+								max="100"
+								placeholder="e.g., 4"
+								value={userInput.numberOfStories || ''}
+								onChange={(e) => handleChange('numberOfStories', e.target.value)}
+								className="h-12"
+							/>
+						</div>
+
+						{/* Year */}
+						<div>
+							<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+								Year Built (approximate)
+							</label>
+							<Input
+								type="number"
+								min="1900"
+								max={new Date().getFullYear()}
+								placeholder="e.g., 2005"
+								value={userInput.yearOfConstruction || ''}
+								onChange={(e) => handleChange('yearOfConstruction', e.target.value)}
+								className="h-12"
+							/>
+						</div>
+
+						{/* Advanced toggle */}
+						<button
+							onClick={() => setShowAdvanced(!showAdvanced)}
+							className="flex items-center justify-between w-full py-2 text-sm text-gray-500 hover:text-gray-700"
+						>
+							<span>More options</span>
+							{showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+						</button>
+
+						<AnimatePresence>
+							{showAdvanced && (
+								<motion.div
+									initial={{ height: 0, opacity: 0 }}
+									animate={{ height: 'auto', opacity: 1 }}
+									exit={{ height: 0, opacity: 0 }}
+									className="space-y-4 overflow-hidden"
+								>
+									{/* Modifications */}
+									<div>
+										<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+											Structural modifications?
+										</label>
+										<div className="flex gap-3">
+											{['no', 'yes'].map((v) => (
+												<button
+													key={v}
+													onClick={() => handleChange('hasModifications', v)}
+													className={`flex-1 py-3 rounded-xl border-2 transition-all ${
+														userInput.hasModifications === v
+															? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20'
+															: 'border-gray-200 dark:border-gray-700'
+													}`}
+												>
+													<span className="capitalize">{v}</span>
+												</button>
+											))}
+										</div>
+									</div>
+
+									{/* Basement */}
+									<div>
+										<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
+											Basement floors
+										</label>
+										<Input
+											type="number"
+											min="0"
+											max="10"
+											placeholder="0"
+											value={userInput.numberOfBasement || ''}
+											onChange={(e) => handleChange('numberOfBasement', e.target.value)}
+											className="h-12"
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</div>
+
+					{/* Actions */}
+					<div className="mt-auto space-y-3">
+						<Button
+							onClick={onNext}
+							disabled={!isValid}
+							size="lg"
+							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:opacity-90 shadow-xl shadow-violet-500/25"
+						>
+							Continue
+							<ArrowRight className="w-5 h-5" />
+						</Button>
+						{hasAiData && (
+							<button
+								onClick={() => setMode('confirm')}
+								className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
+							>
+								Back to summary
+							</button>
+						)}
+					</div>
+				</motion.div>
+			)}
+
+			{/* Footer nav */}
+			<div className="flex justify-between items-center px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+				<Link href="/assessment/2" className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+					Back
+				</Link>
+				<span className="text-xs text-gray-400">Step 3 of 4</span>
+			</div>
 		</div>
 	);
 };

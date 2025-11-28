@@ -5,364 +5,300 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useUserInput } from '@/context/UserInputContext';
 import {
-	ArrowRight,
-	ArrowLeft,
-	ChevronDown,
-	Ruler,
-	Building2,
-	Weight,
-	FileImage,
-	CheckCircle2,
-	SkipForward
+	ArrowRight, ChevronDown, Ruler, Building2, Weight, Sparkles, Check
 } from 'lucide-react';
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-	CardDescription,
-} from '@/components/ui/card';
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
+	Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
-/**
- * OptionalDetailsStep - Accordion-style optional details
- *
- * Combines old steps 7-11 into collapsible sections.
- * All optional - user can skip entirely for faster assessment.
- * Better data = more accurate results.
- */
-
-const OptionalDetailsStep = ({ onNext, onBack }) => {
+const OptionalDetailsStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
-	const [openSections, setOpenSections] = useState({});
+	const [expandedSection, setExpandedSection] = useState(null);
 	const [completedSections, setCompletedSections] = useState({});
-
-	const toggleSection = (section) => {
-		setOpenSections(prev => ({
-			...prev,
-			[section]: !prev[section]
-		}));
-	};
-
-	const markSectionComplete = (section) => {
-		setCompletedSections(prev => ({
-			...prev,
-			[section]: true
-		}));
-		setOpenSections(prev => ({
-			...prev,
-			[section]: false
-		}));
-	};
 
 	const handleChange = (field, value) => {
 		updateUserInput({ [field]: value });
 	};
 
-	// Count completed sections
+	const toggleSection = (id) => {
+		setExpandedSection(expandedSection === id ? null : id);
+	};
+
+	const markDone = (id) => {
+		setCompletedSections(prev => ({ ...prev, [id]: true }));
+		setExpandedSection(null);
+	};
+
 	const completedCount = Object.values(completedSections).filter(Boolean).length;
 
-	// Section configurations
 	const sections = [
 		{
 			id: 'dimensions',
 			icon: Ruler,
-			title: 'Building Dimensions',
-			description: 'Length, width, and floor heights',
+			title: 'Dimensions',
+			subtitle: 'Building size',
 			content: (
-				<div className="space-y-4">
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-2">
-							<Label htmlFor="buildingLength">Length (m)</Label>
+				<div className="space-y-3">
+					<div className="grid grid-cols-2 gap-3">
+						<div>
+							<label className="text-xs text-gray-500 mb-1 block">Length (m)</label>
 							<Input
-								id="buildingLength"
 								type="number"
-								placeholder="e.g., 20"
+								placeholder="20"
 								value={userInput.buildingLength || ''}
 								onChange={(e) => handleChange('buildingLength', e.target.value)}
 							/>
 						</div>
-						<div className="space-y-2">
-							<Label htmlFor="buildingWidth">Width (m)</Label>
+						<div>
+							<label className="text-xs text-gray-500 mb-1 block">Width (m)</label>
 							<Input
-								id="buildingWidth"
 								type="number"
-								placeholder="e.g., 15"
+								placeholder="15"
 								value={userInput.buildingWidth || ''}
 								onChange={(e) => handleChange('buildingWidth', e.target.value)}
 							/>
 						</div>
 					</div>
-					<div className="space-y-2">
-						<Label htmlFor="floorHeight">Typical Floor Height (m)</Label>
+					<div>
+						<label className="text-xs text-gray-500 mb-1 block">Floor height (m)</label>
 						<Input
-							id="floorHeight"
 							type="number"
 							step="0.1"
-							placeholder="e.g., 3.0"
+							placeholder="3.0"
 							value={userInput.floorHeight || ''}
 							onChange={(e) => handleChange('floorHeight', e.target.value)}
 						/>
 					</div>
-					<Button
-						size="sm"
-						variant="outline"
-						onClick={() => markSectionComplete('dimensions')}
-						className="w-full"
+					<button
+						onClick={() => markDone('dimensions')}
+						className="w-full py-2 text-sm text-violet-600 hover:text-violet-700 flex items-center justify-center gap-1"
 					>
-						<CheckCircle2 className="h-4 w-4 mr-2" />
-						Done with dimensions
-					</Button>
+						<Check className="w-4 h-4" /> Done
+					</button>
 				</div>
 			)
 		},
 		{
 			id: 'neighbors',
 			icon: Building2,
-			title: 'Neighboring Buildings',
-			description: 'Adjacent structures that may affect your building',
+			title: 'Neighbors',
+			subtitle: 'Adjacent buildings',
 			content: (
-				<div className="space-y-4">
-					<div className="space-y-2">
-						<Label>Adjacent building situation</Label>
-						<Select
-							value={userInput.adjacentBuildingRisk || ''}
-							onValueChange={(value) => handleChange('adjacentBuildingRisk', value)}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Select situation" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="none">No adjacent buildings (standalone)</SelectItem>
-								<SelectItem value="similar">Similar height neighbors</SelectItem>
-								<SelectItem value="taller">Taller building nearby</SelectItem>
-								<SelectItem value="shorter">Shorter building nearby</SelectItem>
-								<SelectItem value="gap">Small gap between buildings</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="separationDistance">Separation distance (m)</Label>
+				<div className="space-y-3">
+					<Select
+						value={userInput.adjacentBuildingRisk || ''}
+						onValueChange={(v) => handleChange('adjacentBuildingRisk', v)}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select situation" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="none">Standalone (no neighbors)</SelectItem>
+							<SelectItem value="similar">Similar height neighbors</SelectItem>
+							<SelectItem value="taller">Taller building nearby</SelectItem>
+							<SelectItem value="shorter">Shorter building nearby</SelectItem>
+						</SelectContent>
+					</Select>
+					<div>
+						<label className="text-xs text-gray-500 mb-1 block">Gap distance (m)</label>
 						<Input
-							id="separationDistance"
 							type="number"
 							step="0.1"
-							placeholder="e.g., 2.5"
+							placeholder="2.5"
 							value={userInput.separationDistance || ''}
 							onChange={(e) => handleChange('separationDistance', e.target.value)}
 						/>
 					</div>
-					<Button
-						size="sm"
-						variant="outline"
-						onClick={() => markSectionComplete('neighbors')}
-						className="w-full"
+					<button
+						onClick={() => markDone('neighbors')}
+						className="w-full py-2 text-sm text-violet-600 hover:text-violet-700 flex items-center justify-center gap-1"
 					>
-						<CheckCircle2 className="h-4 w-4 mr-2" />
-						Done with neighbors
-					</Button>
+						<Check className="w-4 h-4" /> Done
+					</button>
 				</div>
 			)
 		},
 		{
 			id: 'loads',
 			icon: Weight,
-			title: 'Extra Loads',
-			description: 'Water tanks, solar panels, heavy equipment',
+			title: 'Extra loads',
+			subtitle: 'Rooftop items',
 			content: (
-				<div className="space-y-4">
-					<div className="space-y-3">
-						<Label>Check all that apply:</Label>
-						<div className="space-y-2">
-							{[
-								{ id: 'waterTank', label: 'Rooftop water tank' },
-								{ id: 'solarPanels', label: 'Solar panels' },
-								{ id: 'heavyEquipment', label: 'Heavy mechanical equipment' },
-								{ id: 'roofGarden', label: 'Roof garden/terrace' },
-								{ id: 'signage', label: 'Large signage/billboards' },
-							].map((item) => (
-								<div key={item.id} className="flex items-center space-x-2">
-									<Checkbox
-										id={item.id}
-										checked={userInput.extraLoads?.[item.id] || false}
-										onCheckedChange={(checked) => {
-											handleChange('extraLoads', {
-												...userInput.extraLoads,
-												[item.id]: checked
-											});
-										}}
-									/>
-									<Label htmlFor={item.id} className="font-normal cursor-pointer">
-										{item.label}
-									</Label>
-								</div>
-							))}
+				<div className="space-y-3">
+					{[
+						{ id: 'waterTank', label: 'Water tank' },
+						{ id: 'solarPanels', label: 'Solar panels' },
+						{ id: 'heavyEquipment', label: 'Heavy equipment' },
+						{ id: 'roofGarden', label: 'Roof garden' },
+					].map((item) => (
+						<div key={item.id} className="flex items-center gap-3">
+							<Checkbox
+								id={item.id}
+								checked={userInput.extraLoads?.[item.id] || false}
+								onCheckedChange={(checked) => {
+									handleChange('extraLoads', {
+										...userInput.extraLoads,
+										[item.id]: checked
+									});
+								}}
+							/>
+							<label htmlFor={item.id} className="text-sm cursor-pointer">
+								{item.label}
+							</label>
 						</div>
-					</div>
-					<Button
-						size="sm"
-						variant="outline"
-						onClick={() => markSectionComplete('loads')}
-						className="w-full"
+					))}
+					<button
+						onClick={() => markDone('loads')}
+						className="w-full py-2 text-sm text-violet-600 hover:text-violet-700 flex items-center justify-center gap-1"
 					>
-						<CheckCircle2 className="h-4 w-4 mr-2" />
-						Done with extra loads
-					</Button>
-				</div>
-			)
-		},
-		{
-			id: 'plans',
-			icon: FileImage,
-			title: 'Upload Floor Plans',
-			description: 'Optional: architectural or structural plans',
-			content: (
-				<div className="space-y-4">
-					<div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-						<FileImage className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-						<p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-							Drag and drop floor plans here
-						</p>
-						<p className="text-xs text-gray-500">
-							PDF, JPG, or PNG up to 10MB
-						</p>
-						<Button variant="outline" size="sm" className="mt-3">
-							Browse Files
-						</Button>
-					</div>
-					<p className="text-xs text-gray-500 text-center">
-						Floor plans help us analyze structural layout more accurately
-					</p>
-					<Button
-						size="sm"
-						variant="outline"
-						onClick={() => markSectionComplete('plans')}
-						className="w-full"
-					>
-						<CheckCircle2 className="h-4 w-4 mr-2" />
-						Skip plans for now
-					</Button>
+						<Check className="w-4 h-4" /> Done
+					</button>
 				</div>
 			)
 		}
 	];
 
 	return (
-		<div className="max-w-xl mx-auto">
-			{/* Header */}
-			<div className="text-center mb-6">
-				<div className="inline-flex items-center justify-center p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-3">
-					<Ruler className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-				</div>
-				<h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-					Additional Details
-				</h1>
-				<p className="text-gray-600 dark:text-gray-400">
-					Optional - more details = more accurate results
-				</p>
-			</div>
+		<div className="min-h-[60vh] flex flex-col">
+			{/* Hero section */}
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				className="flex-1 flex flex-col items-center justify-center px-4 py-8"
+			>
+				{/* Icon */}
+				<motion.div
+					initial={{ scale: 0 }}
+					animate={{ scale: 1 }}
+					transition={{ type: "spring", stiffness: 300 }}
+					className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-6 shadow-xl shadow-amber-500/30"
+				>
+					<Sparkles className="w-10 h-10 text-white" />
+				</motion.div>
 
-			<Card className="shadow-sm">
-				<CardContent className="pt-6 space-y-3">
-					{/* Skip all button */}
+				<motion.h1
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 0.1 }}
+					className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
+				>
+					Ready for results!
+				</motion.h1>
+
+				<motion.p
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.2 }}
+					className="text-gray-500 dark:text-gray-400 mb-8 text-center"
+				>
+					Add details for more accuracy, or skip ahead
+				</motion.p>
+
+				{/* Get Results button */}
+				<motion.div
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ delay: 0.3 }}
+					className="w-full max-w-sm mb-8"
+				>
 					<Button
-						variant="outline"
-						className="w-full mb-4 gap-2"
 						onClick={onNext}
+						size="lg"
+						className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:opacity-90 shadow-xl shadow-amber-500/25"
 					>
-						<SkipForward className="h-4 w-4" />
-						Skip all and get results
+						Get Results
+						<ArrowRight className="w-5 h-5" />
 					</Button>
+				</motion.div>
 
-					<div className="text-center text-xs text-gray-500 mb-4">
-						Or expand sections below for more accuracy
-					</div>
+				{/* Optional sections */}
+				<motion.div
+					initial={{ y: 20, opacity: 0 }}
+					animate={{ y: 0, opacity: 1 }}
+					transition={{ delay: 0.4 }}
+					className="w-full max-w-sm"
+				>
+					<p className="text-xs text-gray-400 text-center mb-3 uppercase tracking-wide">
+						Optional: add more details
+					</p>
 
-					{/* Accordion sections */}
-					{sections.map((section) => (
-						<Collapsible
-							key={section.id}
-							open={openSections[section.id]}
-							onOpenChange={() => toggleSection(section.id)}
-						>
-							<CollapsibleTrigger asChild>
-								<div
-									className={`
-										flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors
-										${completedSections[section.id]
-											? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-											: 'bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700'
-										}
-									`}
+					<div className="space-y-2">
+						{sections.map((section) => (
+							<div
+								key={section.id}
+								className={`rounded-xl overflow-hidden transition-all ${
+									completedSections[section.id]
+										? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+										: 'bg-gray-50 dark:bg-gray-800'
+								}`}
+							>
+								<button
+									onClick={() => toggleSection(section.id)}
+									className="w-full px-4 py-3 flex items-center justify-between"
 								>
 									<div className="flex items-center gap-3">
 										{completedSections[section.id] ? (
-											<CheckCircle2 className="h-5 w-5 text-green-500" />
+											<div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+												<Check className="w-4 h-4 text-white" />
+											</div>
 										) : (
-											<section.icon className="h-5 w-5 text-gray-500" />
+											<div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+												<section.icon className="w-4 h-4 text-gray-500" />
+											</div>
 										)}
-										<div>
-											<p className="font-medium text-gray-900 dark:text-white text-sm">
+										<div className="text-left">
+											<p className="font-medium text-sm text-gray-900 dark:text-white">
 												{section.title}
 											</p>
-											<p className="text-xs text-gray-500">
-												{section.description}
-											</p>
+											<p className="text-xs text-gray-500">{section.subtitle}</p>
 										</div>
 									</div>
 									<ChevronDown
-										className={`h-5 w-5 text-gray-400 transition-transform ${
-											openSections[section.id] ? 'rotate-180' : ''
+										className={`w-4 h-4 text-gray-400 transition-transform ${
+											expandedSection === section.id ? 'rotate-180' : ''
 										}`}
 									/>
-								</div>
-							</CollapsibleTrigger>
-							<CollapsibleContent className="pt-4 px-4 pb-2">
-								{section.content}
-							</CollapsibleContent>
-						</Collapsible>
-					))}
+								</button>
 
-					{/* Completion status */}
+								<AnimatePresence>
+									{expandedSection === section.id && (
+										<motion.div
+											initial={{ height: 0, opacity: 0 }}
+											animate={{ height: 'auto', opacity: 1 }}
+											exit={{ height: 0, opacity: 0 }}
+											className="px-4 pb-4 overflow-hidden"
+										>
+											{section.content}
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</div>
+						))}
+					</div>
+
 					{completedCount > 0 && (
-						<div className="text-center text-sm text-green-600 dark:text-green-400 pt-4">
-							{completedCount} of {sections.length} sections completed
-						</div>
+						<motion.p
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							className="text-center text-sm text-green-600 mt-3"
+						>
+							{completedCount} of {sections.length} added
+						</motion.p>
 					)}
-				</CardContent>
+				</motion.div>
+			</motion.div>
 
-				<CardFooter className="flex justify-between border-t pt-4">
-					<Link href="/assessment/3">
-						<Button variant="outline" className="gap-1">
-							<ArrowLeft className="h-4 w-4" /> Back
-						</Button>
-					</Link>
-					<Button onClick={onNext} className="gap-2">
-						Get Results <ArrowRight className="h-4 w-4" />
-					</Button>
-				</CardFooter>
-			</Card>
-
-			{/* Progress indicator */}
-			<p className="text-center text-xs text-gray-500 mt-4">
-				Step 4 of 4 (optional)
-			</p>
+			{/* Footer */}
+			<div className="flex justify-between items-center px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+				<Link href="/assessment/3" className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+					Back
+				</Link>
+				<span className="text-xs text-gray-400">Final step (optional)</span>
+			</div>
 		</div>
 	);
 };
