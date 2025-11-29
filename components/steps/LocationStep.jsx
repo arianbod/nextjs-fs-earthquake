@@ -532,9 +532,8 @@ const LocationStep = ({ onNext }) => {
 								/>
 							</div>
 
-							{/* Google Street View and Satellite Images Gallery */}
-							{(googleImages.satellite || googleImages.streetViews.length > 0 || imagesLoading) && (
-								<Card className='border-blue-200 dark:border-blue-800'>
+							{/* Google Street View and Satellite Images Gallery - ALWAYS show when location exists */}
+							<Card className='border-blue-200 dark:border-blue-800'>
 									<CardHeader className='pb-2'>
 										<CardTitle className='flex items-center gap-2'>
 											<Camera className='h-5 w-5 text-blue-600' />
@@ -557,10 +556,11 @@ const LocationStep = ({ onNext }) => {
 										</CardDescription>
 									</CardHeader>
 									<CardContent className='pt-2'>
-										{imagesLoading ? (
+										{(!googleImages.satellite && !googleImages.streetViews.length) ? (
 											<div className='grid grid-cols-2 gap-3'>
 												<Skeleton className='aspect-video rounded-lg' />
 												<Skeleton className='aspect-video rounded-lg' />
+												<p className='col-span-2 text-xs text-gray-500 text-center'>Loading Google Maps images...</p>
 											</div>
 										) : (
 											<div className='space-y-3'>
@@ -643,7 +643,6 @@ const LocationStep = ({ onNext }) => {
 										)}
 									</CardContent>
 								</Card>
-							)}
 
 							{/* Seismic Zone Information */}
 							{seismicZoneInfo && (
