@@ -8,7 +8,10 @@ import { getZoneByCoordinates } from '@/utils/turkeySeismicData';
 import { googlePlacesService } from '@/services/googlePlacesService';
 import { streetViewService } from '@/services/streetViewService';
 import { MyMapComponent } from '@/components/MyMapComponent';
-import { MapPin, Loader2, ArrowRight, Navigation, AlertTriangle, Check } from 'lucide-react';
+import { MapPin, Loader2, ArrowRight, Navigation, AlertTriangle, Check, Camera, Building, Eye, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LocationStepSimple = ({ onNext }) => {
@@ -17,9 +20,30 @@ const LocationStepSimple = ({ onNext }) => {
 	const [error, setError] = useState(null);
 	const [seismicZone, setSeismicZone] = useState(null);
 	const [progress, setProgress] = useState(0);
+	const [googleImages, setGoogleImages] = useState({ streetViews: [], satellite: null });
+
+	// Show Google Maps images immediately (synchronous)
+	const showGoogleImages = (latitude, longitude) => {
+		const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+		if (!apiKey) return;
+
+		const headings = [0, 90, 180, 270];
+		const streetViewUrls = headings.map(heading => ({
+			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
+			heading,
+			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West'
+		}));
+
+		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
+
+		setGoogleImages({ streetViews: streetViewUrls, satellite: satelliteUrl });
+	};
 
 	// Collect background data silently
 	const collectBackgroundData = async (latitude, longitude, city = null) => {
+		// Show images immediately (synchronous)
+		showGoogleImages(latitude, longitude);
+
 		try {
 			const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -166,6 +190,8 @@ const LocationStepSimple = ({ onNext }) => {
 		if (userInput.latitude && userInput.longitude) {
 			const zoneInfo = getZoneByCoordinates(userInput.latitude, userInput.longitude);
 			setSeismicZone(zoneInfo);
+			// Show images for existing location
+			showGoogleImages(userInput.latitude, userInput.longitude);
 			setStatus('success');
 			return;
 		}
@@ -319,6 +345,80 @@ const LocationStepSimple = ({ onNext }) => {
 								{seismicZone?.zone || 'Checking...'}
 							</p>
 						</div>
+					</motion.div>
+
+					{/* Google Maps Images Gallery */}
+					<motion.div
+						initial={{ y: 20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.3 }}
+					>
+						<Card className='border-blue-200 dark:border-blue-800 mb-4'>
+							<CardHeader className='pb-2 py-3'>
+								<CardTitle className='flex items-center gap-2 text-base'>
+									<Camera className='h-4 w-4 text-blue-600' />
+									Google Maps Images
+									{googleImages.satellite && (
+										<Badge variant='secondary' className='ml-auto text-xs'>
+											<CheckCircle2 className='h-3 w-3 mr-1' />
+											{googleImages.streetViews.length + 1} images
+										</Badge>
+									)}
+								</CardTitle>
+							</CardHeader>
+							<CardContent className='pt-0'>
+								{(!googleImages.satellite && !googleImages.streetViews.length) ? (
+									<div className='grid grid-cols-2 gap-2'>
+										<Skeleton className='aspect-video rounded-lg' />
+										<Skeleton className='aspect-video rounded-lg' />
+										<p className='col-span-2 text-xs text-gray-500 text-center'>Loading images...</p>
+									</div>
+								) : (
+									<div className='space-y-2'>
+										{/* Main views */}
+										<div className='grid grid-cols-2 gap-2'>
+											{googleImages.satellite && (
+												<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
+													<img
+														src={googleImages.satellite}
+														alt='Satellite view'
+														className='w-full h-full object-cover'
+													/>
+													<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center'>
+														Satellite
+													</div>
+												</div>
+											)}
+											{googleImages.streetViews[0] && (
+												<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
+													<img
+														src={googleImages.streetViews[0].url}
+														alt='Street view'
+														className='w-full h-full object-cover'
+													/>
+													<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center'>
+														Street View
+													</div>
+												</div>
+											)}
+										</div>
+										{/* Additional angles */}
+										{googleImages.streetViews.length > 1 && (
+											<div className='grid grid-cols-3 gap-1'>
+												{googleImages.streetViews.slice(1).map((img, idx) => (
+													<div key={idx} className='relative aspect-video rounded overflow-hidden border border-gray-200 dark:border-gray-700'>
+														<img src={img.url} alt={img.description} className='w-full h-full object-cover' />
+														<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] p-0.5 text-center'>
+															{img.description}
+														</div>
+													</div>
+												))}
+											</div>
+										)}
+									</div>
+								)}
+							</CardContent>
+						</Card>
 					</motion.div>
 
 					{/* Success indicator */}
