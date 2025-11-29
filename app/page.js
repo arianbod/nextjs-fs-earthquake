@@ -3,14 +3,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion, useInView, useAnimation, AnimatePresence } from 'framer-motion';
+import { useUser } from '@clerk/nextjs';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
 	ArrowRight,
-	Shield,
-	Building,
 	CheckCircle2,
 	Clock,
 	Award,
@@ -20,7 +19,6 @@ import {
 	Cloud,
 	Brain,
 	Zap,
-	ChevronRight,
 	Play,
 	Mic,
 	MessageSquare,
@@ -28,10 +26,17 @@ import {
 	Users,
 	Globe,
 	Info,
-	Activity,
-	Waves,
+	Building,
 	X,
 } from 'lucide-react';
+
+// Components
+import GuestHero from '@/components/homepage/GuestHero';
+import AuthHero from '@/components/homepage/AuthHero';
+import LoggedInDashboard from '@/components/homepage/LoggedInDashboard';
+
+// Server actions
+import { getLastDraftAssessment, getDashboardStats, getUserAssessments } from '@/lib/actions/assessment';
 
 // Animated counter component
 function AnimatedCounter({ value, suffix = '', duration = 2 }) {
@@ -62,50 +67,65 @@ function AnimatedCounter({ value, suffix = '', duration = 2 }) {
 	);
 }
 
-// Floating particle component
-function FloatingParticle({ delay = 0, size = 4, color = 'blue' }) {
-	return (
-		<motion.div
-			className={`absolute rounded-full bg-${color}-400/30`}
-			style={{ width: size, height: size }}
-			initial={{ opacity: 0, y: 100 }}
-			animate={{
-				opacity: [0, 0.6, 0],
-				y: [100, -100],
-				x: [0, Math.random() * 50 - 25],
-			}}
-			transition={{
-				duration: 4 + Math.random() * 2,
-				delay,
-				repeat: Infinity,
-				ease: 'easeOut',
-			}}
-		/>
-	);
-}
+// Section wrapper for consistent scroll animations
+function SectionWrapper({ children }) {
+	const ref = useRef(null);
+	const isInView = useInView(ref, { once: true, margin: '-100px' });
 
-// Seismic wave animation
-function SeismicWave({ delay = 0 }) {
 	return (
 		<motion.div
-			className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-blue-500/20 rounded-full"
-			initial={{ width: 0, height: 0, opacity: 0.8 }}
-			animate={{ width: 300, height: 300, opacity: 0 }}
-			transition={{
-				duration: 3,
-				delay,
-				repeat: Infinity,
-				ease: 'easeOut',
-			}}
-		/>
+			ref={ref}
+			initial={{ opacity: 0 }}
+			animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+			transition={{ duration: 0.6 }}
+		>
+			{children}
+		</motion.div>
 	);
 }
 
 export default function HomePage() {
+	const { user, isLoaded, isSignedIn } = useUser();
 	const [activeFeature, setActiveFeature] = useState(0);
 	const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-	const heroRef = useRef(null);
-	const isHeroInView = useInView(heroRef, { once: true });
+
+	// Auth-specific state
+	const [draftAssessment, setDraftAssessment] = useState(null);
+	const [stats, setStats] = useState(null);
+	const [recentAssessments, setRecentAssessments] = useState([]);
+	const [isLoadingUserData, setIsLoadingUserData] = useState(false);
+
+	// Load user data when authenticated
+	useEffect(() => {
+		if (isSignedIn && isLoaded) {
+			loadUserData();
+		}
+	}, [isSignedIn, isLoaded]);
+
+	const loadUserData = async () => {
+		setIsLoadingUserData(true);
+		try {
+			const [draftResult, statsResult, assessmentsResult] = await Promise.all([
+				getLastDraftAssessment().catch(() => null),
+				getDashboardStats().catch(() => null),
+				getUserAssessments({ limit: 6 }).catch(() => null),
+			]);
+
+			if (draftResult?.success && draftResult.assessment) {
+				setDraftAssessment(draftResult.assessment);
+			}
+			if (statsResult?.success && statsResult.stats) {
+				setStats(statsResult.stats);
+			}
+			if (assessmentsResult?.success && assessmentsResult.assessments) {
+				setRecentAssessments(assessmentsResult.assessments);
+			}
+		} catch (error) {
+			console.error('Error loading user data:', error);
+		} finally {
+			setIsLoadingUserData(false);
+		}
+	};
 
 	// Auto-rotate features
 	useEffect(() => {
@@ -179,206 +199,23 @@ export default function HomePage() {
 		},
 	];
 
-	const containerVariants = {
-		hidden: { opacity: 0 },
-		visible: {
-			opacity: 1,
-			transition: { staggerChildren: 0.1 },
-		},
-	};
-
-	const itemVariants = {
-		hidden: { opacity: 0, y: 30 },
-		visible: {
-			opacity: 1,
-			y: 0,
-			transition: { duration: 0.6, ease: 'easeOut' },
-		},
-	};
-
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-x-hidden">
-			{/* Hero Section with Dramatic Animations */}
-			<section ref={heroRef} className="relative overflow-hidden pt-20 pb-12 lg:pt-32 lg:pb-20">
-				{/* Animated Background Blobs */}
-				<div className="absolute inset-0 overflow-hidden">
-					<motion.div
-						className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-						animate={{
-							x: [0, 30, 0],
-							y: [0, -50, 0],
-							scale: [1, 1.1, 1],
-						}}
-						transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-					/>
-					<motion.div
-						className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-						animate={{
-							x: [0, -20, 0],
-							y: [0, 20, 0],
-							scale: [1, 0.9, 1],
-						}}
-						transition={{ duration: 7, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
-					/>
-					<motion.div
-						className="absolute top-40 left-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-						animate={{
-							x: [0, 20, 0],
-							y: [0, 30, 0],
-							scale: [1, 1.05, 1],
-						}}
-						transition={{ duration: 7, delay: 4, repeat: Infinity, ease: 'easeInOut' }}
-					/>
+			{/* Conditional Hero Section */}
+			{isLoaded && isSignedIn ? (
+				<AuthHero
+					user={user}
+					draftAssessment={draftAssessment}
+					stats={stats}
+				/>
+			) : (
+				<GuestHero onWatchDemo={() => setIsVideoPlaying(true)} />
+			)}
 
-					{/* Floating particles */}
-					<div className="absolute inset-0 pointer-events-none">
-						{[...Array(15)].map((_, i) => (
-							<motion.div
-								key={i}
-								className="absolute w-1 h-1 rounded-full bg-blue-400/40"
-								style={{
-									left: `${10 + Math.random() * 80}%`,
-									top: `${10 + Math.random() * 80}%`,
-								}}
-								animate={{
-									y: [0, -30, 0],
-									opacity: [0.2, 0.6, 0.2],
-								}}
-								transition={{
-									duration: 3 + Math.random() * 2,
-									delay: i * 0.3,
-									repeat: Infinity,
-									ease: 'easeInOut',
-								}}
-							/>
-						))}
-					</div>
-				</div>
-
-				<div className="container mx-auto px-4 relative z-10">
-					<motion.div
-						className="text-center max-w-5xl mx-auto space-y-8"
-						initial="hidden"
-						animate={isHeroInView ? 'visible' : 'hidden'}
-						variants={containerVariants}
-					>
-						{/* AI Badge */}
-						<motion.div variants={itemVariants} className="inline-block">
-							<motion.div
-								className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-800"
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-							>
-								<motion.div
-									animate={{ rotate: [0, 15, -15, 0] }}
-									transition={{ duration: 2, repeat: Infinity }}
-								>
-									<Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-								</motion.div>
-								<span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
-									Now Powered by Claude AI Vision
-								</span>
-								<Badge variant="default" className="bg-purple-600 text-xs">
-									NEW
-								</Badge>
-							</motion.div>
-						</motion.div>
-
-						{/* Main Heading with Letter Animation */}
-						<motion.h1 variants={itemVariants} className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-							<span className="block text-gray-900 dark:text-white">Earthquake Safety</span>
-							<motion.span
-								className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto]"
-								animate={{ backgroundPosition: ['0% center', '200% center'] }}
-								transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-							>
-								Reimagined with AI
-							</motion.span>
-						</motion.h1>
-
-						{/* Subheading */}
-						<motion.p
-							variants={itemVariants}
-							className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
-						>
-							Upload photos. Get instant analysis. Receive your safety score in minutes.
-							<span className="block mt-2 text-lg">No forms. No complexity. Just results.</span>
-						</motion.p>
-
-						{/* CTA Buttons */}
-						<motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-							<Link href="/assessment/1">
-								<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-									<Button
-										size="lg"
-										className="text-lg px-8 py-6 gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all"
-									>
-										<motion.div
-											animate={{ rotate: [0, 360] }}
-											transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-										>
-											<Zap className="h-5 w-5" />
-										</motion.div>
-										Start AI Assessment
-										<ArrowRight className="h-5 w-5" />
-									</Button>
-								</motion.div>
-							</Link>
-							<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-								<Button
-									variant="outline"
-									size="lg"
-									className="text-lg px-8 py-6 gap-3 border-2"
-									onClick={() => setIsVideoPlaying(true)}
-								>
-									<Play className="h-5 w-5" />
-									Watch Demo (2 min)
-								</Button>
-							</motion.div>
-						</motion.div>
-
-						{/* Trust Indicators with staggered animation */}
-						<motion.div
-							variants={itemVariants}
-							className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400 pt-4"
-						>
-							{[
-								{ icon: CheckCircle2, text: '95% Accuracy', color: 'text-green-600' },
-								{ icon: Clock, text: '5 Min Assessment', color: 'text-blue-600' },
-								{ icon: Users, text: '25,000+ Users', color: 'text-purple-600' },
-							].map((item, idx) => (
-								<motion.span
-									key={idx}
-									className="flex items-center gap-2"
-									initial={{ opacity: 0, y: 10 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{ delay: 0.8 + idx * 0.15 }}
-								>
-									<item.icon className={`h-4 w-4 ${item.color}`} />
-									{item.text}
-								</motion.span>
-							))}
-						</motion.div>
-					</motion.div>
-
-					{/* Seismic indicator animation */}
-					<motion.div
-						className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-2 text-gray-400"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 1.5 }}
-					>
-						<motion.div
-							animate={{ y: [0, 5, 0] }}
-							transition={{ duration: 1.5, repeat: Infinity }}
-							className="flex flex-col items-center"
-						>
-							<Activity className="w-4 h-4" />
-							<div className="w-px h-8 bg-gradient-to-b from-gray-400 to-transparent" />
-						</motion.div>
-					</motion.div>
-				</div>
-			</section>
+			{/* Logged-In Dashboard Section (only for authenticated users) */}
+			{isLoaded && isSignedIn && recentAssessments.length > 0 && (
+				<LoggedInDashboard recentAssessments={recentAssessments} />
+			)}
 
 			{/* AI Features Showcase */}
 			<SectionWrapper>
@@ -754,7 +591,7 @@ export default function HomePage() {
 							<Link href="/assessment/1">
 								<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 									<Button size="lg" className="text-base gap-2 px-8">
-										Begin Your Assessment <ArrowRight className="h-4 w-4" />
+										{isSignedIn ? 'Start New Assessment' : 'Begin Your Assessment'} <ArrowRight className="h-4 w-4" />
 									</Button>
 								</motion.div>
 							</Link>
@@ -937,7 +774,7 @@ export default function HomePage() {
 				</section>
 			</SectionWrapper>
 
-			{/* Final CTA */}
+			{/* Final CTA - Different for Auth vs Guest */}
 			<SectionWrapper>
 				<section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 relative overflow-hidden">
 					{/* Grid pattern */}
@@ -984,7 +821,10 @@ export default function HomePage() {
 								whileInView={{ opacity: 1, y: 0 }}
 								viewport={{ once: true }}
 							>
-								Ready to Experience AI-Powered Safety Assessment?
+								{isSignedIn
+									? 'Ready to Assess Another Building?'
+									: 'Ready to Experience AI-Powered Safety Assessment?'
+								}
 							</motion.h2>
 							<motion.p
 								className="text-xl text-blue-100 mb-8"
@@ -993,7 +833,10 @@ export default function HomePage() {
 								viewport={{ once: true }}
 								transition={{ delay: 0.1 }}
 							>
-								Join thousands who've already secured their buildings with our advanced AI technology
+								{isSignedIn
+									? 'Start a new assessment or view your dashboard to continue your work'
+									: 'Join thousands who\'ve already secured their buildings with our advanced AI technology'
+								}
 							</motion.p>
 							<motion.div
 								className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -1018,33 +861,44 @@ export default function HomePage() {
 									>
 										<Button size="lg" variant="secondary" className="text-base gap-2 px-8">
 											<Sparkles className="h-5 w-5" />
-											Start Free AI Assessment
+											{isSignedIn ? 'Start New Assessment' : 'Start Free AI Assessment'}
 											<ArrowRight className="h-5 w-5" />
 										</Button>
 									</motion.div>
 								</Link>
-								<Link href="/about">
+								<Link href={isSignedIn ? '/dashboard' : '/about'}>
 									<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 										<Button
 											size="lg"
 											variant="outline"
 											className="text-base gap-2 px-8 bg-white/10 text-white border-white/30 hover:bg-white/20"
 										>
-											<Info className="h-5 w-5" />
-											Learn More
+											{isSignedIn ? (
+												<>
+													<Building className="h-5 w-5" />
+													View Dashboard
+												</>
+											) : (
+												<>
+													<Info className="h-5 w-5" />
+													Learn More
+												</>
+											)}
 										</Button>
 									</motion.div>
 								</Link>
 							</motion.div>
-							<motion.p
-								className="text-sm text-blue-200 mt-8"
-								initial={{ opacity: 0 }}
-								whileInView={{ opacity: 1 }}
-								viewport={{ once: true }}
-								transition={{ delay: 0.4 }}
-							>
-								No credit card required - 5-minute assessment - Instant results
-							</motion.p>
+							{!isSignedIn && (
+								<motion.p
+									className="text-sm text-blue-200 mt-8"
+									initial={{ opacity: 0 }}
+									whileInView={{ opacity: 1 }}
+									viewport={{ once: true }}
+									transition={{ delay: 0.4 }}
+								>
+									No credit card required - 5-minute assessment - Instant results
+								</motion.p>
+							)}
 						</motion.div>
 					</div>
 				</section>
@@ -1104,22 +958,5 @@ export default function HomePage() {
 				)}
 			</AnimatePresence>
 		</div>
-	);
-}
-
-// Section wrapper for consistent scroll animations
-function SectionWrapper({ children }) {
-	const ref = useRef(null);
-	const isInView = useInView(ref, { once: true, margin: '-100px' });
-
-	return (
-		<motion.div
-			ref={ref}
-			initial={{ opacity: 0 }}
-			animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-			transition={{ duration: 0.6 }}
-		>
-			{children}
-		</motion.div>
 	);
 }
