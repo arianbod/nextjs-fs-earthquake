@@ -240,46 +240,59 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 				setWeatherData(mockWeatherData);
 				setSeismicData(mockSeismicData);
 
-				// Generate Google Maps images (Street View + Satellite)
-				const lat = userInput.latitude;
-				const lng = userInput.longitude;
-				const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-				console.log('Google Maps API Key available:', !!apiKey);
-				
-				let satelliteUrl = null;
-				let streetViewUrls = [];
-				
-				if (apiKey && apiKey !== 'your_google_maps_api_key_here') {
-					// Generate satellite image
-					satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=${apiKey}`;
-					console.log('Generated satellite URL:', satelliteUrl);
-					
-					// Generate multiple Street View images from different angles
-					const headings = [0, 45, 90, 135, 180, 225, 270, 315]; // 8 different angles
-					streetViewUrls = headings.map((heading, index) => ({
-						url: `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${lat},${lng}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
-						description: `Street View ${getDirectionName(heading)}`,
-						angle: heading,
-						id: `streetview_${heading}`
-					}));
-					
-					console.log(`Generated ${streetViewUrls.length} Street View URLs`);
-					
-					// Store all images through the image storage system
-					try {
-						await storeGoogleImages(streetViewUrls, satelliteUrl, {
-							city: detectedCity,
-							lat: lat,
-							lng: lng,
-							country: 'Turkey'
-						});
-						console.log('All Google images stored successfully');
-					} catch (error) {
-						console.warn('Failed to store Google images:', error);
+				// Check if images were already captured in LocationStep
+				const existingImages = getImageGallery();
+				const hasExistingImages = userInput.googleImagesStored ||
+					(userInput.streetViewImages?.length > 0) ||
+					userInput.satelliteViewUrl ||
+					(existingImages?.categories?.google?.images?.length > 0);
+
+				console.log('WeatherDataStep - Checking existing images:', {
+					googleImagesStored: userInput.googleImagesStored,
+					streetViewImagesCount: userInput.streetViewImages?.length || 0,
+					hasSatelliteUrl: !!userInput.satelliteViewUrl,
+					galleryImagesCount: existingImages?.categories?.google?.images?.length || 0
+				});
+
+				let satelliteUrl = userInput.satelliteViewUrl || null;
+
+				// Only fetch images if not already captured in LocationStep
+				if (!hasExistingImages) {
+					console.log('WeatherDataStep - No existing images, fetching from Google Maps...');
+					const lat = userInput.latitude;
+					const lng = userInput.longitude;
+					const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+					if (apiKey && apiKey !== 'your_google_maps_api_key_here') {
+						// Generate satellite image
+						satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=19&size=600x400&maptype=satellite&markers=color:red%7C${lat},${lng}&key=${apiKey}`;
+
+						// Generate multiple Street View images from different angles
+						const headings = [0, 45, 90, 135, 180, 225, 270, 315];
+						const streetViewUrls = headings.map((heading) => ({
+							url: `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${lat},${lng}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
+							description: `Street View ${getDirectionName(heading)}`,
+							angle: heading,
+							id: `streetview_${heading}`
+						}));
+
+						// Store all images through the image storage system
+						try {
+							await storeGoogleImages(streetViewUrls, satelliteUrl, {
+								city: detectedCity,
+								latitude: lat,
+								longitude: lng,
+								country: 'Turkey'
+							});
+							console.log('WeatherDataStep - Fallback images stored successfully');
+						} catch (error) {
+							console.warn('WeatherDataStep - Failed to store fallback images:', error);
+						}
 					}
 				} else {
-					console.warn('Google Maps API key not configured properly');
+					console.log('WeatherDataStep - Using images already captured in LocationStep');
 				}
+
 				setSatelliteImageUrl(satelliteUrl);
 
 				// Save to user context - make sure to update the city field too

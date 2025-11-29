@@ -460,99 +460,113 @@ const LocationStep = ({ onNext }) => {
 								/>
 							</div>
 
-							{/* Google Street View and Satellite Images */}
-							{(userInput.streetViewUrl || userInput.satelliteViewUrl || autoDataLoading) && (
+							{/* Google Street View and Satellite Images Gallery */}
+							{(userInput.streetViewImages?.length > 0 || userInput.satelliteViewUrl || autoDataLoading) && (
 								<Card className='border-blue-200 dark:border-blue-800'>
-									<CardHeader>
+									<CardHeader className='pb-2'>
 										<CardTitle className='flex items-center gap-2'>
 											<Camera className='h-5 w-5 text-blue-600' />
-											Google Street View & Satellite Images
+											Captured Location Images
 											{autoDataLoading && (
 												<Badge variant='outline' className='ml-auto'>
 													<Loader2 className='h-3 w-3 mr-1 animate-spin' />
-													Loading...
+													Fetching images...
+												</Badge>
+											)}
+											{!autoDataLoading && (
+												<Badge variant='secondary' className='ml-auto'>
+													<CheckCircle2 className='h-3 w-3 mr-1' />
+													{(userInput.streetViewImages?.length || 0) + (userInput.satelliteViewUrl ? 1 : 0)} images captured
 												</Badge>
 											)}
 										</CardTitle>
 										<CardDescription>
-											Automatically captured views of your building location
+											These images are automatically fetched from Google Maps and stored for your assessment
 										</CardDescription>
 									</CardHeader>
-									<CardContent>
+									<CardContent className='pt-2'>
 										{autoDataLoading ? (
-											<div className='grid md:grid-cols-2 gap-3'>
-												<Skeleton className='h-32 rounded-lg' />
-												<Skeleton className='h-32 rounded-lg' />
+											<div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
+												{[1, 2, 3, 4, 5, 6].map((i) => (
+													<Skeleton key={i} className='aspect-video rounded-lg' />
+												))}
 											</div>
 										) : (
-											<div className='grid md:grid-cols-2 gap-3'>
-												{/* Street View */}
-												{userInput.streetViewUrl && (
-													<div>
-														<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
-															<Eye className='h-3 w-3' />
-															Street Level View
-														</h4>
-														<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
-															<img 
-																src={userInput.streetViewUrl} 
-																alt='Street view of building'
-																className='w-full h-full object-cover'
-																onError={(e) => {
-																	e.target.style.display = 'none';
-																	const placeholder = document.createElement('div');
-																	placeholder.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800 p-8';
-																	placeholder.innerHTML = '<p class="text-gray-500 text-center">Street view not available for this location</p>';
-																	e.target.parentElement.appendChild(placeholder);
-																}}
-															/>
-														</div>
-													</div>
-												)}
-												
-												{/* Satellite View */}
-												{userInput.satelliteViewUrl && (
-													<div>
-														<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
-															<Building className='h-3 w-3' />
-															Satellite View
-														</h4>
-														<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
-															<img 
-																src={userInput.satelliteViewUrl} 
-																alt='Satellite view of building'
-																className='w-full h-full object-cover'
-																onError={(e) => {
-																	e.target.style.display = 'none';
-																	const placeholder = document.createElement('div');
-																	placeholder.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800 p-8';
-																	placeholder.innerHTML = '<p class="text-gray-500 text-center">Satellite view loading...</p>';
-																	e.target.parentElement.appendChild(placeholder);
-																}}
-															/>
-														</div>
-													</div>
-												)}
-											</div>
-										)}
-										
-										{/* Multiple angles if available */}
-										{userInput.streetViewImages && userInput.streetViewImages.length > 1 && (
-											<div className='mt-3'>
-												<h4 className='text-xs font-medium mb-1'>Additional Angles</h4>
-												<div className='grid grid-cols-4 gap-1'>
-													{userInput.streetViewImages.slice(0, 4).map((img, idx) => (
-														<div key={idx} className='relative aspect-square rounded overflow-hidden border border-gray-200 dark:border-gray-700'>
-															<img 
-																src={img.url} 
-																alt={img.description}
-																className='w-full h-full object-cover'
-															/>
-															<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1'>
-																{img.description}
+											<div className='space-y-3'>
+												{/* Main views: Satellite + Primary Street View */}
+												<div className='grid md:grid-cols-2 gap-3'>
+													{/* Satellite View */}
+													{userInput.satelliteViewUrl && (
+														<div>
+															<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
+																<Building className='h-3 w-3' />
+																Satellite View
+															</h4>
+															<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-sm'>
+																<img
+																	src={userInput.satelliteViewUrl}
+																	alt='Satellite view of building'
+																	className='w-full h-full object-cover'
+																	onError={(e) => {
+																		e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/><text x="50" y="55" font-size="12" text-anchor="middle" fill="%236b7280">Failed to load</text></svg>';
+																	}}
+																/>
 															</div>
 														</div>
-													))}
+													)}
+
+													{/* Primary Street View */}
+													{userInput.streetViewImages?.[0] && (
+														<div>
+															<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
+																<Eye className='h-3 w-3' />
+																Street Level View
+															</h4>
+															<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-sm'>
+																<img
+																	src={userInput.streetViewImages[0].base64 || userInput.streetViewImages[0].url}
+																	alt='Street view of building'
+																	className='w-full h-full object-cover'
+																	onError={(e) => {
+																		e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/><text x="50" y="55" font-size="12" text-anchor="middle" fill="%236b7280">Failed to load</text></svg>';
+																	}}
+																/>
+															</div>
+														</div>
+													)}
+												</div>
+
+												{/* Additional Street View angles */}
+												{userInput.streetViewImages && userInput.streetViewImages.length > 1 && (
+													<div>
+														<h4 className='text-xs font-medium mb-2 flex items-center gap-1'>
+															<Sparkles className='h-3 w-3' />
+															Additional Viewing Angles ({userInput.streetViewImages.length - 1} more)
+														</h4>
+														<div className='grid grid-cols-3 md:grid-cols-4 gap-2'>
+															{userInput.streetViewImages.slice(1).map((img, idx) => (
+																<div key={idx} className='relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-blue-400 transition-colors cursor-pointer group'>
+																	<img
+																		src={img.base64 || img.url}
+																		alt={img.description || `Street View angle ${idx + 2}`}
+																		className='w-full h-full object-cover group-hover:scale-105 transition-transform'
+																		onError={(e) => {
+																			e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/><text x="50" y="55" font-size="8" text-anchor="middle" fill="%236b7280">N/A</text></svg>';
+																		}}
+																	/>
+																	<div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-1.5'>
+																		{img.heading !== undefined ? `${img.heading}°` : img.description || `Angle ${idx + 2}`}
+																	</div>
+																</div>
+															))}
+														</div>
+													</div>
+												)}
+
+												{/* Status indicator */}
+												<div className='flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg'>
+													<CheckCircle2 className='h-4 w-4' />
+													<span>All images have been captured and stored for your assessment</span>
 												</div>
 											</div>
 										)}

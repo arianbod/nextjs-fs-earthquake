@@ -622,31 +622,45 @@ export const UserInputProvider = ({ children }) => {
 	// Image management functions
 	const storeGoogleImages = async (streetViewUrls, satelliteUrl, location) => {
 		try {
+			// Convert URLs to base64 using the imageStorageManager
 			const imageData = await imageStorageManager.storeGoogleImages(streetViewUrls, satelliteUrl, location);
 			const gallery = createImageGallery(imageStorageManager.getAllImages());
+
+			// Extract base64 data for context and DB storage
+			const streetViewBase64 = imageData?.google?.streetView || [];
+			const satelliteBase64 = imageData?.google?.satellite?.base64 || null;
 
 			updateUserInput({
 				imageGallery: gallery,
 				googleImagesStored: true,
 				googleImagesStoredAt: new Date().toISOString(),
-				// Also store the raw URLs for easy access
-				streetViewImages: streetViewUrls?.filter(img => img.url) || [],
-				satelliteViewUrl: satelliteUrl,
+				// Store base64 data for display (not URLs that may expire)
+				streetViewImages: streetViewBase64.map((img, idx) => ({
+					base64: img.base64,
+					url: img.base64, // For backward compatibility with existing components
+					heading: streetViewUrls?.[idx]?.angle || streetViewUrls?.[idx]?.heading || (idx * 90),
+					angle: img.angle || streetViewUrls?.[idx]?.angle,
+					description: img.description || `Street View ${idx + 1}`,
+					available: true,
+				})),
+				satelliteViewUrl: satelliteBase64, // Store base64 instead of URL
+				satelliteBase64: satelliteBase64,
 			});
 
 			// Save to database if we have an assessment ID
 			if (userInput.assessmentId) {
 				try {
+					// Use base64 data for database storage (not URLs!)
 					const dbResult = await saveGoogleImagery(userInput.assessmentId, {
-						streetViewImages: streetViewUrls?.map(sv => ({
-							url: sv.url,
-							heading: sv.angle || sv.heading,
-							angle: sv.description || `Street View ${sv.angle || 0}°`,
+						streetViewImages: streetViewBase64.map((img, idx) => ({
+							base64: img.base64,
+							heading: streetViewUrls?.[idx]?.angle || streetViewUrls?.[idx]?.heading || (idx * 90),
+							angle: img.description || `Street View ${streetViewUrls?.[idx]?.angle || (idx * 90)}°`,
 							available: true,
-						})) || [],
-						satelliteUrl,
-						latitude: location?.lat || userInput.latitude,
-						longitude: location?.lng || userInput.longitude,
+						})),
+						satelliteBase64: satelliteBase64,
+						latitude: location?.latitude || location?.lat || userInput.latitude,
+						longitude: location?.longitude || location?.lng || userInput.longitude,
 					});
 
 					if (dbResult.success) {
