@@ -108,7 +108,7 @@ export default function HomePage() {
 			const [draftResult, statsResult, assessmentsResult] = await Promise.all([
 				getLastDraftAssessment().catch(() => null),
 				getDashboardStats().catch(() => null),
-				getUserAssessments({ limit: 6 }).catch(() => null),
+				getUserAssessments({ limit: 50 }).catch(() => null), // Fetch more for dashboard view
 			]);
 
 			if (draftResult?.success && draftResult.assessment) {
@@ -213,11 +213,12 @@ export default function HomePage() {
 			)}
 
 			{/* Logged-In Dashboard Section (only for authenticated users) */}
-			{isLoaded && isSignedIn && recentAssessments.length > 0 && (
+			{isLoaded && isSignedIn && (
 				<LoggedInDashboard recentAssessments={recentAssessments} />
 			)}
 
-			{/* AI Features Showcase */}
+			{/* AI Features Showcase - Only for guests */}
+			{!(isLoaded && isSignedIn) && (
 			<SectionWrapper>
 				<section className="py-20 bg-white dark:bg-gray-900">
 					<div className="container mx-auto px-4">
@@ -458,8 +459,9 @@ export default function HomePage() {
 					</div>
 				</section>
 			</SectionWrapper>
+			)}
 
-			{/* Assessment Flow Section */}
+			{/* Assessment Flow Section - Visible for all users */}
 			<SectionWrapper>
 				<section className="py-20 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
 					<div className="container mx-auto px-4">
@@ -600,6 +602,9 @@ export default function HomePage() {
 				</section>
 			</SectionWrapper>
 
+			{/* Stats and Voice Assistant - Only for guests */}
+			{!(isLoaded && isSignedIn) && (
+			<>
 			{/* Stats Section with Animated Counters */}
 			<SectionWrapper>
 				<section className="py-20 bg-white dark:bg-gray-900">
@@ -773,6 +778,8 @@ export default function HomePage() {
 					</div>
 				</section>
 			</SectionWrapper>
+			</>
+			)}
 
 			{/* Final CTA - Different for Auth vs Guest */}
 			<SectionWrapper>
