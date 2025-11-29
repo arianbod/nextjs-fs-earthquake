@@ -461,7 +461,8 @@ export default function HomePage() {
 			</SectionWrapper>
 			)}
 
-			{/* Assessment Flow Section - Visible for all users */}
+			{/* Assessment Flow Section - Only for guests */}
+			{!(isLoaded && isSignedIn) && (
 			<SectionWrapper>
 				<section className="py-20 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
 					<div className="container mx-auto px-4">
@@ -593,7 +594,7 @@ export default function HomePage() {
 							<Link href="/assessment/1">
 								<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 									<Button size="lg" className="text-base gap-2 px-8">
-										{isSignedIn ? 'Start New Assessment' : 'Begin Your Assessment'} <ArrowRight className="h-4 w-4" />
+										Begin Your Assessment <ArrowRight className="h-4 w-4" />
 									</Button>
 								</motion.div>
 							</Link>
@@ -601,6 +602,7 @@ export default function HomePage() {
 					</div>
 				</section>
 			</SectionWrapper>
+			)}
 
 			{/* Stats and Voice Assistant - Only for guests */}
 			{!(isLoaded && isSignedIn) && (
@@ -781,7 +783,8 @@ export default function HomePage() {
 			</>
 			)}
 
-			{/* Final CTA - Different for Auth vs Guest */}
+			{/* Final CTA - Only for guests */}
+			{!(isLoaded && isSignedIn) && (
 			<SectionWrapper>
 				<section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 relative overflow-hidden">
 					{/* Grid pattern */}
@@ -828,10 +831,7 @@ export default function HomePage() {
 								whileInView={{ opacity: 1, y: 0 }}
 								viewport={{ once: true }}
 							>
-								{isSignedIn
-									? 'Ready to Assess Another Building?'
-									: 'Ready to Experience AI-Powered Safety Assessment?'
-								}
+								Ready to Experience AI-Powered Safety Assessment?
 							</motion.h2>
 							<motion.p
 								className="text-xl text-blue-100 mb-8"
@@ -840,10 +840,7 @@ export default function HomePage() {
 								viewport={{ once: true }}
 								transition={{ delay: 0.1 }}
 							>
-								{isSignedIn
-									? 'Start a new assessment or view your dashboard to continue your work'
-									: 'Join thousands who\'ve already secured their buildings with our advanced AI technology'
-								}
+								Join thousands who've already secured their buildings with our advanced AI technology
 							</motion.p>
 							<motion.div
 								className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -868,48 +865,38 @@ export default function HomePage() {
 									>
 										<Button size="lg" variant="secondary" className="text-base gap-2 px-8">
 											<Sparkles className="h-5 w-5" />
-											{isSignedIn ? 'Start New Assessment' : 'Start Free AI Assessment'}
+											Start Free AI Assessment
 											<ArrowRight className="h-5 w-5" />
 										</Button>
 									</motion.div>
 								</Link>
-								<Link href={isSignedIn ? '/dashboard' : '/about'}>
+								<Link href="/about">
 									<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
 										<Button
 											size="lg"
 											variant="outline"
 											className="text-base gap-2 px-8 bg-white/10 text-white border-white/30 hover:bg-white/20"
 										>
-											{isSignedIn ? (
-												<>
-													<Building className="h-5 w-5" />
-													View Dashboard
-												</>
-											) : (
-												<>
-													<Info className="h-5 w-5" />
-													Learn More
-												</>
-											)}
+											<Info className="h-5 w-5" />
+											Learn More
 										</Button>
 									</motion.div>
 								</Link>
 							</motion.div>
-							{!isSignedIn && (
-								<motion.p
-									className="text-sm text-blue-200 mt-8"
-									initial={{ opacity: 0 }}
-									whileInView={{ opacity: 1 }}
-									viewport={{ once: true }}
-									transition={{ delay: 0.4 }}
-								>
-									No credit card required - 5-minute assessment - Instant results
-								</motion.p>
-							)}
+							<motion.p
+								className="text-sm text-blue-200 mt-8"
+								initial={{ opacity: 0 }}
+								whileInView={{ opacity: 1 }}
+								viewport={{ once: true }}
+								transition={{ delay: 0.4 }}
+							>
+								No credit card required - 5-minute assessment - Instant results
+							</motion.p>
 						</motion.div>
 					</div>
 				</section>
 			</SectionWrapper>
+			)}
 
 			{/* Academic Support */}
 			<motion.section
