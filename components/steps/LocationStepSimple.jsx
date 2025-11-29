@@ -22,8 +22,8 @@ const LocationStepSimple = ({ onNext }) => {
 	const [progress, setProgress] = useState(0);
 	const [googleImages, setGoogleImages] = useState({ streetViews: [], satellite: null });
 
-	// Show Google Maps images immediately (synchronous)
-	const showGoogleImages = (latitude, longitude) => {
+	// Show Google Maps images immediately (synchronous) and store to DB
+	const showGoogleImages = (latitude, longitude, city = null) => {
 		const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 		if (!apiKey) return;
 
@@ -31,18 +31,35 @@ const LocationStepSimple = ({ onNext }) => {
 		const streetViewUrls = headings.map(heading => ({
 			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
 			heading,
-			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West'
+			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West',
+			available: true
 		}));
 
 		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
 
+		// Set state for immediate display
 		setGoogleImages({ streetViews: streetViewUrls, satellite: satelliteUrl });
+
+		// Also update context for results page
+		updateUserInput(prev => ({
+			...prev,
+			streetViewImages: streetViewUrls,
+			satelliteViewUrl: satelliteUrl
+		}));
+
+		// Store to database in background (converts URLs to base64)
+		storeGoogleImages(streetViewUrls, satelliteUrl, {
+			latitude,
+			longitude,
+			city: city || userInput.city || 'Unknown Location',
+			address: userInput.address || ''
+		});
 	};
 
 	// Collect background data silently
 	const collectBackgroundData = async (latitude, longitude, city = null) => {
-		// Show images immediately (synchronous)
-		showGoogleImages(latitude, longitude);
+		// Show images immediately (synchronous) and store to DB
+		showGoogleImages(latitude, longitude, city);
 
 		try {
 			const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -190,8 +207,8 @@ const LocationStepSimple = ({ onNext }) => {
 		if (userInput.latitude && userInput.longitude) {
 			const zoneInfo = getZoneByCoordinates(userInput.latitude, userInput.longitude);
 			setSeismicZone(zoneInfo);
-			// Show images for existing location
-			showGoogleImages(userInput.latitude, userInput.longitude);
+			// Show images for existing location and store to DB
+			showGoogleImages(userInput.latitude, userInput.longitude, userInput.city);
 			setStatus('success');
 			return;
 		}
