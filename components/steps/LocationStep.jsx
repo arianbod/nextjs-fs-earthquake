@@ -54,17 +54,17 @@ const LocationStep = ({ onNext }) => {
 	const [googleImages, setGoogleImages] = useState({ streetViews: [], satellite: null });
 	const [imagesLoading, setImagesLoading] = useState(false);
 
-	// Direct Google Images fetch - simple and reliable
-	const fetchGoogleImages = async (latitude, longitude) => {
+	// Direct Google Images fetch - simple and synchronous for display
+	const showGoogleImages = (latitude, longitude) => {
 		const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 		if (!apiKey) {
-			console.warn('No Google Maps API key');
+			console.warn('No Google Maps API key available');
 			return;
 		}
 
-		setImagesLoading(true);
+		console.log('showGoogleImages called for:', latitude, longitude);
 
-		// Generate URLs for all angles
+		// Generate URLs - these work directly as img src (no async needed)
 		const headings = [0, 90, 180, 270];
 		const streetViewUrls = headings.map(heading => ({
 			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
@@ -74,7 +74,9 @@ const LocationStep = ({ onNext }) => {
 
 		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
 
-		// Set immediately for display (URLs work directly)
+		console.log('Setting googleImages state:', { streetViews: streetViewUrls.length, satellite: !!satelliteUrl });
+
+		// Set state immediately - this triggers re-render with images
 		setGoogleImages({
 			streetViews: streetViewUrls,
 			satellite: satelliteUrl
@@ -87,8 +89,21 @@ const LocationStep = ({ onNext }) => {
 			satelliteViewUrl: satelliteUrl,
 			streetViewImages: streetViewUrls.map(sv => ({ ...sv, available: true })),
 		}));
+	};
 
-		// Try to convert to base64 and save to DB in background
+	// Background storage to database (non-blocking)
+	const storeImagesToDatabase = async (latitude, longitude) => {
+		const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+		if (!apiKey) return;
+
+		const headings = [0, 90, 180, 270];
+		const streetViewUrls = headings.map(heading => ({
+			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
+			heading,
+			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West'
+		}));
+		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
+
 		try {
 			const locationData = {
 				latitude,
@@ -101,16 +116,17 @@ const LocationStep = ({ onNext }) => {
 		} catch (err) {
 			console.warn('Failed to store images to DB:', err);
 		}
-
-		setImagesLoading(false);
 	};
 
 	// Enhanced automatic data collection
 	const collectEnhancedData = async (latitude, longitude, fallbackCity = null) => {
 		setAutoDataLoading(true);
 
-		// Immediately fetch Google images
-		fetchGoogleImages(latitude, longitude);
+		// Immediately show Google images (synchronous - no waiting)
+		showGoogleImages(latitude, longitude);
+
+		// Store to database in background (non-blocking)
+		storeImagesToDatabase(latitude, longitude);
 
 		try {
 			// Parallel data collection from multiple sources
@@ -359,8 +375,8 @@ const LocationStep = ({ onNext }) => {
 			soilType: zoneInfo.soilType || prev.typeOfSoil
 		}));
 
-		// Fetch new images for changed location
-		fetchGoogleImages(lat, lng);
+		// Show images immediately for changed location
+		showGoogleImages(lat, lng);
 
 		// Collect enhanced data for new location
 		collectEnhancedData(lat, lng, null);
@@ -375,9 +391,9 @@ const LocationStep = ({ onNext }) => {
 			const zoneInfo = getZoneByCoordinates(userInput.latitude, userInput.longitude);
 			setSeismicZoneInfo(zoneInfo);
 
-			// Fetch Google images for this location
+			// Show Google images for this location
 			if (googleImages.streetViews.length === 0) {
-				fetchGoogleImages(userInput.latitude, userInput.longitude);
+				showGoogleImages(userInput.latitude, userInput.longitude);
 			}
 
 			setIsLoading(false);
