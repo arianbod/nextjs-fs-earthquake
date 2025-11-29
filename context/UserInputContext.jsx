@@ -337,10 +337,23 @@ export const UserInputProvider = ({ children }) => {
 		try {
 			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
 
-			const result = await updateAssessment(userInput.assessmentId, {
+			// Include AI-suggested title and description if available
+			const updateData = {
 				aiPhotoAnalysis: analysisData,
 				currentStep: 4,
-			});
+			};
+
+			// Use AI-suggested title only if no title exists yet
+			if (analysisData?.suggestedTitle && !userInput.title) {
+				updateData.title = analysisData.suggestedTitle;
+			}
+
+			// Use AI-suggested description only if no description exists yet
+			if (analysisData?.suggestedDescription && !userInput.description) {
+				updateData.description = analysisData.suggestedDescription;
+			}
+
+			const result = await updateAssessment(userInput.assessmentId, updateData);
 
 			if (result.success) {
 				setUserInput((prev) => ({
@@ -349,6 +362,9 @@ export const UserInputProvider = ({ children }) => {
 					lastSavedAt: new Date().toISOString(),
 					aiAnalysisData: analysisData,
 					aiAnalysisComplete: true,
+					// Update title and description if set from AI suggestion
+					...(updateData.title ? { title: updateData.title } : {}),
+					...(updateData.description ? { description: updateData.description } : {}),
 				}));
 				return true;
 			} else {
@@ -358,6 +374,40 @@ export const UserInputProvider = ({ children }) => {
 		} catch (error) {
 			console.error('Error saving AI photo analysis:', error);
 			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
+			return false;
+		}
+	}, [userInput.assessmentId, userInput.title, userInput.description]);
+
+	/**
+	 * Save user-edited title and description to database
+	 * @param {string} title - Assessment title
+	 * @param {string} description - Assessment description
+	 * @returns {Promise<boolean>} Success status
+	 */
+	const saveTitleAndDescription = useCallback(async (title, description) => {
+		if (!userInput.assessmentId) return false;
+
+		try {
+			const updateData = {};
+			if (title !== undefined) updateData.title = title;
+			if (description !== undefined) updateData.description = description;
+
+			// Only save if there's something to update
+			if (Object.keys(updateData).length === 0) return true;
+
+			const result = await updateAssessment(userInput.assessmentId, updateData);
+
+			if (result.success) {
+				setUserInput((prev) => ({
+					...prev,
+					...(title !== undefined ? { title } : {}),
+					...(description !== undefined ? { description } : {}),
+				}));
+				return true;
+			}
+			return false;
+		} catch (error) {
+			console.error('Error saving title/description:', error);
 			return false;
 		}
 	}, [userInput.assessmentId]);
@@ -677,6 +727,7 @@ export const UserInputProvider = ({ children }) => {
 		saveLocationToDb,
 		saveWeatherToDb,
 		saveAiPhotoAnalysisToDb,
+		saveTitleAndDescription,
 		saveBuildingInfoToDb,
 		saveStructuralDataToDb,
 		saveSafetyResultToDb,

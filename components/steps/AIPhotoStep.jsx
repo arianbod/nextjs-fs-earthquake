@@ -15,12 +15,15 @@ import {
 	Plus,
 	Loader2,
 	RotateCcw,
+	Pencil,
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => {
-	const { storeUploadedPhotos, saveAiPhotoAnalysisToDb } = useUserInput();
+	const { storeUploadedPhotos, saveAiPhotoAnalysisToDb, saveTitleAndDescription } = useUserInput();
 	const [images, setImages] = useState([]);
 	const [analyzing, setAnalyzing] = useState(false);
 	const [progress, setProgress] = useState(0);
@@ -28,6 +31,9 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 	const [error, setError] = useState(null);
 	const [showCelebration, setShowCelebration] = useState(false);
 	const [isRestoring, setIsRestoring] = useState(true);
+	const [editableTitle, setEditableTitle] = useState('');
+	const [editableDescription, setEditableDescription] = useState('');
+	const [isEditingTitle, setIsEditingTitle] = useState(false);
 	const fileRef = useRef(null);
 	const cameraRef = useRef(null);
 
@@ -104,6 +110,14 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 			setResults(processed);
 			setShowCelebration(true);
 			setImages(prev => prev.map(img => ({ ...img, analyzed: true })));
+
+			// Set editable title and description from AI suggestions
+			if (processed?.suggestedTitle) {
+				setEditableTitle(processed.suggestedTitle);
+			}
+			if (processed?.suggestedDescription) {
+				setEditableDescription(processed.suggestedDescription);
+			}
 
 			if (processed) {
 				let stories = processed.buildingCharacteristics?.stories;
@@ -361,19 +375,54 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 				<motion.div
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
-					className="flex-1 flex flex-col p-4"
+					className="flex-1 flex flex-col p-4 overflow-y-auto"
 				>
 					{/* Success header */}
 					<motion.div
 						initial={{ scale: 0 }}
 						animate={{ scale: 1 }}
 						transition={{ type: "spring", stiffness: 300 }}
-						className="flex items-center justify-center gap-3 mb-6"
+						className="flex items-center justify-center gap-3 mb-4"
 					>
-						<div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-							<Check className="w-6 h-6 text-white" strokeWidth={3} />
+						<div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+							<Check className="w-5 h-5 text-white" strokeWidth={3} />
 						</div>
-						<span className="text-xl font-bold text-gray-900 dark:text-white">Done!</span>
+						<span className="text-lg font-bold text-gray-900 dark:text-white">Analysis Complete!</span>
+					</motion.div>
+
+					{/* Editable Title & Description */}
+					<motion.div
+						initial={{ y: 20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1 }}
+						transition={{ delay: 0.15 }}
+						className="mb-4"
+					>
+						<div className="bg-gradient-to-br from-blue-50 to-violet-50 dark:from-blue-900/20 dark:to-violet-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-800"
+						>
+							<div className="flex items-center gap-2 mb-3">
+								<Pencil className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+								<span className="text-sm font-medium text-blue-700 dark:text-blue-300">Name Your Assessment</span>
+							</div>
+
+							<Input
+								value={editableTitle}
+								onChange={(e) => setEditableTitle(e.target.value)}
+								placeholder="e.g., My Home in Antalya"
+								className="mb-2 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-700 focus:border-blue-400"
+							/>
+
+							<Textarea
+								value={editableDescription}
+								onChange={(e) => setEditableDescription(e.target.value)}
+								placeholder="Optional: Add notes about this building..."
+								rows={2}
+								className="bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-700 focus:border-blue-400 resize-none text-sm"
+							/>
+
+							<p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-2">
+								AI suggested this title based on the building analysis
+							</p>
+						</div>
 					</motion.div>
 
 					{/* Results card */}
@@ -381,9 +430,9 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						initial={{ y: 40, opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
 						transition={{ delay: 0.2 }}
-						className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-5 mb-6"
+						className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 mb-4"
 					>
-						<div className="grid grid-cols-2 gap-4">
+						<div className="grid grid-cols-2 gap-3">
 							<ResultItem
 								label="Stories"
 								value={results?.buildingCharacteristics?.stories || '?'}
@@ -412,7 +461,18 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						className="mt-auto space-y-3"
 					>
 						<Button
-							onClick={onNext}
+							onClick={async () => {
+								// Save title/description to database before continuing
+								if (editableTitle || editableDescription) {
+									updateUserInput({
+										title: editableTitle || undefined,
+										description: editableDescription || undefined,
+									});
+									// Also persist to database
+									await saveTitleAndDescription(editableTitle, editableDescription);
+								}
+								onNext();
+							}}
 							size="lg"
 							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-emerald-500 to-green-500 hover:opacity-90 shadow-xl shadow-emerald-500/25"
 						>

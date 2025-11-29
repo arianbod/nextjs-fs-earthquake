@@ -107,6 +107,10 @@ function formatAnalysisResult(raw, type) {
 
   // Default building analysis
   return {
+    // AI-generated title and description
+    suggestedTitle: raw?.suggestedTitle || null,
+    suggestedDescription: raw?.suggestedDescription || null,
+
     confidence: raw?.confidence || 'high',
     detectedFeatures: {
       buildingType: raw?.structuralSystem || raw?.buildingType || 'Unknown',
@@ -200,6 +204,12 @@ Estimate building dimensions, footprint shape, and surrounding conditions from t
 
 const USER_PROMPTS = {
   building: `Analyze these building photos for earthquake safety assessment and extract:
+
+ASSESSMENT TITLE & DESCRIPTION:
+- Generate a concise, descriptive title for this assessment (e.g., "4-Story RC Apartment Building" or "Modern Steel Commercial Complex")
+- Write a brief 1-2 sentence description summarizing the building
+
+STRUCTURAL ANALYSIS:
 - Building dimensions (estimate in meters)
 - Number of stories/floors
 - Structural system type (concrete frame, steel frame, masonry, timber, etc.)

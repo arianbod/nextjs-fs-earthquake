@@ -5,6 +5,7 @@ import { useUser, SignInButton } from '@clerk/nextjs';
 import { isTeamMember, isAdmin } from '@/config/team-members';
 import SwaggerUI from '@/components/api-docs/SwaggerUI';
 import ApiTester from '@/components/api-docs/ApiTester';
+import JsonBlock from '@/components/api-docs/JsonBlock';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -380,32 +381,58 @@ export default function ApiDocsPage() {
 
                   <div className="space-y-3 text-sm">
                     <div>
-                      <p className="font-medium mb-1">Headers</p>
+                      <p className="font-semibold mb-1 text-blue-600">REQUIRED HEADERS</p>
                       <pre className="bg-gray-900 text-gray-100 p-2 rounded text-xs overflow-x-auto">
 X-Platform-Token: your_service_token
 Content-Type: application/json</pre>
                     </div>
 
                     <div>
-                      <p className="font-medium mb-1">Request Body</p>
-                      <pre className="bg-gray-900 text-gray-100 p-2 rounded text-xs overflow-x-auto">
-<code className="language-json">{`{
+                      <p className="font-semibold mb-1 text-blue-600">INPUT (Request Body)</p>
+                      <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                        <JsonBlock
+                          title="Schema"
+                          json={`{
+  "userId": "string (required)",
+  "appId": "string (required)",
+  "tier": "WEB_APP | BATCH_JOB | DEV_TESTING (required)"
+}`}
+                        />
+                        <JsonBlock
+                          title="Example"
+                          json={`{
   "userId": "user_123",
   "appId": "your-app-id",
   "tier": "WEB_APP"
-}`}</code></pre>
+}`}
+                        />
+                      </div>
                     </div>
 
                     <div>
-                      <p className="font-medium mb-1">Response (201)</p>
-                      <pre className="bg-gray-900 text-gray-100 p-2 rounded text-xs overflow-x-auto">
-<code className="language-json">{`{
+                      <p className="font-semibold mb-1 text-green-600">OUTPUT (Response 201 - Success)</p>
+                      <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                        <JsonBlock
+                          title="Schema"
+                          json={`{
+  "success": true,
+  "data": {
+    "token": "string (JWT token - expires in 24h)",
+    "expiresAt": "ISO8601 datetime string"
+  }
+}`}
+                        />
+                        <JsonBlock
+                          title="Example"
+                          json={`{
   "success": true,
   "data": {
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "expiresAt": "2025-11-25T00:00:00.000Z"
   }
-}`}</code></pre>
+}`}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -452,16 +479,17 @@ Content-Type: application/json</pre>
                 </div>
 
                 {/* Complete Assessment */}
-                <div className="border-l-4 border-green-500 pl-4">
+                <div className="border-l-4 border-green-500 pl-4 bg-green-50 p-4 rounded-r">
                   <div className="flex items-baseline gap-2 mb-2">
-                    <Badge variant="outline" className="bg-green-50">POST</Badge>
-                    <code className="text-sm font-mono">/assessment/complete</code>
+                    <Badge variant="outline" className="bg-green-100 font-semibold">POST</Badge>
+                    <code className="text-sm font-mono font-semibold">/assessment/complete</code>
+                    <Badge className="ml-2 bg-green-600">Main API</Badge>
                   </div>
-                  <p className="text-sm mb-3">Perform complete building safety assessment</p>
+                  <p className="text-sm mb-3 font-medium">Perform complete building safety assessment</p>
 
                   <div className="space-y-3 text-sm">
                     <div>
-                      <p className="font-medium mb-1">Headers</p>
+                      <p className="font-semibold mb-1 text-blue-600">REQUIRED HEADERS</p>
                       <pre className="bg-gray-900 text-gray-100 p-2 rounded text-xs overflow-x-auto">
 X-Platform-Token: your_service_token
 Authorization: Bearer user_jwt_token
@@ -469,56 +497,110 @@ Content-Type: application/json</pre>
                     </div>
 
                     <div>
-                      <p className="font-medium mb-1">Request Body</p>
-                      <pre className="bg-gray-900 text-gray-100 p-2 rounded text-xs overflow-x-auto">
-<code className="language-json">{`{
+                      <p className="font-semibold mb-1 text-blue-600">INPUT (Request Body)</p>
+                      <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                        <JsonBlock
+                          title="Schema"
+                          json={`{
   "location": {
-    "latitude": 41.0082,
-    "longitude": 28.9784
+    "latitude": "number (required) - GPS latitude",
+    "longitude": "number (required) - GPS longitude"
   },
   "building": {
-    "structuralSystem": "C2",
-    "numberOfStories": 5,
-    "yearOfConstruction": 2010,
-    "designRegulation": "2007-2018",
-    "typeOfSoil": "ZC",
-    "typeOfEarthquake": "Zone 4"
+    "structuralSystem": "string (required) - Code from /parameters",
+    "numberOfStories": "number (required)",
+    "yearOfConstruction": "number (required)",
+    "designRegulation": "string (required) - Code from /parameters",
+    "typeOfSoil": "string (optional) - ZA, ZB, ZC, ZD, ZE",
+    "typeOfEarthquake": "string (optional) - Zone 1-4"
   },
   "options": {
-    "includeAiAnalysis": true,
-    "includeLocationIntelligence": true,
-    "includeWeatherRisk": true
+    "includeAiAnalysis": "boolean (optional) - default: false",
+    "includeLocationIntelligence": "boolean (optional) - default: false",
+    "includeWeatherRisk": "boolean (optional) - default: false"
   }
-}`}</code></pre>
+}`}
+                        />
+                        <JsonBlock
+                          title="Example"
+                          json={{
+                            location: {
+                              latitude: 41.0082,
+                              longitude: 28.9784
+                            },
+                            building: {
+                              structuralSystem: "C2",
+                              numberOfStories: 5,
+                              yearOfConstruction: 2010,
+                              designRegulation: "2007-2018",
+                              typeOfSoil: "ZC",
+                              typeOfEarthquake: "Zone 4"
+                            },
+                            options: {
+                              includeAiAnalysis: true,
+                              includeLocationIntelligence: true,
+                              includeWeatherRisk: true
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <div>
-                      <p className="font-medium mb-1">Response (200)</p>
-                      <pre className="bg-gray-900 text-gray-100 p-2 rounded text-xs overflow-x-auto">
-<code className="language-json">{`{
-  "success": true,
+                      <p className="font-semibold mb-1 text-green-600">OUTPUT (Response 200 - Success)</p>
+                      <div className="bg-gray-50 border border-gray-200 rounded p-2">
+                        <JsonBlock
+                          title="Schema"
+                          json={`{
+  "success": "boolean - always true on success",
   "data": {
     "safetyScore": {
-      "overall": 72.5,
-      "interpretation": "Moderate risk",
-      "buildingClassification": "Class B"
+      "overall": "number (0-100) - Safety score",
+      "interpretation": "string - Risk level description",
+      "buildingClassification": "string - Class A/B/C/D"
     },
     "seismicData": {
-      "zone": "Zone 4",
-      "pga": 0.4,
-      "riskLevel": "High"
+      "zone": "string - Earthquake zone",
+      "pga": "number - Peak ground acceleration",
+      "riskLevel": "string - Risk level"
     },
     "location": {
-      "address": "Sultanahmet, Istanbul",
-      "nearbyBuildings": [...],
-      "terrain": {...}
+      "address": "string - Building address",
+      "nearbyBuildings": "array - Adjacent structures",
+      "terrain": "object - Terrain analysis"
     },
-    "recommendations": [
-      "Consider structural reinforcement",
-      "Regular maintenance required"
-    ]
+    "recommendations": "array of strings - Safety recommendations"
   }
-}`}</code></pre>
+}`}
+                        />
+                        <JsonBlock
+                          title="Example"
+                          json={{
+                            success: true,
+                            data: {
+                              safetyScore: {
+                                overall: 72.5,
+                                interpretation: "Moderate risk",
+                                buildingClassification: "Class B"
+                              },
+                              seismicData: {
+                                zone: "Zone 4",
+                                pga: 0.4,
+                                riskLevel: "High"
+                              },
+                              location: {
+                                address: "Sultanahmet, Istanbul",
+                                nearbyBuildings: [],
+                                terrain: {}
+                              },
+                              recommendations: [
+                                "Consider structural reinforcement",
+                                "Regular maintenance required"
+                              ]
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

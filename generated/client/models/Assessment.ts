@@ -45,6 +45,7 @@ export type AssessmentMinAggregateOutputType = {
   assessmentType: string | null
   version: string | null
   title: string | null
+  description: string | null
 }
 
 export type AssessmentMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type AssessmentMaxAggregateOutputType = {
   assessmentType: string | null
   version: string | null
   title: string | null
+  description: string | null
 }
 
 export type AssessmentCountAggregateOutputType = {
@@ -71,7 +73,9 @@ export type AssessmentCountAggregateOutputType = {
   assessmentType: number
   version: number
   title: number
+  description: number
   weather: number
+  aiPhotoAnalysis: number
   structuralSystem: number
   irregularities: number
   planDefinition: number
@@ -102,6 +106,7 @@ export type AssessmentMinAggregateInputType = {
   assessmentType?: true
   version?: true
   title?: true
+  description?: true
 }
 
 export type AssessmentMaxAggregateInputType = {
@@ -115,6 +120,7 @@ export type AssessmentMaxAggregateInputType = {
   assessmentType?: true
   version?: true
   title?: true
+  description?: true
 }
 
 export type AssessmentCountAggregateInputType = {
@@ -128,7 +134,9 @@ export type AssessmentCountAggregateInputType = {
   assessmentType?: true
   version?: true
   title?: true
+  description?: true
   weather?: true
+  aiPhotoAnalysis?: true
   structuralSystem?: true
   irregularities?: true
   planDefinition?: true
@@ -236,7 +244,9 @@ export type AssessmentGroupByOutputType = {
   assessmentType: string
   version: string
   title: string | null
+  description: string | null
   weather: runtime.JsonValue | null
+  aiPhotoAnalysis: runtime.JsonValue | null
   structuralSystem: runtime.JsonValue | null
   irregularities: runtime.JsonValue | null
   planDefinition: runtime.JsonValue | null
@@ -280,7 +290,9 @@ export type AssessmentWhereInput = {
   assessmentType?: Prisma.StringFilter<"Assessment"> | string
   version?: Prisma.StringFilter<"Assessment"> | string
   title?: Prisma.StringNullableFilter<"Assessment"> | string | null
+  description?: Prisma.StringNullableFilter<"Assessment"> | string | null
   weather?: Prisma.JsonNullableFilter<"Assessment">
+  aiPhotoAnalysis?: Prisma.JsonNullableFilter<"Assessment">
   structuralSystem?: Prisma.JsonNullableFilter<"Assessment">
   irregularities?: Prisma.JsonNullableFilter<"Assessment">
   planDefinition?: Prisma.JsonNullableFilter<"Assessment">
@@ -305,7 +317,9 @@ export type AssessmentOrderByWithRelationInput = {
   assessmentType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   weather?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiPhotoAnalysis?: Prisma.SortOrderInput | Prisma.SortOrder
   structuralSystem?: Prisma.SortOrderInput | Prisma.SortOrder
   irregularities?: Prisma.SortOrderInput | Prisma.SortOrder
   planDefinition?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -333,7 +347,9 @@ export type AssessmentWhereUniqueInput = Prisma.AtLeast<{
   assessmentType?: Prisma.StringFilter<"Assessment"> | string
   version?: Prisma.StringFilter<"Assessment"> | string
   title?: Prisma.StringNullableFilter<"Assessment"> | string | null
+  description?: Prisma.StringNullableFilter<"Assessment"> | string | null
   weather?: Prisma.JsonNullableFilter<"Assessment">
+  aiPhotoAnalysis?: Prisma.JsonNullableFilter<"Assessment">
   structuralSystem?: Prisma.JsonNullableFilter<"Assessment">
   irregularities?: Prisma.JsonNullableFilter<"Assessment">
   planDefinition?: Prisma.JsonNullableFilter<"Assessment">
@@ -358,7 +374,9 @@ export type AssessmentOrderByWithAggregationInput = {
   assessmentType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   weather?: Prisma.SortOrderInput | Prisma.SortOrder
+  aiPhotoAnalysis?: Prisma.SortOrderInput | Prisma.SortOrder
   structuralSystem?: Prisma.SortOrderInput | Prisma.SortOrder
   irregularities?: Prisma.SortOrderInput | Prisma.SortOrder
   planDefinition?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -387,7 +405,9 @@ export type AssessmentScalarWhereWithAggregatesInput = {
   assessmentType?: Prisma.StringWithAggregatesFilter<"Assessment"> | string
   version?: Prisma.StringWithAggregatesFilter<"Assessment"> | string
   title?: Prisma.StringNullableWithAggregatesFilter<"Assessment"> | string | null
+  description?: Prisma.StringNullableWithAggregatesFilter<"Assessment"> | string | null
   weather?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
+  aiPhotoAnalysis?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
   structuralSystem?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
   irregularities?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
   planDefinition?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
@@ -408,7 +428,9 @@ export type AssessmentCreateInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -433,7 +455,9 @@ export type AssessmentUncheckedCreateInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -458,7 +482,9 @@ export type AssessmentUpdateInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -483,7 +509,9 @@ export type AssessmentUncheckedUpdateInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -508,7 +536,9 @@ export type AssessmentCreateManyInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -529,7 +559,9 @@ export type AssessmentUpdateManyMutationInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -550,7 +582,9 @@ export type AssessmentUncheckedUpdateManyInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -571,7 +605,9 @@ export type AssessmentCountOrderByAggregateInput = {
   assessmentType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   weather?: Prisma.SortOrder
+  aiPhotoAnalysis?: Prisma.SortOrder
   structuralSystem?: Prisma.SortOrder
   irregularities?: Prisma.SortOrder
   planDefinition?: Prisma.SortOrder
@@ -596,6 +632,7 @@ export type AssessmentMaxOrderByAggregateInput = {
   assessmentType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
 }
 
 export type AssessmentMinOrderByAggregateInput = {
@@ -609,6 +646,7 @@ export type AssessmentMinOrderByAggregateInput = {
   assessmentType?: Prisma.SortOrder
   version?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  description?: Prisma.SortOrder
 }
 
 export type AssessmentSumOrderByAggregateInput = {
@@ -691,7 +729,9 @@ export type AssessmentCreateWithoutLocationInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -715,7 +755,9 @@ export type AssessmentUncheckedCreateWithoutLocationInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -755,7 +797,9 @@ export type AssessmentUpdateWithoutLocationInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -779,7 +823,9 @@ export type AssessmentUncheckedUpdateWithoutLocationInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -803,7 +849,9 @@ export type AssessmentCreateWithoutBuildingInfoInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -827,7 +875,9 @@ export type AssessmentUncheckedCreateWithoutBuildingInfoInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -867,7 +917,9 @@ export type AssessmentUpdateWithoutBuildingInfoInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -891,7 +943,9 @@ export type AssessmentUncheckedUpdateWithoutBuildingInfoInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -915,7 +969,9 @@ export type AssessmentCreateWithoutSafetyResultInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -939,7 +995,9 @@ export type AssessmentUncheckedCreateWithoutSafetyResultInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -979,7 +1037,9 @@ export type AssessmentUpdateWithoutSafetyResultInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1003,7 +1063,9 @@ export type AssessmentUncheckedUpdateWithoutSafetyResultInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1027,7 +1089,9 @@ export type AssessmentCreateWithoutImagesInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1051,7 +1115,9 @@ export type AssessmentUncheckedCreateWithoutImagesInput = {
   assessmentType?: string
   version?: string
   title?: string | null
+  description?: string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1091,7 +1157,9 @@ export type AssessmentUpdateWithoutImagesInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1115,7 +1183,9 @@ export type AssessmentUncheckedUpdateWithoutImagesInput = {
   assessmentType?: Prisma.StringFieldUpdateOperationsInput | string
   version?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weather?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  aiPhotoAnalysis?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   structuralSystem?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   irregularities?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   planDefinition?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1170,7 +1240,9 @@ export type AssessmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   assessmentType?: boolean
   version?: boolean
   title?: boolean
+  description?: boolean
   weather?: boolean
+  aiPhotoAnalysis?: boolean
   structuralSystem?: boolean
   irregularities?: boolean
   planDefinition?: boolean
@@ -1196,7 +1268,9 @@ export type AssessmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   assessmentType?: boolean
   version?: boolean
   title?: boolean
+  description?: boolean
   weather?: boolean
+  aiPhotoAnalysis?: boolean
   structuralSystem?: boolean
   irregularities?: boolean
   planDefinition?: boolean
@@ -1217,7 +1291,9 @@ export type AssessmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   assessmentType?: boolean
   version?: boolean
   title?: boolean
+  description?: boolean
   weather?: boolean
+  aiPhotoAnalysis?: boolean
   structuralSystem?: boolean
   irregularities?: boolean
   planDefinition?: boolean
@@ -1238,7 +1314,9 @@ export type AssessmentSelectScalar = {
   assessmentType?: boolean
   version?: boolean
   title?: boolean
+  description?: boolean
   weather?: boolean
+  aiPhotoAnalysis?: boolean
   structuralSystem?: boolean
   irregularities?: boolean
   planDefinition?: boolean
@@ -1248,7 +1326,7 @@ export type AssessmentSelectScalar = {
   neighborBuildings?: boolean
 }
 
-export type AssessmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "createdAt" | "updatedAt" | "completedAt" | "status" | "currentStep" | "assessmentType" | "version" | "title" | "weather" | "structuralSystem" | "irregularities" | "planDefinition" | "manipulations" | "specificConditions" | "extraLoad" | "neighborBuildings", ExtArgs["result"]["assessment"]>
+export type AssessmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "createdAt" | "updatedAt" | "completedAt" | "status" | "currentStep" | "assessmentType" | "version" | "title" | "description" | "weather" | "aiPhotoAnalysis" | "structuralSystem" | "irregularities" | "planDefinition" | "manipulations" | "specificConditions" | "extraLoad" | "neighborBuildings", ExtArgs["result"]["assessment"]>
 export type AssessmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   location?: boolean | Prisma.Assessment$locationArgs<ExtArgs>
   buildingInfo?: boolean | Prisma.Assessment$buildingInfoArgs<ExtArgs>
@@ -1278,7 +1356,9 @@ export type $AssessmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     assessmentType: string
     version: string
     title: string | null
+    description: string | null
     weather: runtime.JsonValue | null
+    aiPhotoAnalysis: runtime.JsonValue | null
     structuralSystem: runtime.JsonValue | null
     irregularities: runtime.JsonValue | null
     planDefinition: runtime.JsonValue | null
@@ -1723,7 +1803,9 @@ export interface AssessmentFieldRefs {
   readonly assessmentType: Prisma.FieldRef<"Assessment", 'String'>
   readonly version: Prisma.FieldRef<"Assessment", 'String'>
   readonly title: Prisma.FieldRef<"Assessment", 'String'>
+  readonly description: Prisma.FieldRef<"Assessment", 'String'>
   readonly weather: Prisma.FieldRef<"Assessment", 'Json'>
+  readonly aiPhotoAnalysis: Prisma.FieldRef<"Assessment", 'Json'>
   readonly structuralSystem: Prisma.FieldRef<"Assessment", 'Json'>
   readonly irregularities: Prisma.FieldRef<"Assessment", 'Json'>
   readonly planDefinition: Prisma.FieldRef<"Assessment", 'Json'>

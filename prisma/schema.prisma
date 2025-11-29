@@ -193,7 +193,8 @@ model Assessment {
   // Assessment metadata
   assessmentType      String              @default("complete") @map("assessment_type") // complete, quick, detailed
   version             String              @default("1.0") // App version for tracking
-  title               String?             // User-friendly name (auto-generated from address)
+  title               String?             // User-friendly name (auto-generated or user-defined)
+  description         String?             // User notes or AI-generated description
 
   // Weather data (from step 2)
   weather             Json?               // { temperature, humidity, conditions, fetchedAt }

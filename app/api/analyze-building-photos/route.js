@@ -45,6 +45,10 @@ ${planContext}
 
 Please analyze these building exterior photographs and provide:
 
+ASSESSMENT TITLE & DESCRIPTION:
+- Generate a concise, descriptive title for this assessment (e.g., "4-Story RC Apartment in Antalya" or "Modern Steel Commercial Building")
+- Write a brief 1-2 sentence description summarizing the building type and key characteristics
+
 VISUAL VERIFICATION:
 - Actual building dimensions from photos
 - Number of stories visible

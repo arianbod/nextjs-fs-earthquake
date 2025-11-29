@@ -253,6 +253,11 @@ function AssessmentCard({ assessment, onClick, index }) {
 						<h3 className="font-semibold text-gray-900 dark:text-white truncate text-base mb-1">
 							{assessment.title || 'Untitled Assessment'}
 						</h3>
+						{assessment.description && (
+							<p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mb-1">
+								{assessment.description}
+							</p>
+						)}
 						{assessment.location && (
 							<p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 truncate">
 								<MapPin className="h-3.5 w-3.5 flex-shrink-0" />
