@@ -51,11 +51,67 @@ const LocationStep = ({ onNext }) => {
 	const [streetViewData, setStreetViewData] = useState(null);
 	const [autoDataLoading, setAutoDataLoading] = useState(false);
 	const [activeTab, setActiveTab] = useState('location');
+	const [googleImages, setGoogleImages] = useState({ streetViews: [], satellite: null });
+	const [imagesLoading, setImagesLoading] = useState(false);
+
+	// Direct Google Images fetch - simple and reliable
+	const fetchGoogleImages = async (latitude, longitude) => {
+		const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+		if (!apiKey) {
+			console.warn('No Google Maps API key');
+			return;
+		}
+
+		setImagesLoading(true);
+
+		// Generate URLs for all angles
+		const headings = [0, 90, 180, 270];
+		const streetViewUrls = headings.map(heading => ({
+			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
+			heading,
+			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West'
+		}));
+
+		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
+
+		// Set immediately for display (URLs work directly)
+		setGoogleImages({
+			streetViews: streetViewUrls,
+			satellite: satelliteUrl
+		});
+
+		// Also store in context for later use
+		updateUserInput(prev => ({
+			...prev,
+			streetViewUrl: streetViewUrls[0]?.url,
+			satelliteViewUrl: satelliteUrl,
+			streetViewImages: streetViewUrls.map(sv => ({ ...sv, available: true })),
+		}));
+
+		// Try to convert to base64 and save to DB in background
+		try {
+			const locationData = {
+				latitude,
+				longitude,
+				city: userInput.city || 'Unknown Location',
+				address: userInput.address || ''
+			};
+			await storeGoogleImages(streetViewUrls, satelliteUrl, locationData);
+			console.log('Google images stored to database');
+		} catch (err) {
+			console.warn('Failed to store images to DB:', err);
+		}
+
+		setImagesLoading(false);
+	};
 
 	// Enhanced automatic data collection
 	const collectEnhancedData = async (latitude, longitude, fallbackCity = null) => {
 		setAutoDataLoading(true);
-		
+
+		// Immediately fetch Google images
+		fetchGoogleImages(latitude, longitude);
+
 		try {
 			// Parallel data collection from multiple sources
 			const [placesData, streetViewData] = await Promise.allSettled([
@@ -288,7 +344,7 @@ const LocationStep = ({ onNext }) => {
 		// Update seismic zone info for new location
 		const zoneInfo = getZoneByCoordinates(lat, lng);
 		setSeismicZoneInfo(zoneInfo);
-		
+
 		// Update user input with both formats
 		updateUserInput(prev => ({
 			...prev,
@@ -303,6 +359,9 @@ const LocationStep = ({ onNext }) => {
 			soilType: zoneInfo.soilType || prev.typeOfSoil
 		}));
 
+		// Fetch new images for changed location
+		fetchGoogleImages(lat, lng);
+
 		// Collect enhanced data for new location
 		collectEnhancedData(lat, lng, null);
 	};
@@ -316,12 +375,9 @@ const LocationStep = ({ onNext }) => {
 			const zoneInfo = getZoneByCoordinates(userInput.latitude, userInput.longitude);
 			setSeismicZoneInfo(zoneInfo);
 
-			// If we have enhanced data stored, restore it
-			if (userInput.streetViewImages || userInput.satelliteImage) {
-				setEnhancedData({
-					streetViewImages: userInput.streetViewImages,
-					satelliteImage: userInput.satelliteImage,
-				});
+			// Fetch Google images for this location
+			if (googleImages.streetViews.length === 0) {
+				fetchGoogleImages(userInput.latitude, userInput.longitude);
 			}
 
 			setIsLoading(false);
@@ -461,42 +517,41 @@ const LocationStep = ({ onNext }) => {
 							</div>
 
 							{/* Google Street View and Satellite Images Gallery */}
-							{(userInput.streetViewImages?.length > 0 || userInput.satelliteViewUrl || autoDataLoading) && (
+							{(googleImages.satellite || googleImages.streetViews.length > 0 || imagesLoading) && (
 								<Card className='border-blue-200 dark:border-blue-800'>
 									<CardHeader className='pb-2'>
 										<CardTitle className='flex items-center gap-2'>
 											<Camera className='h-5 w-5 text-blue-600' />
-											Captured Location Images
-											{autoDataLoading && (
+											Google Maps Images
+											{imagesLoading && (
 												<Badge variant='outline' className='ml-auto'>
 													<Loader2 className='h-3 w-3 mr-1 animate-spin' />
-													Fetching images...
+													Loading...
 												</Badge>
 											)}
-											{!autoDataLoading && (
+											{!imagesLoading && googleImages.satellite && (
 												<Badge variant='secondary' className='ml-auto'>
 													<CheckCircle2 className='h-3 w-3 mr-1' />
-													{(userInput.streetViewImages?.length || 0) + (userInput.satelliteViewUrl ? 1 : 0)} images captured
+													{googleImages.streetViews.length + 1} images
 												</Badge>
 											)}
 										</CardTitle>
 										<CardDescription>
-											These images are automatically fetched from Google Maps and stored for your assessment
+											Satellite and street view images from your location
 										</CardDescription>
 									</CardHeader>
 									<CardContent className='pt-2'>
-										{autoDataLoading ? (
-											<div className='grid grid-cols-2 md:grid-cols-3 gap-2'>
-												{[1, 2, 3, 4, 5, 6].map((i) => (
-													<Skeleton key={i} className='aspect-video rounded-lg' />
-												))}
+										{imagesLoading ? (
+											<div className='grid grid-cols-2 gap-3'>
+												<Skeleton className='aspect-video rounded-lg' />
+												<Skeleton className='aspect-video rounded-lg' />
 											</div>
 										) : (
 											<div className='space-y-3'>
 												{/* Main views: Satellite + Primary Street View */}
 												<div className='grid md:grid-cols-2 gap-3'>
 													{/* Satellite View */}
-													{userInput.satelliteViewUrl && (
+													{googleImages.satellite && (
 														<div>
 															<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
 																<Building className='h-3 w-3' />
@@ -504,11 +559,11 @@ const LocationStep = ({ onNext }) => {
 															</h4>
 															<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-sm'>
 																<img
-																	src={userInput.satelliteViewUrl}
+																	src={googleImages.satellite}
 																	alt='Satellite view of building'
 																	className='w-full h-full object-cover'
 																	onError={(e) => {
-																		e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/><text x="50" y="55" font-size="12" text-anchor="middle" fill="%236b7280">Failed to load</text></svg>';
+																		e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"><p class="text-gray-500 text-sm">Satellite view unavailable</p></div>';
 																	}}
 																/>
 															</div>
@@ -516,19 +571,19 @@ const LocationStep = ({ onNext }) => {
 													)}
 
 													{/* Primary Street View */}
-													{userInput.streetViewImages?.[0] && (
+													{googleImages.streetViews[0] && (
 														<div>
 															<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
 																<Eye className='h-3 w-3' />
-																Street Level View
+																Street View (North)
 															</h4>
 															<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-sm'>
 																<img
-																	src={userInput.streetViewImages[0].base64 || userInput.streetViewImages[0].url}
+																	src={googleImages.streetViews[0].url}
 																	alt='Street view of building'
 																	className='w-full h-full object-cover'
 																	onError={(e) => {
-																		e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/><text x="50" y="55" font-size="12" text-anchor="middle" fill="%236b7280">Failed to load</text></svg>';
+																		e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"><p class="text-gray-500 text-sm">Street view unavailable</p></div>';
 																	}}
 																/>
 															</div>
@@ -537,25 +592,25 @@ const LocationStep = ({ onNext }) => {
 												</div>
 
 												{/* Additional Street View angles */}
-												{userInput.streetViewImages && userInput.streetViewImages.length > 1 && (
+												{googleImages.streetViews.length > 1 && (
 													<div>
 														<h4 className='text-xs font-medium mb-2 flex items-center gap-1'>
 															<Sparkles className='h-3 w-3' />
-															Additional Viewing Angles ({userInput.streetViewImages.length - 1} more)
+															Additional Angles
 														</h4>
-														<div className='grid grid-cols-3 md:grid-cols-4 gap-2'>
-															{userInput.streetViewImages.slice(1).map((img, idx) => (
-																<div key={idx} className='relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-blue-400 transition-colors cursor-pointer group'>
+														<div className='grid grid-cols-3 gap-2'>
+															{googleImages.streetViews.slice(1).map((img, idx) => (
+																<div key={idx} className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 																	<img
-																		src={img.base64 || img.url}
-																		alt={img.description || `Street View angle ${idx + 2}`}
-																		className='w-full h-full object-cover group-hover:scale-105 transition-transform'
+																		src={img.url}
+																		alt={`Street View ${img.description}`}
+																		className='w-full h-full object-cover'
 																		onError={(e) => {
-																			e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e5e7eb" width="100" height="100"/><text x="50" y="55" font-size="8" text-anchor="middle" fill="%236b7280">N/A</text></svg>';
+																			e.target.style.display = 'none';
 																		}}
 																	/>
-																	<div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-1.5'>
-																		{img.heading !== undefined ? `${img.heading}°` : img.description || `Angle ${idx + 2}`}
+																	<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center'>
+																		{img.description}
 																	</div>
 																</div>
 															))}
@@ -563,10 +618,10 @@ const LocationStep = ({ onNext }) => {
 													</div>
 												)}
 
-												{/* Status indicator */}
+												{/* Status */}
 												<div className='flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg'>
 													<CheckCircle2 className='h-4 w-4' />
-													<span>All images have been captured and stored for your assessment</span>
+													<span>Images captured from Google Maps</span>
 												</div>
 											</div>
 										)}
