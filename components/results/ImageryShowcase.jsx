@@ -136,7 +136,13 @@ export function ImageryShowcase({ userInput, imageGallery }) {
 								<div>
 									<div className="flex items-center gap-2 text-white/80 text-sm mb-1">
 										<Compass className="w-4 h-4" />
-										<span>{streetViewImages[currentStreetIndex]?.angle || 'Front'} view</span>
+										<span>{
+											typeof streetViewImages[currentStreetIndex]?.description === 'string'
+												? streetViewImages[currentStreetIndex].description
+												: typeof streetViewImages[currentStreetIndex]?.angle === 'string'
+													? streetViewImages[currentStreetIndex].angle
+													: `${streetViewImages[currentStreetIndex]?.heading || 0}°`
+										} view</span>
 									</div>
 									<p className="text-white font-medium">{userInput?.address || userInput?.city}</p>
 								</div>
