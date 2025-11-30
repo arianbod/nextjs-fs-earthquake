@@ -7,7 +7,7 @@ import { useUserInput } from '@/context/UserInputContext';
 import { getZoneByCoordinates } from '@/utils/turkeySeismicData';
 import { googlePlacesService } from '@/services/googlePlacesService';
 import { streetViewService } from '@/services/streetViewService';
-import { getWeatherAnalysis } from '@/services/weatherService';
+// Weather data is fetched via secure server API route /api/weather
 import { MyMapComponent } from '@/components/MyMapComponent';
 import { MapPin, Loader2, ArrowRight, Navigation, AlertTriangle, Check, Camera, Building, Eye, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -118,7 +118,9 @@ const LocationStepSimple = ({ onNext }) => {
 
 	const fetchWeatherData = async (lat, lng) => {
 		try {
-			const weatherAnalysis = await getWeatherAnalysis(lat, lng);
+			// Call our secure server-side API route (API key stays on server)
+			const response = await fetch(`/api/weather?lat=${lat}&lon=${lng}`);
+			const weatherAnalysis = await response.json();
 
 			if (weatherAnalysis.success) {
 				// Return the full weather data structure expected by the results page
