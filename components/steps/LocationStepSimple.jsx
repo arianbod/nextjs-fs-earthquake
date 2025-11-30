@@ -7,6 +7,7 @@ import { useUserInput } from '@/context/UserInputContext';
 import { getZoneByCoordinates } from '@/utils/turkeySeismicData';
 import { googlePlacesService } from '@/services/googlePlacesService';
 import { streetViewService } from '@/services/streetViewService';
+import { getWeatherAnalysis } from '@/services/weatherService';
 import { MyMapComponent } from '@/components/MyMapComponent';
 import { MapPin, Loader2, ArrowRight, Navigation, AlertTriangle, Check, Camera, Building, Eye, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -116,11 +117,51 @@ const LocationStepSimple = ({ onNext }) => {
 	};
 
 	const fetchWeatherData = async (lat, lng) => {
-		await new Promise(resolve => setTimeout(resolve, 500));
-		return {
-			rainfall: { total5Days: Math.floor(Math.random() * 50) + 10 },
-			soilSaturationRisk: ['LOW', 'MEDIUM', 'HIGH'][Math.floor(Math.random() * 3)],
-		};
+		try {
+			const weatherAnalysis = await getWeatherAnalysis(lat, lng);
+
+			if (weatherAnalysis.success) {
+				// Return the full weather data structure expected by the results page
+				return {
+					temperature: weatherAnalysis.current?.temp || 20,
+					temp: weatherAnalysis.current?.temp || 20,
+					humidity: weatherAnalysis.current?.humidity || 50,
+					windSpeed: weatherAnalysis.current?.windSpeed || 0,
+					pressure: weatherAnalysis.current?.pressure || 1013,
+					description: weatherAnalysis.current?.description || 'clear',
+					rainfall: weatherAnalysis.rainfall || { total5Days: 0 },
+					soilSaturationRisk: weatherAnalysis.soilSaturationRisk || 'LOW',
+					analysis: weatherAnalysis.analysis,
+					success: true
+				};
+			}
+
+			// Fallback if API fails
+			return {
+				temperature: 20,
+				temp: 20,
+				humidity: 50,
+				windSpeed: 5,
+				pressure: 1013,
+				description: 'Weather data unavailable',
+				rainfall: { total5Days: 10 },
+				soilSaturationRisk: 'MEDIUM',
+				analysis: weatherAnalysis.analysis,
+				success: false
+			};
+		} catch (error) {
+			console.error('Weather fetch error:', error);
+			// Return fallback data
+			return {
+				temperature: 20,
+				temp: 20,
+				humidity: 50,
+				windSpeed: 5,
+				rainfall: { total5Days: 10 },
+				soilSaturationRisk: 'MEDIUM',
+				success: false
+			};
+		}
 	};
 
 	const requestLocation = () => {

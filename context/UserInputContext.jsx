@@ -193,8 +193,8 @@ export const UserInputProvider = ({ children }) => {
 					soilType: assessment.location.soilType,
 				}),
 
-				// Weather data
-				weather: assessment.weather,
+				// Weather data - map to weatherData for results page compatibility
+				weatherData: assessment.weather,
 
 				// Building info
 				...(assessment.buildingInfo && {
@@ -276,6 +276,13 @@ export const UserInputProvider = ({ children }) => {
 			const result = await saveLocation(assessmentId, locationData);
 
 			if (result.success) {
+				// Also save weather data if available (collected alongside location in simplified flow)
+				if (userInput.weatherData) {
+					await updateAssessment(assessmentId, {
+						weather: userInput.weatherData,
+					});
+				}
+
 				setUserInput((prev) => ({
 					...prev,
 					dbSyncStatus: 'saved',
@@ -304,7 +311,7 @@ export const UserInputProvider = ({ children }) => {
 			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'saving' }));
 
 			const result = await updateAssessment(userInput.assessmentId, {
-				weather: userInput.weather || userInput.environmentalData,
+				weather: userInput.weatherData || userInput.weather || userInput.environmentalData,
 				currentStep: 3,
 			});
 
@@ -324,7 +331,7 @@ export const UserInputProvider = ({ children }) => {
 			setUserInput((prev) => ({ ...prev, dbSyncStatus: 'error' }));
 			return false;
 		}
-	}, [userInput.assessmentId, userInput.weather, userInput.environmentalData]);
+	}, [userInput.assessmentId, userInput.weatherData, userInput.weather, userInput.environmentalData]);
 
 	/**
 	 * Save AI photo analysis results to database (Step 3)
