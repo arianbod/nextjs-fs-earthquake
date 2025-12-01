@@ -22,11 +22,16 @@ import { ExpertModeToggle } from '@/components/results/ExpertModeToggle';
 import { KeyFindings } from '@/components/results/KeyFindings';
 import { ExpertDataPanels } from '@/components/results/ExpertDataPanels';
 import PerformanceSummaryCard from '@/components/results/PerformanceSummaryCard';
+import { ShareModal } from '@/components/results/ShareModal';
+import { generatePDF } from '@/components/results/PDFReport';
+import { HistoricalEarthquakeMap } from '@/components/results/HistoricalEarthquakeMap';
+import { RetrofitCostCalculator } from '@/components/results/RetrofitCostCalculator';
+import { EmailReportModal } from '@/components/results/EmailReportModal';
 
 import {
 	AlertTriangle, CheckCircle2, Download, Share2, HomeIcon, Shield,
 	FileText, Lightbulb, Phone, ArrowRight, Wrench, Users, Copy,
-	LayoutDashboard, ChevronDown, Sparkles, Award, Target
+	LayoutDashboard, ChevronDown, Sparkles, Award, Target, Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -50,6 +55,8 @@ const ResultPage = () => {
 	const [phase, setPhase] = useState('loading'); // loading, reveal, complete
 	const [expertMode, setExpertMode] = useState(false);
 	const [showDetails, setShowDetails] = useState(false);
+	const [showShareModal, setShowShareModal] = useState(false);
+	const [showEmailModal, setShowEmailModal] = useState(false);
 	const detailsRef = useRef(null);
 
 	// Load assessment from database if ID provided
@@ -251,6 +258,24 @@ const ResultPage = () => {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+			{/* Share Modal */}
+			<ShareModal
+				isOpen={showShareModal}
+				onClose={() => setShowShareModal(false)}
+				assessmentId={savedAssessmentId || assessmentId}
+				score={safetyResult?.overallScore}
+				buildingName={userInput.address || userInput.city}
+			/>
+
+			{/* Email Modal */}
+			<EmailReportModal
+				isOpen={showEmailModal}
+				onClose={() => setShowEmailModal(false)}
+				assessmentId={savedAssessmentId || assessmentId}
+				score={safetyResult?.overallScore}
+				buildingName={userInput.address || userInput.city}
+			/>
+
 			{/* Navigation Header */}
 			<motion.header
 				initial={{ opacity: 0, y: -20 }}
@@ -370,6 +395,34 @@ const ResultPage = () => {
 								</Card>
 							</motion.div>
 
+							{/* Historical Earthquake Map */}
+							{userInput?.latitude && userInput?.longitude && (
+								<motion.div
+									initial={{ opacity: 0, y: 30 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: 0.9 }}
+									className="mb-10"
+								>
+									<HistoricalEarthquakeMap
+										latitude={parseFloat(userInput.latitude)}
+										longitude={parseFloat(userInput.longitude)}
+									/>
+								</motion.div>
+							)}
+
+							{/* Retrofit Cost Calculator */}
+							<motion.div
+								initial={{ opacity: 0, y: 30 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: 0.95 }}
+								className="mb-10"
+							>
+								<RetrofitCostCalculator
+									safetyResult={safetyResult}
+									userInput={userInput}
+								/>
+							</motion.div>
+
 							{/* Actions Section */}
 							<motion.div
 								initial={{ opacity: 0, y: 30 }}
@@ -377,24 +430,33 @@ const ResultPage = () => {
 								transition={{ delay: 1 }}
 								className="mb-10"
 							>
-								<div className="flex flex-col sm:flex-row gap-3 justify-center">
+								<div className="flex flex-col sm:flex-row gap-3 justify-center flex-wrap">
 									<Button
 										size="lg"
 										className="gap-2 h-14 px-8 bg-gradient-to-r from-violet-500 to-purple-600 hover:opacity-90"
-										onClick={() => window.print()}
+										onClick={() => generatePDF(safetyResult, userInput, savedAssessmentId || assessmentId)}
 									>
 										<Download className="h-5 w-5" />
-										Download Report
+										Download PDF
 									</Button>
 									<Button
 										size="lg"
 										variant="outline"
 										className="gap-2 h-14 px-8"
-										onClick={copyShareableLink}
+										onClick={() => setShowShareModal(true)}
 										disabled={!savedAssessmentId || savedAssessmentId === 'preview'}
 									>
 										<Share2 className="h-5 w-5" />
-										Share Results
+										Share
+									</Button>
+									<Button
+										size="lg"
+										variant="outline"
+										className="gap-2 h-14 px-8"
+										onClick={() => setShowEmailModal(true)}
+									>
+										<Mail className="h-5 w-5" />
+										Email Report
 									</Button>
 								</div>
 							</motion.div>
