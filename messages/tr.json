@@ -659,7 +659,10 @@
     "depth": "Derinlik",
     "coordinates": "Koordinatlar",
     "viewOnUsgs": "USGS'de Görüntüle",
-    "dataSource": "Veriler USGS Deprem Tehlikeleri Programı tarafından sağlanmaktadır"
+    "dataSource": "Veriler USGS Deprem Tehlikeleri Programı tarafından sağlanmaktadır",
+    "mapView": "Harita",
+    "listView": "Liste",
+    "yourBuilding": "Binanız"
   },
   "Share": {
     "shareResults": "Sonuçları Paylaş",

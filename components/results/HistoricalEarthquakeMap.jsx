@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import {
 	MapPin,
 	Activity,
@@ -11,14 +12,42 @@ import {
 	ChevronUp,
 	Info,
 	AlertTriangle,
-	Clock
+	Clock,
+	Map,
+	List
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 
+// Dynamically import map components to avoid SSR issues
+const MapContainer = dynamic(
+	() => import('react-leaflet').then(mod => mod.MapContainer),
+	{ ssr: false }
+);
+const TileLayer = dynamic(
+	() => import('react-leaflet').then(mod => mod.TileLayer),
+	{ ssr: false }
+);
+const CircleMarker = dynamic(
+	() => import('react-leaflet').then(mod => mod.CircleMarker),
+	{ ssr: false }
+);
+const Marker = dynamic(
+	() => import('react-leaflet').then(mod => mod.Marker),
+	{ ssr: false }
+);
+const Popup = dynamic(
+	() => import('react-leaflet').then(mod => mod.Popup),
+	{ ssr: false }
+);
+const Circle = dynamic(
+	() => import('react-leaflet').then(mod => mod.Circle),
+	{ ssr: false }
+);
+
 /**
  * HistoricalEarthquakeMap - Interactive map showing past earthquakes near the assessment location
- * Uses USGS Earthquake API for real-time seismic data
+ * Uses USGS Earthquake API for real-time seismic data and Leaflet/OpenStreetMap for visualization
  */
 export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 	const t = useTranslations('EarthquakeMap');
@@ -29,6 +58,16 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 	const [selectedMagnitude, setSelectedMagnitude] = useState('2.5');
 	const [expanded, setExpanded] = useState(false);
 	const [selectedQuake, setSelectedQuake] = useState(null);
+	const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
+	const [mapReady, setMapReady] = useState(false);
+
+	// Load Leaflet CSS
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			import('leaflet/dist/leaflet.css');
+			setMapReady(true);
+		}
+	}, []);
 
 	// Time range options
 	const timeRanges = {
@@ -92,13 +131,18 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 		fetchEarthquakes();
 	}, [fetchEarthquakes]);
 
-	// Get magnitude color
+	// Get magnitude color (for both CSS classes and hex values)
 	const getMagnitudeColor = (mag) => {
-		if (mag >= 7) return { bg: 'bg-red-500', text: 'text-red-600', border: 'border-red-500' };
-		if (mag >= 6) return { bg: 'bg-orange-500', text: 'text-orange-600', border: 'border-orange-500' };
-		if (mag >= 5) return { bg: 'bg-amber-500', text: 'text-amber-600', border: 'border-amber-500' };
-		if (mag >= 4) return { bg: 'bg-yellow-500', text: 'text-yellow-600', border: 'border-yellow-500' };
-		return { bg: 'bg-green-500', text: 'text-green-600', border: 'border-green-500' };
+		if (mag >= 7) return { bg: 'bg-red-500', text: 'text-red-600', hex: '#EF4444', border: 'border-red-500' };
+		if (mag >= 6) return { bg: 'bg-orange-500', text: 'text-orange-600', hex: '#F97316', border: 'border-orange-500' };
+		if (mag >= 5) return { bg: 'bg-amber-500', text: 'text-amber-600', hex: '#F59E0B', border: 'border-amber-500' };
+		if (mag >= 4) return { bg: 'bg-yellow-500', text: 'text-yellow-600', hex: '#EAB308', border: 'border-yellow-500' };
+		return { bg: 'bg-green-500', text: 'text-green-600', hex: '#22C55E', border: 'border-green-500' };
+	};
+
+	// Get circle radius based on magnitude
+	const getCircleRadius = (mag) => {
+		return Math.max(5, mag * 4);
 	};
 
 	// Get distance from building
@@ -124,7 +168,7 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 	};
 
 	// Get summary statistics
-	const getSummary = () => {
+	const summary = useMemo(() => {
 		if (earthquakes.length === 0) return null;
 
 		const magnitudes = earthquakes.map(eq => eq.properties.mag);
@@ -143,9 +187,7 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 			closestDist: getDistance(closest.geometry.coordinates[1], closest.geometry.coordinates[0]),
 			closestMag: closest.properties.mag
 		};
-	};
-
-	const summary = getSummary();
+	}, [earthquakes, latitude, longitude]);
 
 	if (!latitude || !longitude) {
 		return null;
@@ -185,32 +227,57 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 						transition={{ duration: 0.3 }}
 						className="overflow-hidden"
 					>
-						{/* Filters */}
+						{/* Filters & View Toggle */}
 						<div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-							<div className="flex flex-wrap items-center gap-3">
-								<div className="flex items-center gap-2">
-									<Calendar className="w-4 h-4 text-gray-500" />
-									<select
-										value={selectedTimeRange}
-										onChange={(e) => setSelectedTimeRange(e.target.value)}
-										className="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5"
-									>
-										{Object.entries(timeRanges).map(([key, { label }]) => (
-											<option key={key} value={key}>{label}</option>
-										))}
-									</select>
+							<div className="flex flex-wrap items-center justify-between gap-3">
+								<div className="flex flex-wrap items-center gap-3">
+									<div className="flex items-center gap-2">
+										<Calendar className="w-4 h-4 text-gray-500" />
+										<select
+											value={selectedTimeRange}
+											onChange={(e) => setSelectedTimeRange(e.target.value)}
+											className="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5"
+										>
+											{Object.entries(timeRanges).map(([key, { label }]) => (
+												<option key={key} value={key}>{label}</option>
+											))}
+										</select>
+									</div>
+									<div className="flex items-center gap-2">
+										<Filter className="w-4 h-4 text-gray-500" />
+										<select
+											value={selectedMagnitude}
+											onChange={(e) => setSelectedMagnitude(e.target.value)}
+											className="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5"
+										>
+											{magnitudeOptions.map(({ value, label }) => (
+												<option key={value} value={value}>{t('magnitude')} {label}</option>
+											))}
+										</select>
+									</div>
 								</div>
-								<div className="flex items-center gap-2">
-									<Filter className="w-4 h-4 text-gray-500" />
-									<select
-										value={selectedMagnitude}
-										onChange={(e) => setSelectedMagnitude(e.target.value)}
-										className="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5"
+								{/* View Toggle */}
+								<div className="flex items-center gap-1 bg-white dark:bg-gray-700 rounded-lg p-1 border border-gray-200 dark:border-gray-600">
+									<button
+										onClick={(e) => { e.stopPropagation(); setViewMode('map'); }}
+										className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${viewMode === 'map'
+											? 'bg-orange-500 text-white'
+											: 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+											}`}
 									>
-										{magnitudeOptions.map(({ value, label }) => (
-											<option key={value} value={value}>{t('magnitude')} {label}</option>
-										))}
-									</select>
+										<Map className="w-4 h-4" />
+										{t('mapView') || 'Map'}
+									</button>
+									<button
+										onClick={(e) => { e.stopPropagation(); setViewMode('list'); }}
+										className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors ${viewMode === 'list'
+											? 'bg-orange-500 text-white'
+											: 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
+											}`}
+									>
+										<List className="w-4 h-4" />
+										{t('listView') || 'List'}
+									</button>
 								</div>
 							</div>
 						</div>
@@ -257,8 +324,144 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 							</div>
 						)}
 
-						{/* Earthquake List */}
-						{!loading && !error && (
+						{/* Map View */}
+						{!loading && !error && viewMode === 'map' && mapReady && (
+							<div className="h-96 border-t border-gray-200 dark:border-gray-700">
+								<MapContainer
+									center={[latitude, longitude]}
+									zoom={7}
+									style={{ height: '100%', width: '100%' }}
+									scrollWheelZoom={true}
+								>
+									<TileLayer
+										attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+										url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+									/>
+
+									{/* 500km radius circle */}
+									<Circle
+										center={[latitude, longitude]}
+										radius={500000}
+										pathOptions={{
+											color: '#7C3AED',
+											fillColor: '#7C3AED',
+											fillOpacity: 0.05,
+											weight: 2,
+											dashArray: '5, 10'
+										}}
+									/>
+
+									{/* Building marker */}
+									<CircleMarker
+										center={[latitude, longitude]}
+										radius={10}
+										pathOptions={{
+											color: '#7C3AED',
+											fillColor: '#7C3AED',
+											fillOpacity: 1,
+											weight: 3
+										}}
+									>
+										<Popup>
+											<div className="text-center">
+												<strong>{t('yourBuilding') || 'Your Building'}</strong>
+												<br />
+												<span className="text-xs text-gray-500">
+													{latitude.toFixed(4)}, {longitude.toFixed(4)}
+												</span>
+											</div>
+										</Popup>
+									</CircleMarker>
+
+									{/* Earthquake markers */}
+									{earthquakes.map((quake) => {
+										const { properties, geometry } = quake;
+										const [lon, lat] = geometry.coordinates;
+										const colors = getMagnitudeColor(properties.mag);
+										const distance = getDistance(lat, lon);
+
+										return (
+											<CircleMarker
+												key={quake.id}
+												center={[lat, lon]}
+												radius={getCircleRadius(properties.mag)}
+												pathOptions={{
+													color: colors.hex,
+													fillColor: colors.hex,
+													fillOpacity: 0.6,
+													weight: 2
+												}}
+											>
+												<Popup>
+													<div className="min-w-48">
+														<div className="flex items-center gap-2 mb-2">
+															<span
+																className="px-2 py-1 rounded text-white text-sm font-bold"
+																style={{ backgroundColor: colors.hex }}
+															>
+																M{properties.mag.toFixed(1)}
+															</span>
+															<span className="text-xs text-gray-500">
+																{distance} km {t('away')}
+															</span>
+														</div>
+														<p className="font-medium text-sm mb-1">
+															{properties.place || 'Unknown location'}
+														</p>
+														<p className="text-xs text-gray-500 mb-2">
+															{formatDate(properties.time)} • {t('depth')}: {geometry.coordinates[2].toFixed(1)} km
+														</p>
+														<a
+															href={properties.url}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="text-xs text-orange-600 hover:text-orange-700"
+														>
+															{t('viewOnUsgs')} →
+														</a>
+													</div>
+												</Popup>
+											</CircleMarker>
+										);
+									})}
+								</MapContainer>
+							</div>
+						)}
+
+						{/* Legend (for map view) */}
+						{!loading && !error && viewMode === 'map' && (
+							<div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+								<div className="flex flex-wrap items-center justify-center gap-4 text-xs">
+									<div className="flex items-center gap-1">
+										<div className="w-3 h-3 rounded-full bg-green-500"></div>
+										<span>2.5-3.9</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+										<span>4.0-4.9</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-3 h-3 rounded-full bg-amber-500"></div>
+										<span>5.0-5.9</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-3 h-3 rounded-full bg-orange-500"></div>
+										<span>6.0-6.9</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-3 h-3 rounded-full bg-red-500"></div>
+										<span>7.0+</span>
+									</div>
+									<div className="flex items-center gap-1 ml-4">
+										<div className="w-3 h-3 rounded-full bg-violet-500"></div>
+										<span>{t('yourBuilding') || 'Your Building'}</span>
+									</div>
+								</div>
+							</div>
+						)}
+
+						{/* List View */}
+						{!loading && !error && viewMode === 'list' && (
 							<div className="max-h-96 overflow-y-auto">
 								{earthquakes.length === 0 ? (
 									<div className="p-8 text-center text-gray-500">

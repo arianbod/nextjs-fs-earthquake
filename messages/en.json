@@ -659,7 +659,10 @@
     "depth": "Depth",
     "coordinates": "Coordinates",
     "viewOnUsgs": "View on USGS",
-    "dataSource": "Data provided by USGS Earthquake Hazards Program"
+    "dataSource": "Data provided by USGS Earthquake Hazards Program",
+    "mapView": "Map",
+    "listView": "List",
+    "yourBuilding": "Your Building"
   },
   "Share": {
     "shareResults": "Share Results",
