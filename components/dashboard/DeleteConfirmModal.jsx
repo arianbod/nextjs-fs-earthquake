@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function DeleteConfirmModal({
   isOpen,
@@ -19,6 +20,8 @@ export default function DeleteConfirmModal({
   onConfirm,
   assessmentTitle,
 }) {
+  const t = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
@@ -35,17 +38,13 @@ export default function DeleteConfirmModal({
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Assessment</AlertDialogTitle>
+          <AlertDialogTitle>{t('deleteAssessment')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete{' '}
-            <span className="font-medium text-foreground">
-              {assessmentTitle || 'this assessment'}
-            </span>
-            ? This action cannot be undone.
+            {t('deleteConfirmMessage', { title: assessmentTitle || t('thisAssessment') })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting}>{tCommon('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isDeleting}
@@ -54,10 +53,10 @@ export default function DeleteConfirmModal({
             {isDeleting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Deleting...
+                {t('deleting')}
               </>
             ) : (
-              'Delete'
+              tCommon('delete')
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

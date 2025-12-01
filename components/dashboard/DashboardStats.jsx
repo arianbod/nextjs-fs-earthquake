@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { ClipboardList, CheckCircle2, Clock, TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const statIcons = {
   total: ClipboardList,
@@ -11,6 +12,8 @@ const statIcons = {
 };
 
 export default function DashboardStats({ stats, isLoading }) {
+  const t = useTranslations('Dashboard');
+
   if (isLoading) {
     return <DashboardStatsSkeleton />;
   }
@@ -18,28 +21,28 @@ export default function DashboardStats({ stats, isLoading }) {
   const statsData = [
     {
       key: 'total',
-      label: 'Total Assessments',
+      label: t('totalAssessments'),
       value: stats?.total || 0,
       icon: statIcons.total,
       color: 'text-blue-600 bg-blue-50',
     },
     {
       key: 'completed',
-      label: 'Completed',
+      label: t('completed'),
       value: stats?.completed || 0,
       icon: statIcons.completed,
       color: 'text-green-600 bg-green-50',
     },
     {
       key: 'inProgress',
-      label: 'In Progress',
+      label: t('inProgress'),
       value: stats?.inProgress || 0,
       icon: statIcons.inProgress,
       color: 'text-orange-600 bg-orange-50',
     },
     {
       key: 'averageScore',
-      label: 'Average Score',
+      label: t('averageScore'),
       value: stats?.averageScore !== null ? `${stats.averageScore}%` : '-',
       icon: statIcons.averageScore,
       color: 'text-purple-600 bg-purple-50',

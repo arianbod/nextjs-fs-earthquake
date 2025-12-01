@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle2, AlertTriangle, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 /**
  * SafetyScoreHero - Big, clear safety score display
@@ -15,26 +16,27 @@ export function SafetyScoreHero({
   isPassing,
   className
 }) {
+  const t = useTranslations('Results');
   const scoreValue = parseFloat(score?.overallScore || 0);
   const scorePercentage = parseInt(scoreValue);
 
   // Determine grade letter
   const getGrade = (score) => {
-    if (score >= 90) return { letter: 'A', label: 'Excellent', color: 'text-green-600' };
-    if (score >= 80) return { letter: 'B', label: 'Good', color: 'text-green-500' };
-    if (score >= 70) return { letter: 'C', label: 'Acceptable', color: 'text-yellow-500' };
-    if (score >= 60) return { letter: 'D', label: 'Needs Work', color: 'text-orange-500' };
-    return { letter: 'F', label: 'At Risk', color: 'text-red-500' };
+    if (score >= 90) return { letter: 'A', label: t('gradeExcellent'), color: 'text-green-600' };
+    if (score >= 80) return { letter: 'B', label: t('gradeGood'), color: 'text-green-500' };
+    if (score >= 70) return { letter: 'C', label: t('gradeAcceptable'), color: 'text-yellow-500' };
+    if (score >= 60) return { letter: 'D', label: t('gradeNeedsWork'), color: 'text-orange-500' };
+    return { letter: 'F', label: t('gradeAtRisk'), color: 'text-red-500' };
   };
 
   const grade = getGrade(scoreValue);
 
   // Simple interpretation based on score
   const getInterpretation = (score) => {
-    if (score >= 80) return 'Your building can withstand most earthquake scenarios safely.';
-    if (score >= 70) return 'Your building has adequate earthquake protection with minor concerns.';
-    if (score >= 60) return 'Your building may need improvements for optimal earthquake safety.';
-    return 'Your building has significant vulnerabilities that should be addressed.';
+    if (score >= 80) return t('interpretationExcellent');
+    if (score >= 70) return t('interpretationGood');
+    if (score >= 60) return t('interpretationModerate');
+    return t('interpretationAtRisk');
   };
 
   return (
@@ -99,7 +101,7 @@ export function SafetyScoreHero({
             {grade.label}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {isPassing ? 'Building is safe' : 'Needs attention'}
+            {isPassing ? t('buildingIsSafe') : t('needsAttention')}
           </p>
         </div>
       </div>

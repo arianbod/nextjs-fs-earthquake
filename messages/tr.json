@@ -20,7 +20,9 @@
     "resumeStepButton": "{step}. Adıma Devam Et",
     "startNewAssessment": "Yeni Değerlendirme Başlat",
     "assessmentProgress": "Değerlendirme İlerlemesi",
-    "completedAssessments": "{count} tamamlanmış değerlendirmeniz var"
+    "completedAssessments": "{count} tamamlanmış değerlendirmeniz var",
+    "openMenu": "Menüyü aç",
+    "toggleTheme": "Tema değiştir"
   },
   "Greeting": {
     "morning": "Günaydın",
@@ -55,6 +57,8 @@
   },
   "Assessment": {
     "progress": "Değerlendirme İlerlemesi",
+    "untitled": "İsimsiz Değerlendirme",
+    "stepProgress": "{total} adımdan {step}. adım",
     "step1": {
       "title": "Konum Tespiti",
       "description": "Bina konumunu tespit et ve uydu/sokak görünümü görüntülerini yakala"
@@ -78,6 +82,75 @@
     "step6": {
       "title": "Son İnceleme",
       "description": "Sonuç oluşturmadan önce tüm değerlendirme verilerini onayla"
+    },
+    "status": {
+      "draft": "Taslak",
+      "inProgress": "Devam Ediyor",
+      "complete": "Tamamlandı",
+      "completed": "Tamamlandı",
+      "archived": "Arşivlendi"
+    },
+    "actions": {
+      "copyLink": "Bağlantıyı Kopyala",
+      "duplicate": "Çoğalt",
+      "delete": "Sil",
+      "view": "Görüntüle",
+      "continue": "Devam Et"
+    },
+    "directions": {
+      "north": "Kuzey",
+      "northeast": "Kuzeydoğu",
+      "east": "Doğu",
+      "southeast": "Güneydoğu",
+      "south": "Güney",
+      "southwest": "Güneybatı",
+      "west": "Batı",
+      "northwest": "Kuzeybatı"
+    },
+    "seismicZones": {
+      "zone1": "Bölge 1 (Düşük)",
+      "zone2": "Bölge 2 (Orta)",
+      "zone3": "Bölge 3 (Yüksek)",
+      "zone4": "Bölge 4 (Çok Yüksek)"
+    },
+    "structures": {
+      "reinforcedConcrete": "Betonarme",
+      "reinforcedConcreteDesc": "Betonarme yapısal elemanlardan oluşan binalar",
+      "reinforcedConcreteInfo": "Apartmanlar, ofisler ve ticari yapılarda yaygın olarak kullanılır.",
+      "steel": "Çelik Yapı",
+      "steelDesc": "Çelik çerçeveli binalar",
+      "steelInfo": "Gökdelenler, endüstriyel binalar ve depolarda yaygındır.",
+      "timber": "Ahşap Yapı",
+      "timberDesc": "Ahşap yapısal elemanlı binalar",
+      "timberInfo": "Genellikle konutlarda ve tarihi binalarda bulunur.",
+      "skylife": "Skylife Yapı",
+      "skylifeDesc": "Hafif prefabrik yapı sistemleri",
+      "skylifeInfo": "Modern konut ve ticari yapılarda kullanılır.",
+      "masonry": "Yığma Yapı",
+      "masonryDesc": "Tuğla, taş veya beton blok birimlerinden oluşan binalar",
+      "masonryInfo": "Eski konutlar ve tarihi yapılarda yaygındır."
+    },
+    "irregularities": {
+      "title": "Bina Düzensizlik Değerlendirmesi",
+      "vertical": "Dikey Düzensizlik",
+      "verticalDesc": "Bina katlar arasında önemli yükseklik farklılıkları veya set gerilemeleri içeriyor",
+      "plan": "Plan Düzensizliği",
+      "planDesc": "Bina düzensiz bir kat planına sahip (L şekilli, U şekilli, vb.)",
+      "mass": "Kütle Düzensizliği",
+      "massDesc": "Bina farklı katlarda eşit olmayan kütle dağılımına sahip",
+      "tooltip": "Bina düzensizlikleri, yapının deprem sırasındaki tepkisini önemli ölçüde etkileyebilir",
+      "warning": "Düzensizlikler binanın sismik performansını etkileyebilir"
+    },
+    "review": {
+      "buildingLength": "Bina Uzunluğu",
+      "buildingWidth": "Bina Genişliği",
+      "numberOfStories": "Kat Sayısı",
+      "buildingType": "Bina Tipi",
+      "structuralSystem": "Yapısal Sistem",
+      "earthquakeZone": "Deprem Bölgesi",
+      "soilType": "Zemin Tipi",
+      "fieldMissing": " eksik",
+      "inconsistencies": "{count} veri tutarsızlığı tespit edildi ve doğruluğu etkileyebilir"
     }
   },
   "Location": {
@@ -105,6 +178,46 @@
     "immediateActions": "Acil Eylemler",
     "shortTermActions": "Kısa Vadeli Eylemler",
     "longTermActions": "Uzun Vadeli Eylemler",
+    "outOf100": "/100",
+    "gradeExcellent": "Mükemmel",
+    "gradeGood": "İyi",
+    "gradeAcceptable": "Kabul Edilebilir",
+    "gradeNeedsWork": "İyileştirme Gerekli",
+    "gradeAtRisk": "Riskli",
+    "interpretationExcellent": "Binanız çoğu deprem senaryosuna güvenle dayanabilir.",
+    "interpretationGood": "Binanız küçük endişelerle yeterli deprem korumasına sahip.",
+    "interpretationModerate": "Binanız optimal deprem güvenliği için iyileştirmelere ihtiyaç duyabilir.",
+    "interpretationAtRisk": "Binanızda ele alınması gereken önemli zafiyetler var.",
+    "buildingIsSafe": "Bina güvenli",
+    "needsAttention": "Dikkat gerekli",
+    "structuralSystem": "Yapısal Sistem: {system}",
+    "standardConstruction": "Standart yapı",
+    "goodStructuralIntegrity": "İyi yapısal bütünlük",
+    "mayNeedReinforcement": "Güçlendirme gerekebilir",
+    "builtInYear": "{year} yılında inşa edildi ({age} yaşında)",
+    "modernConstructionStandards": "Modern yapı standartları",
+    "mayNeedSeismicUpdates": "Sismik güncellemeler gerekebilir",
+    "olderConstruction": "Eski yapı, değerlendirme önerilir",
+    "storiesBuilding": "{count} katlı bina",
+    "lowerHeightReducesRisk": "Düşük yükseklik sismik riski azaltır",
+    "mediumRiseBuilding": "Orta yükseklikte bina",
+    "higherBuildingsNeedStronger": "Yüksek binalar daha güçlü temellere ihtiyaç duyar",
+    "earthquakeImpact": "Deprem Etkisi: {impact}",
+    "unknown": "Bilinmiyor",
+    "minimalExpectedDamage": "Tipik olaylarda minimum beklenen hasar",
+    "someDamagePossible": "Güçlü depremlerde bazı hasarlar mümkün",
+    "higherVulnerability": "Deprem hasarına karşı yüksek zafiyet",
+    "structuralIrregularitiesDetected": "Yapısal düzensizlikler tespit edildi",
+    "irregularShapesMayConcentrate": "Düzensiz şekiller deprem sırasında stresi yoğunlaştırabilir",
+    "regularStructuralGeometry": "Düzenli yapısal geometri",
+    "evenDistributionOfForces": "Sismik kuvvetlerin eşit dağılımı",
+    "congratulations": "Tebrikler!",
+    "excellentSafetyScore": "Binanız mükemmel bir güvenlik puanı aldı!",
+    "certified": "Sertifikalı",
+    "verified": "Doğrulanmış",
+    "excellent": "Mükemmel",
+    "meetsAllSafetyStandards": "Binanız depreme dayanıklılık için tüm güvenlik standartlarını karşılıyor. Artık sertifikanızı indirebilirsiniz!",
+    "autoDismissMessage": "Bu mesaj birkaç saniye içinde otomatik olarak kapanacak",
     "riskLevels": {
       "low": "Düşük",
       "moderate": "Orta",
@@ -116,32 +229,295 @@
       "B": "İyi",
       "C": "Kabul Edilebilir",
       "D": "İyileştirme Gerekli",
-      "F": "Riskli"
+      "F": "Riskli",
+      "excellent": "Mükemmel",
+      "good": "İyi",
+      "acceptable": "Kabul Edilebilir",
+      "needsWork": "İyileştirme Gerekli",
+      "atRisk": "Riskli",
+      "fair": "Orta"
     },
     "interpretation": {
       "excellent": "Binanız çoğu deprem senaryosuna güvenle dayanabilir.",
       "good": "Binanız küçük endişelerle yeterli deprem korumasına sahip.",
+      "acceptable": "Binanız optimal deprem güvenliği için iyileştirmelere ihtiyaç duyabilir.",
       "needsWork": "Binanız optimal deprem güvenliği için iyileştirmelere ihtiyaç duyabilir.",
       "atRisk": "Binanızda ele alınması gereken önemli zafiyetler var."
+    },
+    "safety": {
+      "safe": "Bina güvenli",
+      "needsAttention": "Dikkat gerekli",
+      "passed": "Binanız güvenlik değerlendirmesini geçti"
+    },
+    "findings": {
+      "structural": "Yapısal Sistem: {system}",
+      "structuralGood": "İyi yapısal bütünlük",
+      "structuralPoor": "Güçlendirme gerekebilir",
+      "buildingAge": "{year} yılında inşa edildi ({age} yaşında)",
+      "ageGood": "Modern yapı standartları",
+      "ageModerate": "Sismik güncellemeler gerekebilir",
+      "ageOld": "Eski yapı, değerlendirme önerilir",
+      "stories": "{count} katlı bina",
+      "storiesPlural": "{count} katlı bina",
+      "storiesLow": "Düşük yükseklik sismik riski azaltır",
+      "storiesMedium": "Orta yükseklikte bina",
+      "storiesHigh": "Yüksek binalar daha güçlü temellere ihtiyaç duyar",
+      "earthquakeImpact": "Deprem Etkisi: {impact}",
+      "impactLow": "Tipik olaylarda minimum beklenen hasar",
+      "impactModerate": "Güçlü depremlerde bazı hasarlar mümkün",
+      "impactHigh": "Deprem hasarına karşı yüksek zafiyet",
+      "irregularities": "Yapısal düzensizlikler tespit edildi",
+      "irregularitiesDetail": "Düzensiz şekiller deprem sırasında stresi yoğunlaştırabilir",
+      "regular": "Düzenli yapısal geometri",
+      "regularDetail": "Sismik kuvvetlerin eşit dağılımı"
+    },
+    "success": {
+      "title": "Tebrikler!",
+      "subtitle": "Binanız mükemmel bir güvenlik puanı aldı!",
+      "scoreLabel": "Güvenlik Puanı",
+      "certified": "Sertifikalı",
+      "verified": "Doğrulanmış",
+      "excellent": "Mükemmel",
+      "message": "Binanız depreme dayanıklılık için tüm güvenlik standartlarını karşılıyor. Artık sertifikanızı indirebilirsiniz!",
+      "autoDismiss": "Bu mesaj birkaç saniye içinde otomatik olarak kapanacak"
+    },
+    "expertMode": {
+      "simple": "Basit",
+      "expert": "Uzman"
+    },
+    "aiInsights": {
+      "title": "AI Analizi",
+      "analyzing": "Görsel veriler işleniyor...",
+      "extracting": "Bulgular çıkarılıyor...",
+      "complete": "{count} özellik tanımlandı",
+      "preparing": "Analiz hazırlanıyor...",
+      "buildingType": "Yapı Tipi",
+      "stories": "Tespit Edilen Katlar",
+      "floors": " kat",
+      "era": "İnşaat Dönemi",
+      "structural": "Yapısal Sistem",
+      "condition": "Durum",
+      "vulnerabilities": "Tespit Edilen Sorunlar",
+      "concernCount": " potansiyel endişe",
+      "confidence": "% güven",
+      "finished": "Analiz tamamlandı"
+    },
+    "scenarios": {
+      "title": "Risk Senaryoları",
+      "subtitle": "Mevcut koşullar ve en kötü durum analizi",
+      "weatherTab": "Mevcut Hava Durumu",
+      "earthquakeTab": "Deprem Senaryosu",
+      "weatherLabel": "Mevcut Koşullar",
+      "weatherImpacts": "Hava Etkileri",
+      "windHigh": "Yüksek rüzgarlar yapıyı zorlayabilir",
+      "windModerate": "Orta düzeyde rüzgar yükü",
+      "humidityHigh": "Yüksek nem - korozyon riski",
+      "tempExtreme": "Aşırı sıcaklık stresi",
+      "precipitation": "Yağış - drenajı izleyin",
+      "seismicZone": "Sismik Bölge",
+      "maxMagnitude": "Maksimum Büyüklük",
+      "probability": "Olasılık",
+      "simulated": "Simüle Edilmiş Senaryo",
+      "intensity": "Yoğunluk",
+      "duration": "Süre",
+      "durationValue": "15-45 sn",
+      "groundMotion": "Yer Hareketi",
+      "expectedImpact": "Beklenen Etki:",
+      "recommendation": "Güvenlik Önerisi",
+      "recommendationDetail": "İyileştirme eylemleri için aşağıdaki detaylı değerlendirmeyi inceleyin"
+    },
+    "scoreReveal": {
+      "analyzing": "Güvenlik verileri analiz ediliyor..."
+    },
+    "performance": {
+      "title": "Bina Performans Özeti",
+      "description": "Binanızın deprem güvenliği performansının görsel değerlendirmesi",
+      "levelIndicator": "Performans Seviyesi Göstergesi",
+      "good": "İyi",
+      "caution": "Dikkat",
+      "critical": "Kritik",
+      "goodMessage": "Binanız güvenlik standartlarını karşılıyor",
+      "cautionMessage": "Binanız iyileştirmelere ihtiyaç duyabilir",
+      "criticalMessage": "Binanız acil müdahale gerektiriyor",
+      "goodLabel": "İyi Performans",
+      "cautionLabel": "Dikkatli Performans",
+      "criticalLabel": "Kritik Performans",
+      "overallScore": "Genel Puan",
+      "maxSafeRichter": "Maksimum Güvenli Richter",
+      "performanceLevel": "Performans Seviyesi",
+      "whatMeansTitle": "Bu Ne Anlama Geliyor",
+      "whatMeansGood": "Binanız iyi deprem dayanıklılığı gösteriyor ve mevcut güvenlik standartlarını karşılıyor. Düzenli bakım ve izleme önerilir.",
+      "whatMeansCaution": "Binanız orta düzeyde deprem dayanıklılığı gösteriyor ancak yapısal iyileştirmelerden fayda görebilir. Değerlendirme için bir inşaat mühendisine danışmayı düşünün.",
+      "whatMeansCritical": "Binanız deprem hasarına karşı önemli zafiyetlere sahip olabilir. Profesyonel yapısal değerlendirme ve iyileştirmeler şiddetle tavsiye edilir."
+    },
+    "charts": {
+      "performanceTitle": "Bina Performansı vs Deprem Büyüklüğü",
+      "performanceDesc": "Farklı Richter ölçeği büyüklüklerinde beklenen bina performansı",
+      "richterScale": "Richter Ölçeği",
+      "performancePercent": "Performans (%)",
+      "safe": "Güvenli",
+      "caution": "Dikkat",
+      "danger": "Tehlike",
+      "legendSafe": "Güvenli (< 5.5 Richter)",
+      "legendCaution": "Dikkat (5.5-6.5 Richter)",
+      "legendDanger": "Tehlike (> 6.5 Richter)",
+      "zone": "Bölge",
+      "avgPerformance": "Ort. Performans",
+      "disclaimer": "Not: Bu görselleştirme binanızın değerlendirme verilerine dayanmaktadır ve bir tahmin niteliğindedir. Gerçek performans yapı kalitesi, bakım ve yerel jeolojik koşullara göre değişebilir."
+    },
+    "comparison": {
+      "title": "Bina Performans Karşılaştırması",
+      "description": "Binanızın güvenlik puanını sektör karşılaştırma ölçütleriyle karşılaştırın",
+      "yourBuilding": "Sizin Binanız",
+      "yourDescription": "Mevcut değerlendirme puanı",
+      "avgType": "{type} için Ortalama",
+      "avgTypeDescription": "Bu bina tipi için ortalama",
+      "avgAge": "Yaş için Ort. ({age}y)",
+      "avgAgeDescription": "Bu yaştaki binalar için ortalama",
+      "recommendedMin": "Önerilen Minimum",
+      "recommendedMinDescription": "Minimum önerilen güvenlik puanı",
+      "scoreLabel": "Güvenlik Puanı (%)",
+      "insightsTitle": "Performans Analizleri",
+      "above": "{type} binalar için ortalamanın {points} puan üstünde",
+      "below": "{type} binalar için ortalamanın {points} puan altında",
+      "average": "{type} binalar için ortalama seviyede performans",
+      "ageAbove": "Bu yaştaki binalar için ortalamanın {points} puan üstünde",
+      "ageBelow": "Bu yaştaki binalar için ortalamanın {points} puan altında",
+      "recommendationsTitle": "Öneriler",
+      "improve": "%{threshold} güvenlik eşiğine ulaşmak için yapısal iyileştirmeler düşünün",
+      "consult": "Profesyonel değerlendirme için bir inşaat mühendisine danışın",
+      "meets": "Binanız önerilen güvenlik standartlarını karşılıyor",
+      "maintain": "Güvenlik seviyelerini korumak için düzenli bakıma devam edin",
+      "methodology": "Not: Karşılaştırma ortalamaları Türkiye'deki benzer binalardan elde edilen istatistiksel verilere dayanmaktadır. Bireysel performans yapı kalitesi, bakım ve yerel koşullara göre değişebilir."
+    },
+    "benefits": {
+      "title": "Ekonomik Fayda Analizi",
+      "description": "Binanızın güvenlik uyumunun finansal avantajları"
+    },
+    "costBenefit": {
+      "title": "Maliyet-Fayda Analizi",
+      "description": "Deprem güvenliğini iyileştirmek için yatırım analizi",
+      "insuranceSavings": "Yıllık Sigorta Tasarrufu",
+      "propertyIncrease": "Mülk Değer Artışı",
+      "totalBenefits": "Toplam Ekonomik Faydalar",
+      "certificationBenefits": "Sertifikasyon Faydaları",
+      "insuranceEligibility": "Sigorta Uygunluğu",
+      "qualified": "Uygun",
+      "insuranceDiscount": "Deprem Sigortası İndirimi",
+      "discountRate": "%15-25",
+      "regulatory": "Yasal Uyumluluk",
+      "compliant": "Uyumlu",
+      "resaleValue": "Yeniden Satış Değer Primi",
+      "premiumRate": "%5-10",
+      "retrofitCost": "Tahmini Güçlendirme Maliyeti",
+      "paybackPeriod": "Yatırım Geri Dönüş Süresi",
+      "years": " yıl",
+      "roiAnalysis": "Yatırım Getirisi Analizi",
+      "annualSavings": "Yıllık Sigorta Tasarrufu",
+      "tenYearSavings": "10 Yıllık Tasarruf",
+      "netTenYearBenefit": "Net 10 Yıllık Fayda",
+      "financingTitle": "Potansiyel Finansman Seçenekleri",
+      "grantsTitle": "Devlet Hibeleri",
+      "grantsDesc": "Sismik güçlendirme için %50'ye kadar karşılama",
+      "loansTitle": "Düşük Faizli Krediler",
+      "loansDesc": "Deprem güvenliği iyileştirmeleri için özel oranlar",
+      "disclaimerTitle": "Önemli Uyarı",
+      "disclaimerText": "Bunlar sektör ortalamalarına dayanan tahmini maliyetler ve faydalardır ve gerçek bina koşulları, yerel müteahhitler, malzeme maliyetleri ve sigorta poliçelerine göre önemli ölçüde değişebilir. Doğru teklifler ve değerlendirmeler için profesyonellere danışın."
+    },
+    "imagery": {
+      "title": "Binanızı Bulduk",
+      "subtitle": "Birden fazla kaynaktan toplanan görüntüler",
+      "streetView": "Sokak Görünümü",
+      "satellite": "Uydu",
+      "yourPhotos": "Fotoğraflarınız",
+      "view": " görünüm",
+      "googleStreetView": "Google Sokak Görünümü",
+      "satelliteLabel": "Uydu görüntüsü",
+      "googleSatellite": "Google Uydu",
+      "photosAnalyzed": "{count} fotoğraf analiz edildi",
+      "streetCaption": "Konumunuzdan otomatik olarak toplanan sokak seviyesi görüntüleri",
+      "satelliteCaption": "Bina bölgenizin yüksek çözünürlüklü uydu görünümü",
+      "userPhotosCaption": "AI analizi için yüklediğiniz fotoğraflar"
     }
   },
   "Dashboard": {
     "title": "Değerlendirmelerim",
     "subtitle": "Deprem güvenliği değerlendirmelerinizi görüntüleyin ve yönetin",
+    "newButton": "Yeni Değerlendirme",
+    "totalAssessments": "Toplam Değerlendirme",
+    "completed": "Tamamlanan",
+    "complete": "Tamamlandı",
+    "inProgress": "Devam Eden",
+    "averageScore": "Ortalama Puan",
+    "noAssessmentsYet": "Henüz değerlendirme yok",
+    "startFirstDescription": "Bina zafiyetini değerlendirmek ve kişiselleştirilmiş güvenlik önerileri almak için ilk deprem güvenliği değerlendirmenizi başlatın.",
+    "startFirstAssessment": "İlk Değerlendirmenizi Başlatın",
+    "fiveMin": "5 dk",
+    "averageTime": "Ortalama süre",
+    "ai": "AI",
+    "poweredAnalysis": "Destekli analiz",
+    "free": "Ücretsiz",
+    "alwaysFree": "Her zaman ücretsiz",
+    "deleteAssessment": "Değerlendirmeyi Sil",
+    "deleteConfirmMessage": "{title} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+    "thisAssessment": "bu değerlendirme",
+    "deleting": "Siliniyor...",
+    "draft": "Taslak",
+    "archived": "Arşivlendi",
+    "untitledAssessment": "İsimsiz Değerlendirme",
+    "riskLevelLow": "Düşük Risk",
+    "riskLevelModerate": "Orta Risk",
+    "riskLevelHigh": "Yüksek Risk",
+    "riskLevelVeryHigh": "Çok Yüksek Risk",
+    "stepOf": "{total} adımdan {step}. adım",
+    "copyLink": "Bağlantıyı Kopyala",
+    "duplicate": "Çoğalt",
     "stats": {
+      "total": "Toplam Değerlendirme",
       "completed": "Tamamlanan",
       "inProgress": "Devam Eden",
-      "avgScore": "Ort. Puan"
+      "avgScore": "Ort. Puan",
+      "averageScore": "Ortalama Puan"
     },
     "empty": {
       "title": "Henüz değerlendirme yok",
-      "description": "Sonuçları burada görmek için ilk deprem güvenliği değerlendirmenizi başlatın.",
-      "cta": "Değerlendirmeye Başla"
+      "description": "Bina zafiyetini değerlendirmek ve kişiselleştirilmiş güvenlik önerileri almak için ilk deprem güvenliği değerlendirmenizi başlatın.",
+      "cta": "Değerlendirmeye Başla",
+      "button": "İlk Değerlendirmenizi Başlatın",
+      "time": "5 dk",
+      "timeLabel": "Ortalama süre",
+      "aiLabel": "AI",
+      "aiDescription": "Destekli analiz",
+      "priceLabel": "Ücretsiz",
+      "priceDescription": "Her zaman ücretsiz",
+      "filteredMessage": "Hiç {filter} değerlendirme bulunamadı."
     },
     "card": {
       "viewDetails": "Detayları Gör",
       "continue": "Devam Et",
       "delete": "Sil"
+    },
+    "modal": {
+      "deleteTitle": "Değerlendirmeyi Sil",
+      "deleteMessage": "Silmek istediğinizden emin misiniz: ",
+      "cannotUndo": "? Bu işlem geri alınamaz.",
+      "deleting": "Siliniyor...",
+      "defaultTitle": "bu değerlendirme"
+    },
+    "filters": {
+      "all": "Tümü",
+      "inProgress": "Devam Eden",
+      "completed": "Tamamlanan"
+    },
+    "errors": {
+      "loadFailed": "Değerlendirmeler yüklenemedi",
+      "deleteFailed": "Değerlendirme silinemedi",
+      "duplicateFailed": "Değerlendirme çoğaltılamadı"
+    },
+    "notifications": {
+      "deleted": "Değerlendirme silindi",
+      "duplicated": "Değerlendirme çoğaltıldı",
+      "linkCopied": "Bağlantı panoya kopyalandı"
     }
   },
   "Common": {
@@ -154,29 +530,108 @@
     "edit": "Düzenle",
     "close": "Kapat",
     "loading": "Yükleniyor...",
+    "loadingAssessments": "Değerlendirmeleriniz yükleniyor...",
     "uploading": "Yükleniyor...",
     "processing": "İşleniyor...",
     "analyzing": "Analiz ediliyor...",
     "success": "Başarılı",
     "error": "Hata",
     "retry": "Tekrar Dene",
+    "view": "Görüntüle",
     "viewMore": "Daha Fazla",
     "viewLess": "Daha Az",
+    "loadMore": "Daha Fazla Yükle",
+    "previous": "Önceki",
     "yes": "Evet",
-    "no": "Hayır"
+    "no": "Hayır",
+    "celsius": "°C",
+    "kmh": "km/s",
+    "humidity": "nem",
+    "mmRain": "mm yağış",
+    "gravity": "g",
+    "time": {
+      "minutesAgo": "dk önce",
+      "hoursAgo": "sa önce",
+      "yesterday": "Dün",
+      "daysAgo": "gün önce"
+    },
+    "theme": {
+      "light": "Açık",
+      "dark": "Koyu",
+      "system": "Sistem"
+    }
   },
   "Errors": {
     "generic": "Bir hata oluştu. Lütfen tekrar deneyin.",
     "network": "Ağ hatası. Lütfen bağlantınızı kontrol edin.",
     "locationNotFound": "Konum bulunamadı",
     "photoUploadFailed": "Fotoğraf yüklenemedi",
-    "analysisFaile": "Analiz başarısız oldu. Lütfen tekrar deneyin.",
-    "sessionExpired": "Oturumunuz sona erdi. Lütfen tekrar giriş yapın."
+    "analysisFailed": "Analiz başarısız oldu. Lütfen tekrar deneyin.",
+    "sessionExpired": "Oturumunuz sona erdi. Lütfen tekrar giriş yapın.",
+    "signInRequired": "Değerlendirmelerinizi görüntülemek için lütfen giriş yapın"
   },
   "Language": {
     "label": "Dil",
     "english": "English",
     "turkish": "Türkçe",
     "changed": "Dil {language} olarak değiştirildi"
+  },
+  "Home": {
+    "letsStart": "Başlayalım",
+    "riskLevels": {
+      "high": "Yüksek Risk",
+      "moderate": "Orta Risk",
+      "low": "Düşük Risk"
+    },
+    "howItWorks": {
+      "title": "Nasıl Çalışır",
+      "description": "Basit 3 adımlı sürecimiz binanız için doğru deprem risk değerlendirmesi sağlar"
+    },
+    "steps": {
+      "step1Title": "Bina Detaylarını Girin",
+      "step1Desc": "Binanızın konumu, yapı tipi ve yaşı hakkında bilgi verin.",
+      "step2Title": "AI Destekli Analiz",
+      "step2Desc": "Algoritmamız bina verilerinizi sismik standartlara ve risk faktörlerine göre analiz eder.",
+      "step3Title": "Detaylı Sonuçları Alın",
+      "step3Desc": "Güvenlik puanı ve öneriler içeren kapsamlı bir rapor alın."
+    },
+    "simulator": {
+      "title": "İnteraktif Risk Simülatörü",
+      "buildingAge": "Bina Yaşı (yıl)",
+      "structuralCondition": "Yapısal Durum (%)",
+      "seismicZone": "Sismik Bölge Riski (%)"
+    },
+    "noAssessments": {
+      "title": "Henüz değerlendirme yok",
+      "description": "İlk deprem güvenliği değerlendirmenizi başlatın",
+      "button": "Yeni Değerlendirme Başlat"
+    }
+  },
+  "Pages": {
+    "about": {
+      "title": "QuakeWise Hakkında",
+      "missionLabel": "Misyonumuz",
+      "missionTitle": "Araştırma Temelli Yaklaşım",
+      "missionSubtitle": "Mühendislik prensiplerini pratik çözümlerle birleştirme",
+      "objectivesHeading": "Hedeflerimiz",
+      "objectivesDesc": "QuakeWise'da platform geliştirmemize yön veren bu temel hedeflere bağlıyız",
+      "objective1": "Doğru analiz sağlamak için kapsamlı bina verileri topluyoruz.",
+      "objective2": "Algoritmalarımız yapısal zafiyeti ve potansiyel deprem etkilerini değerlendiriyor.",
+      "objective3": "Görsel temsiller potansiyel riskleri ve azaltma stratejilerini anlamanıza yardımcı olur.",
+      "academicLabel": "Akademik Destek",
+      "academicTitle": "Araştırma Destekli"
+    },
+    "history": {
+      "title": "Değerlendirme Geçmişi",
+      "description": "Deprem güvenliği değerlendirmelerinizi görüntüleyin ve yönetin",
+      "emptyTitle": "Henüz değerlendirme yok",
+      "emptyDesc": "İlk deprem güvenliği değerlendirmenizi başlatın",
+      "emptyButton": "Yeni Değerlendirme Başlat",
+      "deleteConfirm": "Bu değerlendirmeyi silmek istediğinizden emin misiniz?",
+      "deleteFailed": "Değerlendirme silinemedi: "
+    },
+    "welcome": {
+      "greeting": "QuakeWise'a Hoş Geldiniz"
+    }
   }
 }

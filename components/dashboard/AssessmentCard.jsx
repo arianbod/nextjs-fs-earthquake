@@ -22,29 +22,7 @@ import {
   Trash2,
   Play,
 } from 'lucide-react';
-
-const statusConfig = {
-  DRAFT: {
-    label: 'Draft',
-    variant: 'secondary',
-    color: 'bg-gray-100 text-gray-700',
-  },
-  IN_PROGRESS: {
-    label: 'In Progress',
-    variant: 'default',
-    color: 'bg-blue-100 text-blue-700',
-  },
-  COMPLETE: {
-    label: 'Complete',
-    variant: 'success',
-    color: 'bg-green-100 text-green-700',
-  },
-  ARCHIVED: {
-    label: 'Archived',
-    variant: 'outline',
-    color: 'bg-gray-50 text-gray-500',
-  },
-};
+import { useTranslations } from 'next-intl';
 
 const riskLevelConfig = {
   Low: { color: 'text-green-600', bg: 'bg-green-50' },
@@ -67,13 +45,39 @@ export default function AssessmentCard({
   onDelete,
   onShare,
 }) {
+  const t = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
+  const tNav = useTranslations('Navigation');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const statusConfig = {
+    DRAFT: {
+      label: t('draft'),
+      variant: 'secondary',
+      color: 'bg-gray-100 text-gray-700',
+    },
+    IN_PROGRESS: {
+      label: t('inProgress'),
+      variant: 'default',
+      color: 'bg-blue-100 text-blue-700',
+    },
+    COMPLETE: {
+      label: t('complete'),
+      variant: 'success',
+      color: 'bg-green-100 text-green-700',
+    },
+    ARCHIVED: {
+      label: t('archived'),
+      variant: 'outline',
+      color: 'bg-gray-50 text-gray-500',
+    },
+  };
 
   const status = statusConfig[assessment.status] || statusConfig.DRAFT;
   const address = assessment.location?.fullAddress ||
     assessment.location?.city ||
     assessment.title ||
-    'Untitled Assessment';
+    t('untitledAssessment');
   const score = assessment.safetyResult?.overallScore;
   const grade = assessment.safetyResult?.safetyRating;
   const riskLevel = assessment.safetyResult?.riskLevel;
@@ -129,7 +133,7 @@ export default function AssessmentCard({
                 </div>
                 {riskLevel && (
                   <span className={`text-xs px-2 py-1 rounded ${riskLevelConfig[riskLevel]?.bg || ''} ${riskLevelConfig[riskLevel]?.color || ''}`}>
-                    {riskLevel} Risk
+                    {t(`riskLevel${riskLevel.replace(' ', '')}`)}
                   </span>
                 )}
               </div>
@@ -138,7 +142,7 @@ export default function AssessmentCard({
             {/* Progress indicator for drafts */}
             {isDraft && (
               <div className="text-xs text-muted-foreground">
-                Step {Math.min(assessment.currentStep || 1, 4)} of 4
+                {t('stepOf', { step: Math.min(assessment.currentStep || 1, 4), total: 4 })}
               </div>
             )}
           </div>
@@ -150,14 +154,14 @@ export default function AssessmentCard({
               <Link href={`/result/${assessment.id}`}>
                 <Button size="sm" variant="outline">
                   <Eye className="w-4 h-4 mr-1" />
-                  View
+                  {tCommon('view')}
                 </Button>
               </Link>
             ) : (
               <Link href={`/assessment/${Math.min(assessment.currentStep || 1, 4)}?id=${assessment.id}`}>
                 <Button size="sm">
                   <Play className="w-4 h-4 mr-1" />
-                  Continue
+                  {tNav('continue')}
                 </Button>
               </Link>
             )}
@@ -174,14 +178,14 @@ export default function AssessmentCard({
                   <>
                     <DropdownMenuItem onClick={handleCopyLink}>
                       <Share2 className="w-4 h-4 mr-2" />
-                      Copy Link
+                      {t('copyLink')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
                 <DropdownMenuItem onClick={() => onDuplicate?.(assessment.id)}>
                   <Copy className="w-4 h-4 mr-2" />
-                  Duplicate
+                  {t('duplicate')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -189,7 +193,7 @@ export default function AssessmentCard({
                   onClick={() => onDelete?.(assessment.id)}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                  {tCommon('delete')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

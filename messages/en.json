@@ -20,7 +20,9 @@
     "resumeStepButton": "Resume Step {step}",
     "startNewAssessment": "Start New Assessment",
     "assessmentProgress": "Assessment Progress",
-    "completedAssessments": "You have {count} completed assessments"
+    "completedAssessments": "You have {count} completed assessments",
+    "openMenu": "Open menu",
+    "toggleTheme": "Toggle theme"
   },
   "Greeting": {
     "morning": "Good morning",
@@ -55,6 +57,8 @@
   },
   "Assessment": {
     "progress": "Assessment Progress",
+    "untitled": "Untitled Assessment",
+    "stepProgress": "Step {step} of {total}",
     "step1": {
       "title": "Location Detection",
       "description": "Detect building location and capture satellite/street view images"
@@ -78,6 +82,75 @@
     "step6": {
       "title": "Final Review",
       "description": "Confirm all assessment data before generating results"
+    },
+    "status": {
+      "draft": "Draft",
+      "inProgress": "In Progress",
+      "complete": "Complete",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "actions": {
+      "copyLink": "Copy Link",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "view": "View",
+      "continue": "Continue"
+    },
+    "directions": {
+      "north": "North",
+      "northeast": "Northeast",
+      "east": "East",
+      "southeast": "Southeast",
+      "south": "South",
+      "southwest": "Southwest",
+      "west": "West",
+      "northwest": "Northwest"
+    },
+    "seismicZones": {
+      "zone1": "Zone 1 (Low)",
+      "zone2": "Zone 2 (Moderate)",
+      "zone3": "Zone 3 (High)",
+      "zone4": "Zone 4 (Very High)"
+    },
+    "structures": {
+      "reinforcedConcrete": "Reinforced Concrete",
+      "reinforcedConcreteDesc": "Buildings with structural elements made of reinforced concrete",
+      "reinforcedConcreteInfo": "Commonly used in apartment buildings, offices, and commercial structures.",
+      "steel": "Steel Structure",
+      "steelDesc": "Buildings with a steel framework",
+      "steelInfo": "Common in skyscrapers, industrial buildings, and warehouses.",
+      "timber": "Timber Structure",
+      "timberDesc": "Buildings with wooden structural elements",
+      "timberInfo": "Typically found in residential homes and historical buildings.",
+      "skylife": "Skylife Structure",
+      "skylifeDesc": "Lightweight prefabricated building systems",
+      "skylifeInfo": "Used in modern residential and commercial construction.",
+      "masonry": "Masonry Structure",
+      "masonryDesc": "Buildings constructed from individual units of brick, stone, or concrete blocks",
+      "masonryInfo": "Common in older residential buildings and historical structures."
+    },
+    "irregularities": {
+      "title": "Building Irregularity Assessment",
+      "vertical": "Vertical Irregularity",
+      "verticalDesc": "Building has significant height variations or setbacks between floors",
+      "plan": "Plan Irregularity",
+      "planDesc": "Building has an irregular floor plan (L-shaped, U-shaped, etc.)",
+      "mass": "Mass Irregularity",
+      "massDesc": "Building has uneven distribution of mass across different floors",
+      "tooltip": "Building irregularities can significantly impact how a structure responds during an earthquake",
+      "warning": "Irregularities may affect a building's seismic performance"
+    },
+    "review": {
+      "buildingLength": "Building Length",
+      "buildingWidth": "Building Width",
+      "numberOfStories": "Number of Stories",
+      "buildingType": "Building Type",
+      "structuralSystem": "Structural System",
+      "earthquakeZone": "Earthquake Zone",
+      "soilType": "Soil Type",
+      "fieldMissing": " is missing",
+      "inconsistencies": "{count} data inconsistencies were detected and may affect accuracy"
     }
   },
   "Location": {
@@ -105,6 +178,46 @@
     "immediateActions": "Immediate Actions",
     "shortTermActions": "Short-term Actions",
     "longTermActions": "Long-term Actions",
+    "outOf100": "/100",
+    "gradeExcellent": "Excellent",
+    "gradeGood": "Good",
+    "gradeAcceptable": "Acceptable",
+    "gradeNeedsWork": "Needs Work",
+    "gradeAtRisk": "At Risk",
+    "interpretationExcellent": "Your building can withstand most earthquake scenarios safely.",
+    "interpretationGood": "Your building has adequate earthquake protection with minor concerns.",
+    "interpretationModerate": "Your building may need improvements for optimal earthquake safety.",
+    "interpretationAtRisk": "Your building has significant vulnerabilities that should be addressed.",
+    "buildingIsSafe": "Building is safe",
+    "needsAttention": "Needs attention",
+    "structuralSystem": "Structural System: {system}",
+    "standardConstruction": "Standard construction",
+    "goodStructuralIntegrity": "Good structural integrity",
+    "mayNeedReinforcement": "May need reinforcement",
+    "builtInYear": "Built in {year} ({age} years old)",
+    "modernConstructionStandards": "Modern construction standards",
+    "mayNeedSeismicUpdates": "May need seismic updates",
+    "olderConstruction": "Older construction, consider evaluation",
+    "storiesBuilding": "{count} story building",
+    "lowerHeightReducesRisk": "Lower height reduces seismic risk",
+    "mediumRiseBuilding": "Medium-rise building",
+    "higherBuildingsNeedStronger": "Higher buildings need stronger foundations",
+    "earthquakeImpact": "Earthquake Impact: {impact}",
+    "unknown": "Unknown",
+    "minimalExpectedDamage": "Minimal expected damage in typical events",
+    "someDamagePossible": "Some damage possible in strong earthquakes",
+    "higherVulnerability": "Higher vulnerability to earthquake damage",
+    "structuralIrregularitiesDetected": "Structural irregularities detected",
+    "irregularShapesMayConcentrate": "Irregular shapes may concentrate stress during earthquakes",
+    "regularStructuralGeometry": "Regular structural geometry",
+    "evenDistributionOfForces": "Even distribution of seismic forces",
+    "congratulations": "Congratulations!",
+    "excellentSafetyScore": "Your building has achieved an excellent safety score!",
+    "certified": "Certified",
+    "verified": "Verified",
+    "excellent": "Excellent",
+    "meetsAllSafetyStandards": "Your building meets all safety standards for earthquake resistance. You can now download your certificate!",
+    "autoDismissMessage": "This message will auto-dismiss in a few seconds",
     "riskLevels": {
       "low": "Low",
       "moderate": "Moderate",
@@ -116,32 +229,295 @@
       "B": "Good",
       "C": "Acceptable",
       "D": "Needs Work",
-      "F": "At Risk"
+      "F": "At Risk",
+      "excellent": "Excellent",
+      "good": "Good",
+      "acceptable": "Acceptable",
+      "needsWork": "Needs Work",
+      "atRisk": "At Risk",
+      "fair": "Fair"
     },
     "interpretation": {
       "excellent": "Your building can withstand most earthquake scenarios safely.",
       "good": "Your building has adequate earthquake protection with minor concerns.",
+      "acceptable": "Your building may need improvements for optimal earthquake safety.",
       "needsWork": "Your building may need improvements for optimal earthquake safety.",
       "atRisk": "Your building has significant vulnerabilities that should be addressed."
+    },
+    "safety": {
+      "safe": "Building is safe",
+      "needsAttention": "Needs attention",
+      "passed": "Your building passed the safety assessment"
+    },
+    "findings": {
+      "structural": "Structural System: {system}",
+      "structuralGood": "Good structural integrity",
+      "structuralPoor": "May need reinforcement",
+      "buildingAge": "Built in {year} ({age} years old)",
+      "ageGood": "Modern construction standards",
+      "ageModerate": "May need seismic updates",
+      "ageOld": "Older construction, consider evaluation",
+      "stories": "{count} story building",
+      "storiesPlural": "{count} stories building",
+      "storiesLow": "Lower height reduces seismic risk",
+      "storiesMedium": "Medium-rise building",
+      "storiesHigh": "Higher buildings need stronger foundations",
+      "earthquakeImpact": "Earthquake Impact: {impact}",
+      "impactLow": "Minimal expected damage in typical events",
+      "impactModerate": "Some damage possible in strong earthquakes",
+      "impactHigh": "Higher vulnerability to earthquake damage",
+      "irregularities": "Structural irregularities detected",
+      "irregularitiesDetail": "Irregular shapes may concentrate stress during earthquakes",
+      "regular": "Regular structural geometry",
+      "regularDetail": "Even distribution of seismic forces"
+    },
+    "success": {
+      "title": "Congratulations!",
+      "subtitle": "Your building has achieved an excellent safety score!",
+      "scoreLabel": "Safety Score",
+      "certified": "Certified",
+      "verified": "Verified",
+      "excellent": "Excellent",
+      "message": "Your building meets all safety standards for earthquake resistance. You can now download your certificate!",
+      "autoDismiss": "This message will auto-dismiss in a few seconds"
+    },
+    "expertMode": {
+      "simple": "Simple",
+      "expert": "Expert"
+    },
+    "aiInsights": {
+      "title": "AI Analysis",
+      "analyzing": "Processing visual data...",
+      "extracting": "Extracting insights...",
+      "complete": "{count} characteristics identified",
+      "preparing": "Preparing analysis...",
+      "buildingType": "Structure Type",
+      "stories": "Stories Detected",
+      "floors": " floors",
+      "era": "Construction Era",
+      "structural": "Structural System",
+      "condition": "Condition",
+      "vulnerabilities": "Detected Issues",
+      "concernCount": " potential concern(s)",
+      "confidence": "% confidence",
+      "finished": "Analysis complete"
+    },
+    "scenarios": {
+      "title": "Risk Scenarios",
+      "subtitle": "Current conditions & worst-case analysis",
+      "weatherTab": "Current Weather",
+      "earthquakeTab": "Earthquake Scenario",
+      "weatherLabel": "Current Conditions",
+      "weatherImpacts": "Weather Impacts",
+      "windHigh": "High winds may stress structure",
+      "windModerate": "Moderate wind loading",
+      "humidityHigh": "High humidity - corrosion risk",
+      "tempExtreme": "Extreme temperature stress",
+      "precipitation": "Precipitation - monitor drainage",
+      "seismicZone": "Seismic Zone",
+      "maxMagnitude": "Max Magnitude",
+      "probability": "Probability",
+      "simulated": "Simulated Scenario",
+      "intensity": "Intensity",
+      "duration": "Duration",
+      "durationValue": "15-45 sec",
+      "groundMotion": "Ground Motion",
+      "expectedImpact": "Expected Impact:",
+      "recommendation": "Safety Recommendation",
+      "recommendationDetail": "Review detailed assessment below for improvement actions"
+    },
+    "scoreReveal": {
+      "analyzing": "Analyzing safety data..."
+    },
+    "performance": {
+      "title": "Building Performance Summary",
+      "description": "Visual assessment of your building's earthquake safety performance",
+      "levelIndicator": "Performance Level Indicator",
+      "good": "Good",
+      "caution": "Caution",
+      "critical": "Critical",
+      "goodMessage": "Your building meets safety standards",
+      "cautionMessage": "Your building may need improvements",
+      "criticalMessage": "Your building requires immediate attention",
+      "goodLabel": "Good Performance",
+      "cautionLabel": "Caution Performance",
+      "criticalLabel": "Critical Performance",
+      "overallScore": "Overall Score",
+      "maxSafeRichter": "Max Safe Richter",
+      "performanceLevel": "Performance Level",
+      "whatMeansTitle": "What This Means",
+      "whatMeansGood": "Your building demonstrates good earthquake resistance and meets current safety standards. Regular maintenance and monitoring are recommended.",
+      "whatMeansCaution": "Your building shows moderate earthquake resistance but may benefit from structural improvements. Consider consulting a structural engineer for assessment.",
+      "whatMeansCritical": "Your building may have significant vulnerabilities to earthquake damage. Professional structural assessment and improvements are strongly recommended."
+    },
+    "charts": {
+      "performanceTitle": "Building Performance vs Earthquake Magnitude",
+      "performanceDesc": "Expected building performance across different Richter scale magnitudes",
+      "richterScale": "Richter Scale",
+      "performancePercent": "Performance (%)",
+      "safe": "Safe",
+      "caution": "Caution",
+      "danger": "Danger",
+      "legendSafe": "Safe (< 5.5 Richter)",
+      "legendCaution": "Caution (5.5-6.5 Richter)",
+      "legendDanger": "Danger (> 6.5 Richter)",
+      "zone": "Zone",
+      "avgPerformance": "Avg. Performance",
+      "disclaimer": "Note: This visualization is based on your building's assessment data and serves as an estimation. Actual performance may vary based on construction quality, maintenance, and local geological conditions."
+    },
+    "comparison": {
+      "title": "Building Performance Comparison",
+      "description": "Compare your building's safety score against industry benchmarks",
+      "yourBuilding": "Your Building",
+      "yourDescription": "Current assessment score",
+      "avgType": "Avg for {type}",
+      "avgTypeDescription": "Average for this building type",
+      "avgAge": "Avg for Age ({age}y)",
+      "avgAgeDescription": "Average for buildings of this age",
+      "recommendedMin": "Recommended Min",
+      "recommendedMinDescription": "Minimum recommended safety score",
+      "scoreLabel": "Safety Score (%)",
+      "insightsTitle": "Performance Insights",
+      "above": "{points} points above average for {type} buildings",
+      "below": "{points} points below average for {type} buildings",
+      "average": "Performs at average level for {type} buildings",
+      "ageAbove": "{points} points above average for buildings of this age",
+      "ageBelow": "{points} points below average for buildings of this age",
+      "recommendationsTitle": "Recommendations",
+      "improve": "Consider structural improvements to reach the {threshold}% safety threshold",
+      "consult": "Consult with a structural engineer for professional assessment",
+      "meets": "Your building meets the recommended safety standards",
+      "maintain": "Continue regular maintenance to preserve safety levels",
+      "methodology": "Note: Comparison averages are based on statistical data from similar buildings in Turkey. Individual performance may vary based on construction quality, maintenance, and local conditions."
+    },
+    "benefits": {
+      "title": "Economic Benefits Analysis",
+      "description": "Financial advantages of your building's safety compliance"
+    },
+    "costBenefit": {
+      "title": "Cost-Benefit Analysis",
+      "description": "Investment analysis for improving earthquake safety",
+      "insuranceSavings": "Annual Insurance Savings",
+      "propertyIncrease": "Property Value Increase",
+      "totalBenefits": "Total Economic Benefits",
+      "certificationBenefits": "Certification Benefits",
+      "insuranceEligibility": "Insurance Eligibility",
+      "qualified": "Qualified",
+      "insuranceDiscount": "Earthquake Insurance Discount",
+      "discountRate": "15-25%",
+      "regulatory": "Regulatory Compliance",
+      "compliant": "Compliant",
+      "resaleValue": "Resale Value Premium",
+      "premiumRate": "5-10%",
+      "retrofitCost": "Estimated Retrofit Cost",
+      "paybackPeriod": "Investment Payback Period",
+      "years": " years",
+      "roiAnalysis": "Return on Investment Analysis",
+      "annualSavings": "Annual Insurance Savings",
+      "tenYearSavings": "10-Year Savings",
+      "netTenYearBenefit": "Net 10-Year Benefit",
+      "financingTitle": "Potential Financing Options",
+      "grantsTitle": "Government Grants",
+      "grantsDesc": "Up to 50% coverage for seismic retrofitting",
+      "loansTitle": "Low-Interest Loans",
+      "loansDesc": "Special rates for earthquake safety improvements",
+      "disclaimerTitle": "Important Disclaimer",
+      "disclaimerText": "These are estimated costs and benefits based on industry averages and may vary significantly based on actual building conditions, local contractors, material costs, and insurance policies. Consult with professionals for accurate quotes and assessments."
+    },
+    "imagery": {
+      "title": "We Found Your Building",
+      "subtitle": "Images collected from multiple sources",
+      "streetView": "Street View",
+      "satellite": "Satellite",
+      "yourPhotos": "Your Photos",
+      "view": " view",
+      "googleStreetView": "Google Street View",
+      "satelliteLabel": "Satellite imagery",
+      "googleSatellite": "Google Satellite",
+      "photosAnalyzed": "{count} photos analyzed",
+      "streetCaption": "Street-level imagery automatically collected from your location",
+      "satelliteCaption": "High-resolution satellite view of your building area",
+      "userPhotosCaption": "Photos you uploaded for AI analysis"
     }
   },
   "Dashboard": {
     "title": "My Assessments",
     "subtitle": "View and manage your earthquake safety assessments",
+    "newButton": "New Assessment",
+    "totalAssessments": "Total Assessments",
+    "completed": "Completed",
+    "complete": "Complete",
+    "inProgress": "In Progress",
+    "averageScore": "Average Score",
+    "noAssessmentsYet": "No assessments yet",
+    "startFirstDescription": "Start your first earthquake safety assessment to evaluate building vulnerability and get personalized safety recommendations.",
+    "startFirstAssessment": "Start Your First Assessment",
+    "fiveMin": "5 min",
+    "averageTime": "Average time",
+    "ai": "AI",
+    "poweredAnalysis": "Powered analysis",
+    "free": "Free",
+    "alwaysFree": "Always free",
+    "deleteAssessment": "Delete Assessment",
+    "deleteConfirmMessage": "Are you sure you want to delete {title}? This action cannot be undone.",
+    "thisAssessment": "this assessment",
+    "deleting": "Deleting...",
+    "draft": "Draft",
+    "archived": "Archived",
+    "untitledAssessment": "Untitled Assessment",
+    "riskLevelLow": "Low Risk",
+    "riskLevelModerate": "Moderate Risk",
+    "riskLevelHigh": "High Risk",
+    "riskLevelVeryHigh": "Very High Risk",
+    "stepOf": "Step {step} of {total}",
+    "copyLink": "Copy Link",
+    "duplicate": "Duplicate",
     "stats": {
+      "total": "Total Assessments",
       "completed": "Completed",
       "inProgress": "In Progress",
-      "avgScore": "Avg Score"
+      "avgScore": "Avg Score",
+      "averageScore": "Average Score"
     },
     "empty": {
       "title": "No assessments yet",
-      "description": "Start your first earthquake safety assessment to see results here.",
-      "cta": "Start Assessment"
+      "description": "Start your first earthquake safety assessment to evaluate building vulnerability and get personalized safety recommendations.",
+      "cta": "Start Assessment",
+      "button": "Start Your First Assessment",
+      "time": "5 min",
+      "timeLabel": "Average time",
+      "aiLabel": "AI",
+      "aiDescription": "Powered analysis",
+      "priceLabel": "Free",
+      "priceDescription": "Always free",
+      "filteredMessage": "No {filter} assessments found."
     },
     "card": {
       "viewDetails": "View Details",
       "continue": "Continue",
       "delete": "Delete"
+    },
+    "modal": {
+      "deleteTitle": "Delete Assessment",
+      "deleteMessage": "Are you sure you want to delete ",
+      "cannotUndo": "? This action cannot be undone.",
+      "deleting": "Deleting...",
+      "defaultTitle": "this assessment"
+    },
+    "filters": {
+      "all": "All",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    },
+    "errors": {
+      "loadFailed": "Failed to load assessments",
+      "deleteFailed": "Failed to delete assessment",
+      "duplicateFailed": "Failed to duplicate assessment"
+    },
+    "notifications": {
+      "deleted": "Assessment deleted",
+      "duplicated": "Assessment duplicated",
+      "linkCopied": "Link copied to clipboard"
     }
   },
   "Common": {
@@ -154,29 +530,108 @@
     "edit": "Edit",
     "close": "Close",
     "loading": "Loading...",
+    "loadingAssessments": "Loading your assessments...",
     "uploading": "Uploading...",
     "processing": "Processing...",
     "analyzing": "Analyzing...",
     "success": "Success",
     "error": "Error",
     "retry": "Retry",
+    "view": "View",
     "viewMore": "View More",
     "viewLess": "View Less",
+    "loadMore": "Load More",
+    "previous": "Previous",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "celsius": "°C",
+    "kmh": "km/h",
+    "humidity": "humidity",
+    "mmRain": "mm rain",
+    "gravity": "g",
+    "time": {
+      "minutesAgo": "m ago",
+      "hoursAgo": "h ago",
+      "yesterday": "Yesterday",
+      "daysAgo": "d ago"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
   "Errors": {
     "generic": "An error occurred. Please try again.",
     "network": "Network error. Please check your connection.",
     "locationNotFound": "Location not found",
     "photoUploadFailed": "Photo upload failed",
-    "analysisFaile": "Analysis failed. Please try again.",
-    "sessionExpired": "Your session has expired. Please sign in again."
+    "analysisFailed": "Analysis failed. Please try again.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "signInRequired": "Please sign in to view your assessments"
   },
   "Language": {
     "label": "Language",
     "english": "English",
     "turkish": "Türkçe",
     "changed": "Language changed to {language}"
+  },
+  "Home": {
+    "letsStart": "Let's Start",
+    "riskLevels": {
+      "high": "High Risk",
+      "moderate": "Moderate Risk",
+      "low": "Low Risk"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "description": "Our simple 3-step process provides accurate earthquake risk assessment for your building"
+    },
+    "steps": {
+      "step1Title": "Input Building Details",
+      "step1Desc": "Provide information about your building's location, structure type, and age.",
+      "step2Title": "AI-Powered Analysis",
+      "step2Desc": "Our algorithm analyzes your building data against seismic standards and risk factors.",
+      "step3Title": "Get Detailed Results",
+      "step3Desc": "Receive a comprehensive report with safety score and recommendations."
+    },
+    "simulator": {
+      "title": "Interactive Risk Simulator",
+      "buildingAge": "Building Age (years)",
+      "structuralCondition": "Structural Condition (%)",
+      "seismicZone": "Seismic Zone Risk (%)"
+    },
+    "noAssessments": {
+      "title": "No assessments yet",
+      "description": "Start your first earthquake safety assessment",
+      "button": "Start New Assessment"
+    }
+  },
+  "Pages": {
+    "about": {
+      "title": "About QuakeWise",
+      "missionLabel": "Our Mission",
+      "missionTitle": "Research-Based Approach",
+      "missionSubtitle": "Combining engineering principles with practical solutions",
+      "objectivesHeading": "What We Aim to Accomplish",
+      "objectivesDesc": "At QuakeWise, we're dedicated to these key objectives that guide our platform development",
+      "objective1": "We gather comprehensive building data to enable accurate analysis.",
+      "objective2": "Our algorithms assess structural vulnerability and potential earthquake impacts.",
+      "objective3": "Visual representations help you understand potential risks and mitigation strategies.",
+      "academicLabel": "Academic Support",
+      "academicTitle": "Backed by Research"
+    },
+    "history": {
+      "title": "Assessment History",
+      "description": "View and manage your earthquake safety assessments",
+      "emptyTitle": "No assessments yet",
+      "emptyDesc": "Start your first earthquake safety assessment",
+      "emptyButton": "Start New Assessment",
+      "deleteConfirm": "Are you sure you want to delete this assessment?",
+      "deleteFailed": "Failed to delete assessment: "
+    },
+    "welcome": {
+      "greeting": "Welcome to QuakeWise"
+    }
   }
 }

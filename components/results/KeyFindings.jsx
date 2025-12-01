@@ -10,6 +10,7 @@ import {
   Layers
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 /**
  * KeyFindings - 3-5 bullet points summarizing the assessment
@@ -22,6 +23,8 @@ export function KeyFindings({
   userInput,
   className
 }) {
+  const t = useTranslations('Results');
+
   // Generate findings based on the safety result
   const generateFindings = () => {
     const findings = [];
@@ -31,11 +34,11 @@ export function KeyFindings({
     const structuralScore = parseFloat(safetyResult?.structuralIntegrity || 0);
     findings.push({
       icon: Building,
-      text: `Structural System: ${userInput?.structuralSystem || 'Standard construction'}`,
+      text: t('structuralSystem', { system: userInput?.structuralSystem || t('standardConstruction') }),
       type: structuralScore >= 70 ? 'positive' : structuralScore >= 50 ? 'warning' : 'negative',
       detail: structuralScore >= 70
-        ? 'Good structural integrity'
-        : 'May need reinforcement'
+        ? t('goodStructuralIntegrity')
+        : t('mayNeedReinforcement')
     });
 
     // 2. Building Age Finding
@@ -44,13 +47,13 @@ export function KeyFindings({
     if (age !== null) {
       findings.push({
         icon: Calendar,
-        text: `Built in ${yearBuilt} (${age} years old)`,
+        text: t('builtInYear', { year: yearBuilt, age: age }),
         type: age <= 20 ? 'positive' : age <= 40 ? 'warning' : 'negative',
         detail: age <= 20
-          ? 'Modern construction standards'
+          ? t('modernConstructionStandards')
           : age <= 40
-            ? 'May need seismic updates'
-            : 'Older construction, consider evaluation'
+            ? t('mayNeedSeismicUpdates')
+            : t('olderConstruction')
       });
     }
 
@@ -59,27 +62,27 @@ export function KeyFindings({
     if (stories > 0) {
       findings.push({
         icon: Layers,
-        text: `${stories} ${stories === 1 ? 'story' : 'stories'} building`,
+        text: t('storiesBuilding', { count: stories }),
         type: stories <= 3 ? 'positive' : stories <= 6 ? 'neutral' : 'warning',
         detail: stories <= 3
-          ? 'Lower height reduces seismic risk'
+          ? t('lowerHeightReducesRisk')
           : stories <= 6
-            ? 'Medium-rise building'
-            : 'Higher buildings need stronger foundations'
+            ? t('mediumRiseBuilding')
+            : t('higherBuildingsNeedStronger')
       });
     }
 
     // 4. Earthquake Impact Finding
-    const impact = safetyResult?.earthquakeImpact || 'Unknown';
+    const impact = safetyResult?.earthquakeImpact || t('unknown');
     findings.push({
       icon: AlertTriangle,
-      text: `Earthquake Impact: ${impact}`,
+      text: t('earthquakeImpact', { impact: impact }),
       type: impact === 'Low' ? 'positive' : impact === 'Moderate' ? 'warning' : 'negative',
       detail: impact === 'Low'
-        ? 'Minimal expected damage in typical events'
+        ? t('minimalExpectedDamage')
         : impact === 'Moderate'
-          ? 'Some damage possible in strong earthquakes'
-          : 'Higher vulnerability to earthquake damage'
+          ? t('someDamagePossible')
+          : t('higherVulnerability')
     });
 
     // 5. Irregularity Finding (if applicable)
@@ -88,16 +91,16 @@ export function KeyFindings({
     if (hasIrregularity) {
       findings.push({
         icon: Info,
-        text: 'Structural irregularities detected',
+        text: t('structuralIrregularitiesDetected'),
         type: 'warning',
-        detail: 'Irregular shapes may concentrate stress during earthquakes'
+        detail: t('irregularShapesMayConcentrate')
       });
     } else if (userInput?.planIrregularity || userInput?.verticalIrregularity) {
       findings.push({
         icon: CheckCircle2,
-        text: 'Regular structural geometry',
+        text: t('regularStructuralGeometry'),
         type: 'positive',
-        detail: 'Even distribution of seismic forces'
+        detail: t('evenDistributionOfForces')
       });
     }
 
@@ -146,7 +149,7 @@ export function KeyFindings({
   return (
     <div className={cn("space-y-3", className)}>
       <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-4">
-        Key Findings
+        {t('keyFindings')}
       </h3>
 
       {findings.map((finding, index) => {

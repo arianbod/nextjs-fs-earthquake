@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Building2, Plus, Shield } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function EmptyState() {
+  const t = useTranslations('Dashboard');
+
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="relative mb-6">
@@ -16,31 +19,30 @@ export default function EmptyState() {
         </div>
       </div>
 
-      <h3 className="text-xl font-semibold mb-2">No assessments yet</h3>
+      <h3 className="text-xl font-semibold mb-2">{t('noAssessmentsYet')}</h3>
       <p className="text-muted-foreground max-w-sm mb-6">
-        Start your first earthquake safety assessment to evaluate building
-        vulnerability and get personalized safety recommendations.
+        {t('startFirstDescription')}
       </p>
 
       <Link href="/assessment/1">
         <Button size="lg" className="gap-2">
           <Plus className="w-5 h-5" />
-          Start Your First Assessment
+          {t('startFirstAssessment')}
         </Button>
       </Link>
 
       <div className="mt-8 grid grid-cols-3 gap-6 text-center max-w-md">
         <div>
-          <div className="text-2xl font-bold text-blue-600">5 min</div>
-          <div className="text-xs text-muted-foreground">Average time</div>
+          <div className="text-2xl font-bold text-blue-600">{t('fiveMin')}</div>
+          <div className="text-xs text-muted-foreground">{t('averageTime')}</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-green-600">AI</div>
-          <div className="text-xs text-muted-foreground">Powered analysis</div>
+          <div className="text-2xl font-bold text-green-600">{t('ai')}</div>
+          <div className="text-xs text-muted-foreground">{t('poweredAnalysis')}</div>
         </div>
         <div>
-          <div className="text-2xl font-bold text-purple-600">Free</div>
-          <div className="text-xs text-muted-foreground">Always free</div>
+          <div className="text-2xl font-bold text-purple-600">{t('free')}</div>
+          <div className="text-xs text-muted-foreground">{t('alwaysFree')}</div>
         </div>
       </div>
     </div>

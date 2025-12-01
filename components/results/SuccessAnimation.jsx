@@ -1,8 +1,12 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Star, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const SuccessAnimation = ({ score, show = true, onComplete }) => {
+	const t = useTranslations('Results');
 	const [isVisible, setIsVisible] = useState(show);
 	const [showConfetti, setShowConfetti] = useState(false);
 	const overallScore = parseFloat(score?.overallScore || 0);
@@ -207,14 +211,14 @@ const SuccessAnimation = ({ score, show = true, onComplete }) => {
 								className="text-3xl font-bold text-gray-900 dark:text-white mb-4"
 								variants={childVariants}
 							>
-								🎉 Congratulations!
+								{t('congratulations')}
 							</motion.h2>
 
 							<motion.p
 								className="text-lg text-gray-600 dark:text-gray-300 mb-4"
 								variants={childVariants}
 							>
-								Your building has achieved an excellent safety score!
+								{t('excellentSafetyScore')}
 							</motion.p>
 
 							{/* Score Display */}
@@ -226,7 +230,7 @@ const SuccessAnimation = ({ score, show = true, onComplete }) => {
 									{overallScore}%
 								</div>
 								<div className="text-sm text-green-700 dark:text-green-300">
-									Safety Score
+									{t('safetyScore')}
 								</div>
 							</motion.div>
 
@@ -239,19 +243,19 @@ const SuccessAnimation = ({ score, show = true, onComplete }) => {
 									<div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mb-2">
 										<Star className="w-6 h-6 text-yellow-600" />
 									</div>
-									<span className="text-xs text-gray-600 dark:text-gray-400">Certified</span>
+									<span className="text-xs text-gray-600 dark:text-gray-400">{t('certified')}</span>
 								</div>
 								<div className="text-center">
 									<div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-2">
 										<CheckCircle2 className="w-6 h-6 text-blue-600" />
 									</div>
-									<span className="text-xs text-gray-600 dark:text-gray-400">Verified</span>
+									<span className="text-xs text-gray-600 dark:text-gray-400">{t('verified')}</span>
 								</div>
 								<div className="text-center">
 									<div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
 										<Sparkles className="w-6 h-6 text-green-600" />
 									</div>
-									<span className="text-xs text-gray-600 dark:text-gray-400">Excellent</span>
+									<span className="text-xs text-gray-600 dark:text-gray-400">{t('excellent')}</span>
 								</div>
 							</motion.div>
 
@@ -260,8 +264,7 @@ const SuccessAnimation = ({ score, show = true, onComplete }) => {
 								className="text-sm text-gray-500 dark:text-gray-400"
 								variants={childVariants}
 							>
-								Your building meets all safety standards for earthquake resistance.
-								You can now download your certificate!
+								{t('meetsAllSafetyStandards')}
 							</motion.p>
 
 							{/* Auto-dismiss indicator */}
@@ -269,7 +272,7 @@ const SuccessAnimation = ({ score, show = true, onComplete }) => {
 								className="mt-4 text-xs text-gray-400"
 								variants={childVariants}
 							>
-								This message will auto-dismiss in a few seconds
+								{t('autoDismissMessage')}
 							</motion.div>
 						</div>
 					</motion.div>
