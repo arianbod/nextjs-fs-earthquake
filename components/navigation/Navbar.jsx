@@ -5,9 +5,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserButton, useUser } from '@clerk/nextjs';
 import ThemeToggle from './ThemeToggle';
+import LanguageToggle from './LanguageToggle';
 import {
 	Menu,
 	HomeIcon,
@@ -57,6 +59,9 @@ const Navbar = () => {
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
 	const [showQuickStats, setShowQuickStats] = useState(false);
 
+	const t = useTranslations('Navigation');
+	const tGreeting = useTranslations('Greeting');
+
 	const isAssessmentPath = pathname.includes('/assessment/');
 	const currentStepMatch = pathname.match(/\/assessment\/(\d+)/);
 	const currentStep = currentStepMatch ? parseInt(currentStepMatch[1]) : 0;
@@ -88,10 +93,10 @@ const Navbar = () => {
 
 	// Navigation links with smart ordering
 	const navLinks = [
-		{ href: '/', label: 'Home', icon: HomeIcon, showAlways: true },
-		{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, requiresAuth: true },
-		{ href: '/history', label: 'Assessments', icon: History, requiresAuth: true },
-		{ href: '/about', label: 'About', icon: InfoIcon, showAlways: true },
+		{ href: '/', label: t('home'), icon: HomeIcon, showAlways: true },
+		{ href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard, requiresAuth: true },
+		{ href: '/history', label: t('assessments'), icon: History, requiresAuth: true },
+		{ href: '/about', label: t('about'), icon: InfoIcon, showAlways: true },
 	];
 
 	const filteredNavLinks = navLinks.filter(
@@ -109,9 +114,9 @@ const Navbar = () => {
 	// Greeting based on time of day
 	const getGreeting = () => {
 		const hour = new Date().getHours();
-		if (hour < 12) return 'Good morning';
-		if (hour < 18) return 'Good afternoon';
-		return 'Good evening';
+		if (hour < 12) return tGreeting('morning');
+		if (hour < 18) return tGreeting('afternoon');
+		return tGreeting('evening');
 	};
 
 	return (
@@ -196,9 +201,9 @@ const Navbar = () => {
 											>
 												<Sparkles className="h-4 w-4" />
 												<span className="hidden lg:inline">
-													{draftAssessment ? 'Continue' : 'New Assessment'}
+													{draftAssessment ? t('continue') : t('newAssessment')}
 												</span>
-												<span className="lg:hidden">Start</span>
+												<span className="lg:hidden">{t('start')}</span>
 												<ChevronDown className="h-3 w-3" />
 											</Button>
 										</motion.div>
@@ -206,7 +211,7 @@ const Navbar = () => {
 									<DropdownMenuContent align="end" className="w-64">
 										<DropdownMenuLabel className="flex items-center gap-2">
 											<Building2 className="h-4 w-4" />
-											Assessment Options
+											{t('assessmentOptions')}
 										</DropdownMenuLabel>
 										<DropdownMenuSeparator />
 
@@ -219,11 +224,10 @@ const Navbar = () => {
 												>
 													<div className="flex items-center gap-2 text-blue-600 font-medium">
 														<Play className="h-4 w-4" />
-														Continue Assessment
+														{t('continueAssessment')}
 													</div>
 													<span className="text-xs text-muted-foreground mt-1 ml-6">
-														Step {draftAssessment.currentStep || 1} of{' '}
-														{AssessmentSteps.length}
+														{t('resumeStep', { step: draftAssessment.currentStep || 1, total: AssessmentSteps.length })}
 													</span>
 													{draftAssessment.location?.city && (
 														<span className="text-xs text-muted-foreground ml-6">
@@ -242,7 +246,7 @@ const Navbar = () => {
 												className="flex items-center gap-2 py-2 cursor-pointer"
 											>
 												<Sparkles className="h-4 w-4 text-emerald-500" />
-												<span>Start New Assessment</span>
+												<span>{t('startAssessment')}</span>
 											</Link>
 										</DropdownMenuItem>
 									</DropdownMenuContent>
@@ -257,7 +261,7 @@ const Navbar = () => {
 											className="ml-2 gap-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
 										>
 											<Sparkles className="h-4 w-4" />
-											Start Assessment
+											{t('startAssessment')}
 										</Button>
 									</motion.div>
 								</Link>
@@ -281,7 +285,7 @@ const Navbar = () => {
 										</motion.button>
 									</TooltipTrigger>
 									<TooltipContent>
-										<p>You have {stats.totalCompleted || 0} completed assessments</p>
+										<p>{t('completedAssessments', { count: stats.totalCompleted || 0 })}</p>
 									</TooltipContent>
 								</Tooltip>
 							)}
@@ -302,10 +306,11 @@ const Navbar = () => {
 									</Link>
 								</TooltipTrigger>
 								<TooltipContent>
-									<p>Help & Support</p>
+									<p>{t('help')}</p>
 								</TooltipContent>
 							</Tooltip>
 
+							<LanguageToggle />
 							<ThemeToggle />
 
 							{/* User Button with greeting */}
@@ -320,7 +325,7 @@ const Navbar = () => {
 								<div className="hidden md:flex">
 									<Link href="/sign-in">
 										<Button variant="outline" size="sm">
-											Sign In
+											{t('signIn')}
 										</Button>
 									</Link>
 								</div>
@@ -369,7 +374,7 @@ const Navbar = () => {
 											<div className="p-4 mx-4 mt-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
 												<p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2 flex items-center gap-1">
 													<Clock className="h-3 w-3" />
-													Continue where you left off
+													{t('continueWhereLeft')}
 												</p>
 												<SheetClose asChild>
 													<Button
@@ -378,7 +383,7 @@ const Navbar = () => {
 														onClick={handleQuickResume}
 													>
 														<Play className="h-4 w-4" />
-														Resume Step {draftAssessment.currentStep || 1}
+														{t('resumeStepButton', { step: draftAssessment.currentStep || 1 })}
 													</Button>
 												</SheetClose>
 											</div>
@@ -432,7 +437,7 @@ const Navbar = () => {
 													<Link href="/assessment/1">
 														<Button className="w-full gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600">
 															<Sparkles className="h-4 w-4" />
-															Start New Assessment
+															{t('startNewAssessment')}
 														</Button>
 													</Link>
 												</SheetClose>
@@ -442,7 +447,7 @@ const Navbar = () => {
 											{isAssessmentPath && (
 												<div className="mt-6">
 													<h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
-														Assessment Progress
+														{t('assessmentProgress')}
 													</h3>
 													<div className="space-y-1">
 														{AssessmentSteps.slice(0, 4).map((step, index) => {
@@ -516,7 +521,7 @@ const Navbar = () => {
 												<Link href="/about">
 													<Button variant="outline" className="w-full gap-2">
 														<HelpCircle className="h-4 w-4" />
-														Help & Support
+														{t('help')}
 													</Button>
 												</Link>
 											</SheetClose>

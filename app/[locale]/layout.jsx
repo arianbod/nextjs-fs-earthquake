@@ -2,17 +2,34 @@
 
 import React from 'react';
 import Script from 'next/script';
-import Providers from './providers';
+import { NextIntlClientProvider } from 'next-intl';
+import Providers from '../providers';
 import Navbar from '@/components/navigation/Navbar';
 import { Progress } from '@/components/ui/progress';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { usePathname } from 'next/navigation';
 import AssessmentSteps from '@/components/AssessmentSteps';
 import { Toaster } from 'sonner';
-import "./globals.css"
-import './voice-assistant-bundle.css'
-const MainLayout = ({ children }) => {
+import "../globals.css"
+import '../voice-assistant-bundle.css'
+
+// We'll load messages on the server and pass them to the client
+// For now, we import them statically (will be optimized later)
+import enMessages from '@/messages/en.json';
+import trMessages from '@/messages/tr.json';
+
+const messages = {
+  en: enMessages,
+  tr: trMessages,
+};
+
+const LocaleLayout = ({ children, params }) => {
   const pathname = usePathname();
+
+  // Extract locale from params or pathname
+  const localeMatch = pathname.match(/^\/(en|tr)/);
+  const locale = localeMatch ? localeMatch[1] : 'en';
+
   const isAssessmentPath = pathname.includes('/assessment/');
   const match = pathname.match(/\/assessment\/(\d+)/);
   const currentStep = match ? parseInt(match[1], 10) : 0;
@@ -21,7 +38,7 @@ const MainLayout = ({ children }) => {
     : 0;
 
   return (
-    <html className="min-h-screen">
+    <html lang={locale} className="min-h-screen">
       <head>
         <Script
           src='/cdn/voice-assistant-bundle.js'
@@ -116,37 +133,39 @@ Based on your assessment results, we provide:
             `,
           }}
         />
-        <Providers>
-          <div className="grid grid-cols-1 h-screen">
-            <div className="flex flex-col h-full">
-              <Navbar />
+        <NextIntlClientProvider locale={locale} messages={messages[locale]}>
+          <Providers>
+            <div className="grid grid-cols-1 h-screen">
+              <div className="flex flex-col h-full">
+                <Navbar />
 
-              {/* Assessment progress bar */}
-              {isAssessmentPath && (
-                <div className="container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 py-1 lg:py-2 mt-2 lg:mt-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Assessment Progress</span>
-                    <span className="text-sm font-medium">{Math.round(progress)}%</span>
+                {/* Assessment progress bar */}
+                {isAssessmentPath && (
+                  <div className="container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 py-1 lg:py-2 mt-2 lg:mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Assessment Progress</span>
+                      <span className="text-sm font-medium">{Math.round(progress)}%</span>
+                    </div>
+                    <Progress
+                      value={progress}
+                      className="h-2 bg-gray-200 dark:bg-gray-700"
+                    />
+                    <Breadcrumb currentStep={currentStep} />
                   </div>
-                  <Progress
-                    value={progress}
-                    className="h-2 bg-gray-200 dark:bg-gray-700"
-                  />
-                  <Breadcrumb currentStep={currentStep} />
-                </div>
-              )}
+                )}
 
-              {/* Page children */}
-              <main className="flex-grow overflow-y-auto container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
-                {children}
-              </main>
+                {/* Page children */}
+                <main className="flex-grow overflow-y-auto container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
-          <Toaster position="top-right" richColors />
-        </Providers>
+            <Toaster position="top-right" richColors />
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
 };
 
-export default MainLayout;
+export default LocaleLayout;

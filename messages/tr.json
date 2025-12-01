@@ -1,0 +1,182 @@
+{
+  "Navigation": {
+    "home": "Ana Sayfa",
+    "dashboard": "Kontrol Paneli",
+    "assessments": "Değerlendirmeler",
+    "history": "Geçmiş",
+    "about": "Hakkında",
+    "help": "Yardım ve Destek",
+    "signIn": "Giriş Yap",
+    "signOut": "Çıkış Yap",
+    "startAssessment": "Değerlendirmeye Başla",
+    "newAssessment": "Yeni Değerlendirme",
+    "continueAssessment": "Değerlendirmeye Devam Et",
+    "continue": "Devam Et",
+    "start": "Başla",
+    "assessmentOptions": "Değerlendirme Seçenekleri",
+    "resumeStep": "{total} adımdan {step}. adım",
+    "step": "Adım {current}/{total}",
+    "continueWhereLeft": "Kaldığınız yerden devam edin",
+    "resumeStepButton": "{step}. Adıma Devam Et",
+    "startNewAssessment": "Yeni Değerlendirme Başlat",
+    "assessmentProgress": "Değerlendirme İlerlemesi",
+    "completedAssessments": "{count} tamamlanmış değerlendirmeniz var"
+  },
+  "Greeting": {
+    "morning": "Günaydın",
+    "afternoon": "İyi günler",
+    "evening": "İyi akşamlar"
+  },
+  "Hero": {
+    "badge": "Artık Claude AI Vision ile Güçlendirildi",
+    "new": "YENİ",
+    "title": "Deprem Güvenliği",
+    "titleHighlight": "Yapay Zeka ile Yeniden Tasarlandı",
+    "subtitle": "Fotoğraf yükleyin. Anında analiz alın. Dakikalar içinde güvenlik puanınızı öğrenin.",
+    "subtitleSecondary": "Form yok. Karmaşıklık yok. Sadece sonuçlar.",
+    "cta": "AI Değerlendirmesini Başlat",
+    "watchDemo": "Demo İzle (2 dk)",
+    "accuracy": "%95 Doğruluk",
+    "assessmentTime": "5 Dk Değerlendirme",
+    "users": "25.000+ Kullanıcı",
+    "readyContinue": "Değerlendirmenize devam etmeye hazır mısınız?",
+    "readyStart": "Yeni bir güvenlik değerlendirmesi başlatmaya hazır mısınız?",
+    "inProgress": "Devam Ediyor",
+    "stepOf": "{total} adımdan {step}. adım",
+    "untitledAssessment": "İsimsiz Değerlendirme",
+    "locationSet": "Konum belirlendi",
+    "startFresh": "Yeni bir bina değerlendirmesi başlat",
+    "viewDashboard": "Paneli Görüntüle",
+    "seeAllAssessments": "Tüm değerlendirmelerinizi görün",
+    "completed": "tamamlandı",
+    "inProgressLower": "devam ediyor",
+    "avgScore": "ort. puan",
+    "viewAll": "Tümünü gör"
+  },
+  "Assessment": {
+    "progress": "Değerlendirme İlerlemesi",
+    "step1": {
+      "title": "Konum Tespiti",
+      "description": "Bina konumunu tespit et ve uydu/sokak görünümü görüntülerini yakala"
+    },
+    "step2": {
+      "title": "Çevresel Analiz",
+      "description": "Hava durumu verilerini analiz et ve toplanan görüntüleri göster"
+    },
+    "step3": {
+      "title": "AI Plan Analizi",
+      "description": "AI yapısal analizi için mimari planları yükle"
+    },
+    "step4": {
+      "title": "AI Fotoğraf Analizi",
+      "description": "Kapsamlı görsel değerlendirme için bina fotoğraflarını yükle"
+    },
+    "step5": {
+      "title": "Bina İncelemesi",
+      "description": "AI tarafından tespit edilen bina özelliklerini incele ve onayla"
+    },
+    "step6": {
+      "title": "Son İnceleme",
+      "description": "Sonuç oluşturmadan önce tüm değerlendirme verilerini onayla"
+    }
+  },
+  "Location": {
+    "title": "Konum Tespiti",
+    "detecting": "Konumunuz tespit ediliyor...",
+    "detected": "Konum tespit edildi",
+    "seismicZone": "Deprem Bölgesi",
+    "address": "Adres",
+    "coordinates": "Koordinatlar",
+    "collectingImages": "Sokak Görünümü görüntüleri toplanıyor...",
+    "imagesCollected": "Görüntüler toplandı",
+    "north": "Kuzey",
+    "east": "Doğu",
+    "south": "Güney",
+    "west": "Batı",
+    "satellite": "Uydu Görünümü",
+    "streetView": "Sokak Görünümü"
+  },
+  "Results": {
+    "title": "Güvenlik Değerlendirme Sonuçları",
+    "safetyScore": "Güvenlik Puanı",
+    "riskLevel": "Risk Seviyesi",
+    "keyFindings": "Önemli Bulgular",
+    "recommendations": "Öneriler",
+    "immediateActions": "Acil Eylemler",
+    "shortTermActions": "Kısa Vadeli Eylemler",
+    "longTermActions": "Uzun Vadeli Eylemler",
+    "riskLevels": {
+      "low": "Düşük",
+      "moderate": "Orta",
+      "high": "Yüksek",
+      "veryHigh": "Çok Yüksek"
+    },
+    "grades": {
+      "A": "Mükemmel",
+      "B": "İyi",
+      "C": "Kabul Edilebilir",
+      "D": "İyileştirme Gerekli",
+      "F": "Riskli"
+    },
+    "interpretation": {
+      "excellent": "Binanız çoğu deprem senaryosuna güvenle dayanabilir.",
+      "good": "Binanız küçük endişelerle yeterli deprem korumasına sahip.",
+      "needsWork": "Binanız optimal deprem güvenliği için iyileştirmelere ihtiyaç duyabilir.",
+      "atRisk": "Binanızda ele alınması gereken önemli zafiyetler var."
+    }
+  },
+  "Dashboard": {
+    "title": "Değerlendirmelerim",
+    "subtitle": "Deprem güvenliği değerlendirmelerinizi görüntüleyin ve yönetin",
+    "stats": {
+      "completed": "Tamamlanan",
+      "inProgress": "Devam Eden",
+      "avgScore": "Ort. Puan"
+    },
+    "empty": {
+      "title": "Henüz değerlendirme yok",
+      "description": "Sonuçları burada görmek için ilk deprem güvenliği değerlendirmenizi başlatın.",
+      "cta": "Değerlendirmeye Başla"
+    },
+    "card": {
+      "viewDetails": "Detayları Gör",
+      "continue": "Devam Et",
+      "delete": "Sil"
+    }
+  },
+  "Common": {
+    "next": "İleri",
+    "back": "Geri",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "confirm": "Onayla",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "close": "Kapat",
+    "loading": "Yükleniyor...",
+    "uploading": "Yükleniyor...",
+    "processing": "İşleniyor...",
+    "analyzing": "Analiz ediliyor...",
+    "success": "Başarılı",
+    "error": "Hata",
+    "retry": "Tekrar Dene",
+    "viewMore": "Daha Fazla",
+    "viewLess": "Daha Az",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "Errors": {
+    "generic": "Bir hata oluştu. Lütfen tekrar deneyin.",
+    "network": "Ağ hatası. Lütfen bağlantınızı kontrol edin.",
+    "locationNotFound": "Konum bulunamadı",
+    "photoUploadFailed": "Fotoğraf yüklenemedi",
+    "analysisFaile": "Analiz başarısız oldu. Lütfen tekrar deneyin.",
+    "sessionExpired": "Oturumunuz sona erdi. Lütfen tekrar giriş yapın."
+  },
+  "Language": {
+    "label": "Dil",
+    "english": "English",
+    "turkish": "Türkçe",
+    "changed": "Dil {language} olarak değiştirildi"
+  }
+}

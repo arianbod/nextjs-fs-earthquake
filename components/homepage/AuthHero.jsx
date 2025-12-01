@@ -4,6 +4,7 @@ import React, { useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, useInView } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +22,9 @@ import {
 } from 'lucide-react';
 
 export default function AuthHero({ user, draftAssessment, stats }) {
+	const t = useTranslations('Hero');
+	const tGreeting = useTranslations('Greeting');
+	const tNav = useTranslations('Navigation');
 	const heroRef = useRef(null);
 	const isHeroInView = useInView(heroRef, { once: true });
 	const router = useRouter();
@@ -28,9 +32,9 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 	// Time-based greeting
 	const getGreeting = () => {
 		const hour = new Date().getHours();
-		if (hour < 12) return 'Good morning';
-		if (hour < 18) return 'Good afternoon';
-		return 'Good evening';
+		if (hour < 12) return tGreeting('morning');
+		if (hour < 18) return tGreeting('afternoon');
+		return tGreeting('evening');
 	};
 
 	const containerVariants = {
@@ -95,8 +99,8 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 						</h1>
 						<p className="text-lg text-gray-600 dark:text-gray-300">
 							{draftAssessment
-								? 'Ready to continue your assessment?'
-								: 'Ready to start a new safety assessment?'
+								? t('readyContinue')
+								: t('readyStart')
 							}
 						</p>
 					</motion.div>
@@ -120,19 +124,19 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 												<div className="flex items-center gap-2 mb-2">
 													<Badge className="bg-blue-600">
 														<Clock className="h-3 w-3 mr-1" />
-														In Progress
+														{t('inProgress')}
 													</Badge>
 													<span className="text-sm text-gray-500 dark:text-gray-400">
-														Step {draftAssessment.currentStep || 1} of 4
+														{t('stepOf', { step: draftAssessment.currentStep || 1, total: 4 })}
 													</span>
 												</div>
 												<h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
-													{draftAssessment.title || 'Untitled Assessment'}
+													{draftAssessment.title || t('untitledAssessment')}
 												</h3>
 												{draftAssessment.location && (
 													<p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
 														<MapPin className="h-3.5 w-3.5" />
-														{draftAssessment.location.city || draftAssessment.location.fullAddress || 'Location set'}
+														{draftAssessment.location.city || draftAssessment.location.fullAddress || t('locationSet')}
 													</p>
 												)}
 											</div>
@@ -143,7 +147,7 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 											>
 												<Button className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
 													<Play className="h-4 w-4" />
-													Continue
+													{tNav('continue')}
 													<ArrowRight className="h-4 w-4" />
 												</Button>
 											</motion.div>
@@ -181,10 +185,10 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 											<Plus className="h-7 w-7 text-blue-600 dark:text-blue-400" />
 										</motion.div>
 										<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-											New Assessment
+											{tNav('newAssessment')}
 										</h3>
 										<p className="text-sm text-gray-500 dark:text-gray-400">
-											Start a fresh building evaluation
+											{t('startFresh')}
 										</p>
 									</CardContent>
 								</Card>
@@ -207,10 +211,10 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 												<Building className="h-7 w-7 text-purple-600 dark:text-purple-400" />
 											</motion.div>
 											<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-												View Dashboard
+												{t('viewDashboard')}
 											</h3>
 											<p className="text-sm text-gray-500 dark:text-gray-400">
-												See all your assessments
+												{t('seeAllAssessments')}
 											</p>
 										</CardContent>
 									</Card>
@@ -228,7 +232,7 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 										<Target className="h-4 w-4 text-green-600 dark:text-green-400" />
 									</div>
 									<span className="text-sm">
-										<span className="font-semibold text-gray-900 dark:text-white">{stats.totalCompleted}</span> completed
+										<span className="font-semibold text-gray-900 dark:text-white">{stats.totalCompleted}</span> {t('completed')}
 									</span>
 								</div>
 							)}
@@ -238,7 +242,7 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 										<Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
 									</div>
 									<span className="text-sm">
-										<span className="font-semibold text-gray-900 dark:text-white">{stats.inProgress}</span> in progress
+										<span className="font-semibold text-gray-900 dark:text-white">{stats.inProgress}</span> {t('inProgressLower')}
 									</span>
 								</div>
 							)}
@@ -248,7 +252,7 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 										<TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
 									</div>
 									<span className="text-sm">
-										<span className="font-semibold text-gray-900 dark:text-white">{stats.averageScore}%</span> avg score
+										<span className="font-semibold text-gray-900 dark:text-white">{stats.averageScore}%</span> {t('avgScore')}
 									</span>
 								</div>
 							)}
@@ -256,7 +260,7 @@ export default function AuthHero({ user, draftAssessment, stats }) {
 								href="/dashboard"
 								className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
 							>
-								View all <ChevronRight className="h-4 w-4" />
+								{t('viewAll')} <ChevronRight className="h-4 w-4" />
 							</Link>
 						</motion.div>
 					)}

@@ -3,6 +3,7 @@
 import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function GuestHero({ onWatchDemo }) {
+	const t = useTranslations('Hero');
 	const heroRef = useRef(null);
 	const isHeroInView = useInView(heroRef, { once: true });
 
@@ -116,23 +118,23 @@ export default function GuestHero({ onWatchDemo }) {
 								<Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
 							</motion.div>
 							<span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
-								Now Powered by Claude AI Vision
+								{t('badge')}
 							</span>
 							<Badge variant="default" className="bg-purple-600 text-xs">
-								NEW
+								{t('new')}
 							</Badge>
 						</motion.div>
 					</motion.div>
 
 					{/* Main Heading with Letter Animation */}
 					<motion.h1 variants={itemVariants} className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-						<span className="block text-gray-900 dark:text-white">Earthquake Safety</span>
+						<span className="block text-gray-900 dark:text-white">{t('title')}</span>
 						<motion.span
 							className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto]"
 							animate={{ backgroundPosition: ['0% center', '200% center'] }}
 							transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
 						>
-							Reimagined with AI
+							{t('titleHighlight')}
 						</motion.span>
 					</motion.h1>
 
@@ -141,8 +143,8 @@ export default function GuestHero({ onWatchDemo }) {
 						variants={itemVariants}
 						className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
 					>
-						Upload photos. Get instant analysis. Receive your safety score in minutes.
-						<span className="block mt-2 text-lg">No forms. No complexity. Just results.</span>
+						{t('subtitle')}
+						<span className="block mt-2 text-lg">{t('subtitleSecondary')}</span>
 					</motion.p>
 
 					{/* CTA Buttons */}
@@ -159,7 +161,7 @@ export default function GuestHero({ onWatchDemo }) {
 									>
 										<Zap className="h-5 w-5" />
 									</motion.div>
-									Start AI Assessment
+									{t('cta')}
 									<ArrowRight className="h-5 w-5" />
 								</Button>
 							</motion.div>
@@ -172,7 +174,7 @@ export default function GuestHero({ onWatchDemo }) {
 								onClick={onWatchDemo}
 							>
 								<Play className="h-5 w-5" />
-								Watch Demo (2 min)
+								{t('watchDemo')}
 							</Button>
 						</motion.div>
 					</motion.div>
@@ -183,9 +185,9 @@ export default function GuestHero({ onWatchDemo }) {
 						className="flex flex-wrap justify-center gap-6 text-sm text-gray-600 dark:text-gray-400 pt-4"
 					>
 						{[
-							{ icon: CheckCircle2, text: '95% Accuracy', color: 'text-green-600' },
-							{ icon: Clock, text: '5 Min Assessment', color: 'text-blue-600' },
-							{ icon: Users, text: '25,000+ Users', color: 'text-purple-600' },
+							{ icon: CheckCircle2, text: t('accuracy'), color: 'text-green-600' },
+							{ icon: Clock, text: t('assessmentTime'), color: 'text-blue-600' },
+							{ icon: Users, text: t('users'), color: 'text-purple-600' },
 						].map((item, idx) => (
 							<motion.span
 								key={idx}

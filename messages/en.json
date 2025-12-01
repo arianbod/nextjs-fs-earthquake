@@ -1,0 +1,182 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "assessments": "Assessments",
+    "history": "History",
+    "about": "About",
+    "help": "Help & Support",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "startAssessment": "Start Assessment",
+    "newAssessment": "New Assessment",
+    "continueAssessment": "Continue Assessment",
+    "continue": "Continue",
+    "start": "Start",
+    "assessmentOptions": "Assessment Options",
+    "resumeStep": "Step {step} of {total}",
+    "step": "Step {current}/{total}",
+    "continueWhereLeft": "Continue where you left off",
+    "resumeStepButton": "Resume Step {step}",
+    "startNewAssessment": "Start New Assessment",
+    "assessmentProgress": "Assessment Progress",
+    "completedAssessments": "You have {count} completed assessments"
+  },
+  "Greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "Hero": {
+    "badge": "Now Powered by Claude AI Vision",
+    "new": "NEW",
+    "title": "Earthquake Safety",
+    "titleHighlight": "Reimagined with AI",
+    "subtitle": "Upload photos. Get instant analysis. Receive your safety score in minutes.",
+    "subtitleSecondary": "No forms. No complexity. Just results.",
+    "cta": "Start AI Assessment",
+    "watchDemo": "Watch Demo (2 min)",
+    "accuracy": "95% Accuracy",
+    "assessmentTime": "5 Min Assessment",
+    "users": "25,000+ Users",
+    "readyContinue": "Ready to continue your assessment?",
+    "readyStart": "Ready to start a new safety assessment?",
+    "inProgress": "In Progress",
+    "stepOf": "Step {step} of {total}",
+    "untitledAssessment": "Untitled Assessment",
+    "locationSet": "Location set",
+    "startFresh": "Start a fresh building evaluation",
+    "viewDashboard": "View Dashboard",
+    "seeAllAssessments": "See all your assessments",
+    "completed": "completed",
+    "inProgressLower": "in progress",
+    "avgScore": "avg score",
+    "viewAll": "View all"
+  },
+  "Assessment": {
+    "progress": "Assessment Progress",
+    "step1": {
+      "title": "Location Detection",
+      "description": "Detect building location and capture satellite/street view images"
+    },
+    "step2": {
+      "title": "Environmental Analysis",
+      "description": "Analyze weather patterns and display collected images"
+    },
+    "step3": {
+      "title": "AI Plan Analysis",
+      "description": "Upload architectural plans for AI structural analysis"
+    },
+    "step4": {
+      "title": "AI Photo Analysis",
+      "description": "Upload building photos for comprehensive visual assessment"
+    },
+    "step5": {
+      "title": "Building Review",
+      "description": "Review and confirm AI-detected building characteristics"
+    },
+    "step6": {
+      "title": "Final Review",
+      "description": "Confirm all assessment data before generating results"
+    }
+  },
+  "Location": {
+    "title": "Location Detection",
+    "detecting": "Detecting your location...",
+    "detected": "Location detected",
+    "seismicZone": "Seismic Zone",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "collectingImages": "Collecting Street View images...",
+    "imagesCollected": "Images collected",
+    "north": "North",
+    "east": "East",
+    "south": "South",
+    "west": "West",
+    "satellite": "Satellite View",
+    "streetView": "Street View"
+  },
+  "Results": {
+    "title": "Safety Assessment Results",
+    "safetyScore": "Safety Score",
+    "riskLevel": "Risk Level",
+    "keyFindings": "Key Findings",
+    "recommendations": "Recommendations",
+    "immediateActions": "Immediate Actions",
+    "shortTermActions": "Short-term Actions",
+    "longTermActions": "Long-term Actions",
+    "riskLevels": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High",
+      "veryHigh": "Very High"
+    },
+    "grades": {
+      "A": "Excellent",
+      "B": "Good",
+      "C": "Acceptable",
+      "D": "Needs Work",
+      "F": "At Risk"
+    },
+    "interpretation": {
+      "excellent": "Your building can withstand most earthquake scenarios safely.",
+      "good": "Your building has adequate earthquake protection with minor concerns.",
+      "needsWork": "Your building may need improvements for optimal earthquake safety.",
+      "atRisk": "Your building has significant vulnerabilities that should be addressed."
+    }
+  },
+  "Dashboard": {
+    "title": "My Assessments",
+    "subtitle": "View and manage your earthquake safety assessments",
+    "stats": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "avgScore": "Avg Score"
+    },
+    "empty": {
+      "title": "No assessments yet",
+      "description": "Start your first earthquake safety assessment to see results here.",
+      "cta": "Start Assessment"
+    },
+    "card": {
+      "viewDetails": "View Details",
+      "continue": "Continue",
+      "delete": "Delete"
+    }
+  },
+  "Common": {
+    "next": "Next",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "loading": "Loading...",
+    "uploading": "Uploading...",
+    "processing": "Processing...",
+    "analyzing": "Analyzing...",
+    "success": "Success",
+    "error": "Error",
+    "retry": "Retry",
+    "viewMore": "View More",
+    "viewLess": "View Less",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "Errors": {
+    "generic": "An error occurred. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "locationNotFound": "Location not found",
+    "photoUploadFailed": "Photo upload failed",
+    "analysisFaile": "Analysis failed. Please try again.",
+    "sessionExpired": "Your session has expired. Please sign in again."
+  },
+  "Language": {
+    "label": "Language",
+    "english": "English",
+    "turkish": "Türkçe",
+    "changed": "Language changed to {language}"
+  }
+}
