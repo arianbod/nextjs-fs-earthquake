@@ -3,11 +3,17 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DashboardStats, AssessmentList } from '@/components/dashboard';
 import { getDashboardStats } from '@/lib/actions/assessment';
-import { Plus } from 'lucide-react';
+import RecentEarthquakes from '@/components/alerts/RecentEarthquakes';
+import AlertNotificationList from '@/components/alerts/AlertNotificationList';
+import { Plus, Building2, AlertTriangle, Bell } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function DashboardPage() {
+  const t = useTranslations('Dashboard');
+  const tAlerts = useTranslations('Alerts');
   const [stats, setStats] = useState(null);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
 
@@ -28,19 +34,19 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-4xl">
+    <div className="container mx-auto px-4 py-6 max-w-6xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">My Assessments</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <p className="text-muted-foreground text-sm">
-            View and manage your earthquake safety assessments
+            {t('subtitle')}
           </p>
         </div>
         <Link href="/assessment/1">
           <Button className="gap-2">
             <Plus className="w-4 h-4" />
-            New Assessment
+            {t('newButton')}
           </Button>
         </Link>
       </div>
@@ -50,8 +56,35 @@ export default function DashboardPage() {
         <DashboardStats stats={stats} isLoading={isLoadingStats} />
       </div>
 
-      {/* Assessment List */}
-      <AssessmentList />
+      {/* Main Content - Tabbed View */}
+      <Tabs defaultValue="assessments" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="assessments" className="flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            {t('title')}
+          </TabsTrigger>
+          <TabsTrigger value="earthquakes" className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" />
+            {tAlerts('recentEarthquakes')}
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="flex items-center gap-2">
+            <Bell className="w-4 h-4" />
+            {tAlerts('notifications')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="assessments">
+          <AssessmentList />
+        </TabsContent>
+
+        <TabsContent value="earthquakes">
+          <RecentEarthquakes hours={24} minMagnitude={3} limit={20} />
+        </TabsContent>
+
+        <TabsContent value="notifications">
+          <AlertNotificationList limit={30} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

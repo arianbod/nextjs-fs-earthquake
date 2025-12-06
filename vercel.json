@@ -3,10 +3,19 @@
     "app/api/analyze-image/route.js": {
       "maxDuration": 60
     },
+    "app/api/alerts/cron/poll-earthquakes/route.js": {
+      "maxDuration": 60
+    },
     "app/api/**/*.js": {
       "maxDuration": 30
     }
   },
+  "crons": [
+    {
+      "path": "/api/alerts/cron/poll-earthquakes",
+      "schedule": "* * * * *"
+    }
+  ],
   "buildCommand": "next build",
   "outputDirectory": ".next",
   "framework": "nextjs",

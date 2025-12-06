@@ -55,3 +55,25 @@ export const ImageType = {
 } as const
 
 export type ImageType = (typeof ImageType)[keyof typeof ImageType]
+
+
+export const AlertPriority = {
+  LOW: 'LOW',
+  NORMAL: 'NORMAL',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+} as const
+
+export type AlertPriority = (typeof AlertPriority)[keyof typeof AlertPriority]
+
+
+export const AlertStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED'
+} as const
+
+export type AlertStatus = (typeof AlertStatus)[keyof typeof AlertStatus]

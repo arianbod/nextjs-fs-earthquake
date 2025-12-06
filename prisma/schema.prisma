@@ -425,3 +425,205 @@ enum ImageType {
 
   @@map("image_type")
 }
+
+// ============================================
+// EARTHQUAKE ALERT SYSTEM MODELS
+// ============================================
+
+// Earthquake events from all sources (AFAD, EMSC, USGS)
+model EarthquakeEvent {
+  id              String              @id @default(cuid())
+  sourceId        String              @map("source_id") // Original ID from source
+  source          String              // AFAD, EMSC, USGS
+  fingerprint     String              @unique // Hash for deduplication
+
+  // Location data
+  latitude        Float
+  longitude       Float
+  depth           Float?              // km
+
+  // Event characteristics
+  magnitude       Float
+  magnitudeType   String?             @map("magnitude_type") // Mw, ML, etc.
+  location        String?             // Human-readable location
+  region          String?             // Province/state
+  country         String?             @default("Turkey")
+  eventTime       DateTime            @map("event_time")
+
+  // Processing status
+  processed       Boolean             @default(false)
+  processedAt     DateTime?           @map("processed_at")
+
+  // Metadata
+  rawData         Json?               @map("raw_data")
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  notifications   AlertNotification[]
+
+  @@index([eventTime])
+  @@index([magnitude])
+  @@index([latitude, longitude])
+  @@index([processed, eventTime])
+  @@index([source, sourceId])
+  @@map("earthquake_events")
+}
+
+// User notification preferences
+model UserAlertPreferences {
+  id                  String              @id @default(cuid())
+  userId              String              @unique @map("user_id") // Clerk user ID
+
+  // Alert toggles
+  alertsEnabled       Boolean             @default(true) @map("alerts_enabled")
+  pushEnabled         Boolean             @default(true) @map("push_enabled")
+  emailEnabled        Boolean             @default(false) @map("email_enabled")
+
+  // Thresholds
+  minMagnitude        Float               @default(4.0) @map("min_magnitude")
+  maxDistanceKm       Int                 @default(100) @map("max_distance_km")
+  criticalMagnitude   Float               @default(5.0) @map("critical_magnitude") // Always alert
+
+  // Quiet hours (optional)
+  quietHoursEnabled   Boolean             @default(false) @map("quiet_hours_enabled")
+  quietHoursStart     String?             @map("quiet_hours_start") // "22:00"
+  quietHoursEnd       String?             @map("quiet_hours_end") // "07:00"
+
+  // Notification frequency
+  cooldownMinutes     Int                 @default(5) @map("cooldown_minutes")
+  dailyLimit          Int                 @default(50) @map("daily_limit")
+
+  // Email preferences
+  emailAddress        String?             @map("email_address")
+
+  // Language
+  language            String              @default("tr")
+
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  subscriptions       PushSubscription[]
+  notifications       AlertNotification[]
+
+  @@index([userId])
+  @@index([alertsEnabled])
+  @@map("user_alert_preferences")
+}
+
+// Push notification subscriptions (Web Push)
+model PushSubscription {
+  id              String              @id @default(cuid())
+  userId          String              @map("user_id")
+  preferencesId   String              @map("preferences_id")
+
+  // Subscription type
+  type            String              // WEB_PUSH, FCM
+
+  // Web Push fields
+  endpoint        String?             @db.Text
+  p256dhKey       String?             @map("p256dh_key")
+  authKey         String?             @map("auth_key")
+
+  // FCM fields
+  fcmToken        String?             @map("fcm_token") @db.Text
+
+  // Device info
+  deviceName      String?             @map("device_name")
+  browser         String?
+  platform        String?             // web, android, ios
+
+  // Status
+  active          Boolean             @default(true)
+  lastUsed        DateTime?           @map("last_used")
+  failureCount    Int                 @default(0) @map("failure_count")
+
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  preferences     UserAlertPreferences @relation(fields: [preferencesId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@index([active])
+  @@map("push_subscriptions")
+}
+
+// Generated alert notifications
+model AlertNotification {
+  id                  String              @id @default(cuid())
+  userId              String              @map("user_id")
+  preferencesId       String              @map("preferences_id")
+  earthquakeId        String              @map("earthquake_id")
+
+  // Alert details
+  title               String
+  body                String              @db.Text
+  priority            AlertPriority       @default(NORMAL)
+
+  // Location context
+  distanceKm          Float?              @map("distance_km")
+  relevantLocationId  String?             @map("relevant_location_id") // Assessment ID
+  relevantLocationName String?            @map("relevant_location_name")
+
+  // Delivery status
+  status              AlertStatus         @default(PENDING)
+
+  // Delivery channels used
+  pushSent            Boolean             @default(false) @map("push_sent")
+  emailSent           Boolean             @default(false) @map("email_sent")
+
+  // Timestamps
+  createdAt           DateTime            @default(now()) @map("created_at")
+  sentAt              DateTime?           @map("sent_at")
+  readAt              DateTime?           @map("read_at")
+
+  // Relations
+  preferences         UserAlertPreferences @relation(fields: [preferencesId], references: [id], onDelete: Cascade)
+  earthquake          EarthquakeEvent     @relation(fields: [earthquakeId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, status])
+  @@map("alert_notifications")
+}
+
+// Alert priority levels
+enum AlertPriority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+
+  @@map("alert_priority")
+}
+
+// Alert delivery status
+enum AlertStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+  SKIPPED  // Due to quiet hours, cooldown, etc.
+
+  @@map("alert_status")
+}
+
+// Polling job status tracking
+model EarthquakePollingStatus {
+  id              String              @id @default(cuid())
+  source          String              @unique
+  lastPollAt      DateTime            @map("last_poll_at")
+  lastSuccessAt   DateTime?           @map("last_success_at")
+  lastEventTime   DateTime?           @map("last_event_time")
+  eventsProcessed Int                 @default(0) @map("events_processed")
+  errorCount      Int                 @default(0) @map("error_count")
+  lastError       String?             @map("last_error")
+  isHealthy       Boolean             @default(true) @map("is_healthy")
+
+  @@map("earthquake_polling_status")
+}

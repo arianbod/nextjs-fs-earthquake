@@ -394,7 +394,12 @@ export const ModelName = {
   Location: 'Location',
   BuildingInfo: 'BuildingInfo',
   SafetyResult: 'SafetyResult',
-  AssessmentImage: 'AssessmentImage'
+  AssessmentImage: 'AssessmentImage',
+  EarthquakeEvent: 'EarthquakeEvent',
+  UserAlertPreferences: 'UserAlertPreferences',
+  PushSubscription: 'PushSubscription',
+  AlertNotification: 'AlertNotification',
+  EarthquakePollingStatus: 'EarthquakePollingStatus'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "apiApp" | "apiUsage" | "rateLimit" | "apiToken" | "apiError" | "apiUsageSummary" | "assessment" | "location" | "buildingInfo" | "safetyResult" | "assessmentImage"
+    modelProps: "apiApp" | "apiUsage" | "rateLimit" | "apiToken" | "apiError" | "apiUsageSummary" | "assessment" | "location" | "buildingInfo" | "safetyResult" | "assessmentImage" | "earthquakeEvent" | "userAlertPreferences" | "pushSubscription" | "alertNotification" | "earthquakePollingStatus"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1233,376 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EarthquakeEvent: {
+      payload: Prisma.$EarthquakeEventPayload<ExtArgs>
+      fields: Prisma.EarthquakeEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EarthquakeEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EarthquakeEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>
+        }
+        findFirst: {
+          args: Prisma.EarthquakeEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EarthquakeEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>
+        }
+        findMany: {
+          args: Prisma.EarthquakeEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>[]
+        }
+        create: {
+          args: Prisma.EarthquakeEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>
+        }
+        createMany: {
+          args: Prisma.EarthquakeEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EarthquakeEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>[]
+        }
+        delete: {
+          args: Prisma.EarthquakeEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>
+        }
+        update: {
+          args: Prisma.EarthquakeEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.EarthquakeEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EarthquakeEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EarthquakeEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.EarthquakeEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakeEventPayload>
+        }
+        aggregate: {
+          args: Prisma.EarthquakeEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEarthquakeEvent>
+        }
+        groupBy: {
+          args: Prisma.EarthquakeEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EarthquakeEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EarthquakeEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EarthquakeEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserAlertPreferences: {
+      payload: Prisma.$UserAlertPreferencesPayload<ExtArgs>
+      fields: Prisma.UserAlertPreferencesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserAlertPreferencesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserAlertPreferencesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>
+        }
+        findFirst: {
+          args: Prisma.UserAlertPreferencesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserAlertPreferencesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>
+        }
+        findMany: {
+          args: Prisma.UserAlertPreferencesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>[]
+        }
+        create: {
+          args: Prisma.UserAlertPreferencesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>
+        }
+        createMany: {
+          args: Prisma.UserAlertPreferencesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserAlertPreferencesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>[]
+        }
+        delete: {
+          args: Prisma.UserAlertPreferencesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>
+        }
+        update: {
+          args: Prisma.UserAlertPreferencesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserAlertPreferencesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserAlertPreferencesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserAlertPreferencesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserAlertPreferencesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserAlertPreferencesPayload>
+        }
+        aggregate: {
+          args: Prisma.UserAlertPreferencesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserAlertPreferences>
+        }
+        groupBy: {
+          args: Prisma.UserAlertPreferencesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserAlertPreferencesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserAlertPreferencesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserAlertPreferencesCountAggregateOutputType> | number
+        }
+      }
+    }
+    PushSubscription: {
+      payload: Prisma.$PushSubscriptionPayload<ExtArgs>
+      fields: Prisma.PushSubscriptionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PushSubscriptionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PushSubscriptionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        findFirst: {
+          args: Prisma.PushSubscriptionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PushSubscriptionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        findMany: {
+          args: Prisma.PushSubscriptionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+        }
+        create: {
+          args: Prisma.PushSubscriptionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        createMany: {
+          args: Prisma.PushSubscriptionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PushSubscriptionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+        }
+        delete: {
+          args: Prisma.PushSubscriptionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        update: {
+          args: Prisma.PushSubscriptionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PushSubscriptionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PushSubscriptionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PushSubscriptionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PushSubscriptionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>
+        }
+        aggregate: {
+          args: Prisma.PushSubscriptionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePushSubscription>
+        }
+        groupBy: {
+          args: Prisma.PushSubscriptionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PushSubscriptionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionCountAggregateOutputType> | number
+        }
+      }
+    }
+    AlertNotification: {
+      payload: Prisma.$AlertNotificationPayload<ExtArgs>
+      fields: Prisma.AlertNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AlertNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AlertNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.AlertNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AlertNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.AlertNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.AlertNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.AlertNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AlertNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.AlertNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>
+        }
+        update: {
+          args: Prisma.AlertNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AlertNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AlertNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AlertNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AlertNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AlertNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.AlertNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAlertNotification>
+        }
+        groupBy: {
+          args: Prisma.AlertNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AlertNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AlertNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AlertNotificationCountAggregateOutputType> | number
+        }
+      }
+    }
+    EarthquakePollingStatus: {
+      payload: Prisma.$EarthquakePollingStatusPayload<ExtArgs>
+      fields: Prisma.EarthquakePollingStatusFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EarthquakePollingStatusFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EarthquakePollingStatusFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>
+        }
+        findFirst: {
+          args: Prisma.EarthquakePollingStatusFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EarthquakePollingStatusFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>
+        }
+        findMany: {
+          args: Prisma.EarthquakePollingStatusFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>[]
+        }
+        create: {
+          args: Prisma.EarthquakePollingStatusCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>
+        }
+        createMany: {
+          args: Prisma.EarthquakePollingStatusCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EarthquakePollingStatusCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>[]
+        }
+        delete: {
+          args: Prisma.EarthquakePollingStatusDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>
+        }
+        update: {
+          args: Prisma.EarthquakePollingStatusUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>
+        }
+        deleteMany: {
+          args: Prisma.EarthquakePollingStatusDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EarthquakePollingStatusUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EarthquakePollingStatusUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>[]
+        }
+        upsert: {
+          args: Prisma.EarthquakePollingStatusUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EarthquakePollingStatusPayload>
+        }
+        aggregate: {
+          args: Prisma.EarthquakePollingStatusAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEarthquakePollingStatus>
+        }
+        groupBy: {
+          args: Prisma.EarthquakePollingStatusGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EarthquakePollingStatusGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EarthquakePollingStatusCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EarthquakePollingStatusCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1492,6 +1867,112 @@ export const AssessmentImageScalarFieldEnum = {
 export type AssessmentImageScalarFieldEnum = (typeof AssessmentImageScalarFieldEnum)[keyof typeof AssessmentImageScalarFieldEnum]
 
 
+export const EarthquakeEventScalarFieldEnum = {
+  id: 'id',
+  sourceId: 'sourceId',
+  source: 'source',
+  fingerprint: 'fingerprint',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  depth: 'depth',
+  magnitude: 'magnitude',
+  magnitudeType: 'magnitudeType',
+  location: 'location',
+  region: 'region',
+  country: 'country',
+  eventTime: 'eventTime',
+  processed: 'processed',
+  processedAt: 'processedAt',
+  rawData: 'rawData',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EarthquakeEventScalarFieldEnum = (typeof EarthquakeEventScalarFieldEnum)[keyof typeof EarthquakeEventScalarFieldEnum]
+
+
+export const UserAlertPreferencesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  alertsEnabled: 'alertsEnabled',
+  pushEnabled: 'pushEnabled',
+  emailEnabled: 'emailEnabled',
+  minMagnitude: 'minMagnitude',
+  maxDistanceKm: 'maxDistanceKm',
+  criticalMagnitude: 'criticalMagnitude',
+  quietHoursEnabled: 'quietHoursEnabled',
+  quietHoursStart: 'quietHoursStart',
+  quietHoursEnd: 'quietHoursEnd',
+  cooldownMinutes: 'cooldownMinutes',
+  dailyLimit: 'dailyLimit',
+  emailAddress: 'emailAddress',
+  language: 'language',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserAlertPreferencesScalarFieldEnum = (typeof UserAlertPreferencesScalarFieldEnum)[keyof typeof UserAlertPreferencesScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  preferencesId: 'preferencesId',
+  type: 'type',
+  endpoint: 'endpoint',
+  p256dhKey: 'p256dhKey',
+  authKey: 'authKey',
+  fcmToken: 'fcmToken',
+  deviceName: 'deviceName',
+  browser: 'browser',
+  platform: 'platform',
+  active: 'active',
+  lastUsed: 'lastUsed',
+  failureCount: 'failureCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const AlertNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  preferencesId: 'preferencesId',
+  earthquakeId: 'earthquakeId',
+  title: 'title',
+  body: 'body',
+  priority: 'priority',
+  distanceKm: 'distanceKm',
+  relevantLocationId: 'relevantLocationId',
+  relevantLocationName: 'relevantLocationName',
+  status: 'status',
+  pushSent: 'pushSent',
+  emailSent: 'emailSent',
+  createdAt: 'createdAt',
+  sentAt: 'sentAt',
+  readAt: 'readAt'
+} as const
+
+export type AlertNotificationScalarFieldEnum = (typeof AlertNotificationScalarFieldEnum)[keyof typeof AlertNotificationScalarFieldEnum]
+
+
+export const EarthquakePollingStatusScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  lastPollAt: 'lastPollAt',
+  lastSuccessAt: 'lastSuccessAt',
+  lastEventTime: 'lastEventTime',
+  eventsProcessed: 'eventsProcessed',
+  errorCount: 'errorCount',
+  lastError: 'lastError',
+  isHealthy: 'isHealthy'
+} as const
+
+export type EarthquakePollingStatusScalarFieldEnum = (typeof EarthquakePollingStatusScalarFieldEnum)[keyof typeof EarthquakePollingStatusScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1699,6 +2180,34 @@ export type EnumImageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 export type ListEnumImageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImageType[]'>
     
 
+
+/**
+ * Reference to a field of type 'AlertPriority'
+ */
+export type EnumAlertPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertPriority'>
+    
+
+
+/**
+ * Reference to a field of type 'AlertPriority[]'
+ */
+export type ListEnumAlertPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertPriority[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AlertStatus'
+ */
+export type EnumAlertStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AlertStatus[]'
+ */
+export type ListEnumAlertStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -1789,6 +2298,11 @@ export type GlobalOmitConfig = {
   buildingInfo?: Prisma.BuildingInfoOmit
   safetyResult?: Prisma.SafetyResultOmit
   assessmentImage?: Prisma.AssessmentImageOmit
+  earthquakeEvent?: Prisma.EarthquakeEventOmit
+  userAlertPreferences?: Prisma.UserAlertPreferencesOmit
+  pushSubscription?: Prisma.PushSubscriptionOmit
+  alertNotification?: Prisma.AlertNotificationOmit
+  earthquakePollingStatus?: Prisma.EarthquakePollingStatusOmit
 }
 
 /* Types for Logging */

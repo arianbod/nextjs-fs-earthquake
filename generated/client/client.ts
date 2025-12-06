@@ -94,3 +94,28 @@ export type SafetyResult = Prisma.SafetyResultModel
  * 
  */
 export type AssessmentImage = Prisma.AssessmentImageModel
+/**
+ * Model EarthquakeEvent
+ * 
+ */
+export type EarthquakeEvent = Prisma.EarthquakeEventModel
+/**
+ * Model UserAlertPreferences
+ * 
+ */
+export type UserAlertPreferences = Prisma.UserAlertPreferencesModel
+/**
+ * Model PushSubscription
+ * 
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel
+/**
+ * Model AlertNotification
+ * 
+ */
+export type AlertNotification = Prisma.AlertNotificationModel
+/**
+ * Model EarthquakePollingStatus
+ * 
+ */
+export type EarthquakePollingStatus = Prisma.EarthquakePollingStatusModel

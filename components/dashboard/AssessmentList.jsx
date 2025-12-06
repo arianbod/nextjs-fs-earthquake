@@ -2,12 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import AssessmentCard, { AssessmentCardSkeleton } from './AssessmentCard';
 import EmptyState from './EmptyState';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { GitCompareArrows, X, CheckSquare } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import {
   getUserAssessments,
   archiveAssessment,
@@ -15,15 +18,22 @@ import {
 } from '@/lib/actions/assessment';
 
 const ITEMS_PER_PAGE = 10;
+const MAX_COMPARE = 4;
 
 export default function AssessmentList() {
   const router = useRouter();
+  const t = useTranslations('Dashboard');
+  const tCompare = useTranslations('Compare');
   const [assessments, setAssessments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
+
+  // Compare selection state
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState([]);
 
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -125,6 +135,35 @@ export default function AssessmentList() {
     fetchAssessments(false);
   };
 
+  // Compare selection handlers
+  const handleToggleCompareMode = () => {
+    setCompareMode(!compareMode);
+    if (compareMode) {
+      setSelectedForCompare([]);
+    }
+  };
+
+  const handleToggleSelect = (id) => {
+    setSelectedForCompare((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((i) => i !== id);
+      }
+      if (prev.length >= MAX_COMPARE) {
+        toast.error(`Maximum ${MAX_COMPARE} buildings can be compared`);
+        return prev;
+      }
+      return [...prev, id];
+    });
+  };
+
+  const handleGoToCompare = () => {
+    if (selectedForCompare.length >= 2) {
+      router.push(`/compare?ids=${selectedForCompare.join(',')}`);
+    }
+  };
+
+  const completedCount = assessments.filter(a => a.status === 'COMPLETE').length;
+
   // Empty state
   if (!isLoading && assessments.length === 0 && filter === 'all') {
     return <EmptyState />;
@@ -132,20 +171,42 @@ export default function AssessmentList() {
 
   return (
     <div className="space-y-4">
-      {/* Filter tabs */}
-      <div className="flex items-center justify-between">
+      {/* Filter tabs and Compare button */}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <Tabs value={filter} onValueChange={setFilter}>
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="drafts">In Progress</TabsTrigger>
-            <TabsTrigger value="complete">Completed</TabsTrigger>
+            <TabsTrigger value="all">{t('filters.all')}</TabsTrigger>
+            <TabsTrigger value="drafts">{t('filters.inProgress')}</TabsTrigger>
+            <TabsTrigger value="complete">{t('filters.completed')}</TabsTrigger>
           </TabsList>
         </Tabs>
-        {total > 0 && (
-          <span className="text-sm text-muted-foreground">
-            {total} assessment{total !== 1 ? 's' : ''}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {total > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {total} assessment{total !== 1 ? 's' : ''}
+            </span>
+          )}
+          {completedCount >= 2 && (
+            <Button
+              variant={compareMode ? 'default' : 'outline'}
+              size="sm"
+              onClick={handleToggleCompareMode}
+              className="gap-1.5"
+            >
+              {compareMode ? (
+                <>
+                  <X className="w-4 h-4" />
+                  {t('cancelCompare')}
+                </>
+              ) : (
+                <>
+                  <CheckSquare className="w-4 h-4" />
+                  {t('selectToCompare')}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Assessment cards */}
@@ -169,6 +230,9 @@ export default function AssessmentList() {
               onDuplicate={handleDuplicate}
               onDelete={handleDeleteClick}
               onShare={handleShare}
+              compareMode={compareMode}
+              isSelected={selectedForCompare.includes(assessment.id)}
+              onToggleSelect={handleToggleSelect}
             />
           ))
         )}
@@ -201,6 +265,39 @@ export default function AssessmentList() {
           'this assessment'
         }
       />
+
+      {/* Floating Compare Button */}
+      <AnimatePresence>
+        {compareMode && selectedForCompare.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          >
+            <div className="flex items-center gap-3 px-4 py-3 bg-background border rounded-full shadow-lg">
+              <span className="text-sm font-medium">
+                {selectedForCompare.length} {t('selected')}
+              </span>
+              <Button
+                onClick={handleGoToCompare}
+                disabled={selectedForCompare.length < 2}
+                className="gap-2"
+              >
+                <GitCompareArrows className="w-4 h-4" />
+                {tCompare('title')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedForCompare([])}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

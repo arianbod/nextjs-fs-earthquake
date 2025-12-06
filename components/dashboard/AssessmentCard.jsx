@@ -21,7 +21,9 @@ import {
   Share2,
   Trash2,
   Play,
+  Check,
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslations } from 'next-intl';
 
 const riskLevelConfig = {
@@ -44,6 +46,9 @@ export default function AssessmentCard({
   onDuplicate,
   onDelete,
   onShare,
+  compareMode = false,
+  isSelected = false,
+  onToggleSelect,
 }) {
   const t = useTranslations('Dashboard');
   const tCommon = useTranslations('Common');
@@ -97,10 +102,37 @@ export default function AssessmentCard({
     onShare?.(assessment.id, 'copied');
   };
 
+  const canCompare = isComplete && compareMode;
+
+  const handleCardClick = () => {
+    if (canCompare && onToggleSelect) {
+      onToggleSelect(assessment.id);
+    }
+  };
+
   return (
-    <Card className="group hover:shadow-md transition-shadow duration-200">
+    <Card
+      className={`group hover:shadow-md transition-all duration-200 ${
+        canCompare ? 'cursor-pointer' : ''
+      } ${isSelected ? 'ring-2 ring-primary bg-primary/5' : ''}`}
+      onClick={canCompare ? handleCardClick : undefined}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
+          {/* Compare checkbox */}
+          {canCompare && (
+            <div
+              className="flex-shrink-0 pt-0.5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onToggleSelect?.(assessment.id)}
+                className="h-5 w-5"
+              />
+            </div>
+          )}
+
           {/* Left side - Main info */}
           <div className="flex-1 min-w-0">
             {/* Address */}

@@ -61,7 +61,12 @@ export const ModelName = {
   Location: 'Location',
   BuildingInfo: 'BuildingInfo',
   SafetyResult: 'SafetyResult',
-  AssessmentImage: 'AssessmentImage'
+  AssessmentImage: 'AssessmentImage',
+  EarthquakeEvent: 'EarthquakeEvent',
+  UserAlertPreferences: 'UserAlertPreferences',
+  PushSubscription: 'PushSubscription',
+  AlertNotification: 'AlertNotification',
+  EarthquakePollingStatus: 'EarthquakePollingStatus'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -303,6 +308,112 @@ export const AssessmentImageScalarFieldEnum = {
 } as const
 
 export type AssessmentImageScalarFieldEnum = (typeof AssessmentImageScalarFieldEnum)[keyof typeof AssessmentImageScalarFieldEnum]
+
+
+export const EarthquakeEventScalarFieldEnum = {
+  id: 'id',
+  sourceId: 'sourceId',
+  source: 'source',
+  fingerprint: 'fingerprint',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  depth: 'depth',
+  magnitude: 'magnitude',
+  magnitudeType: 'magnitudeType',
+  location: 'location',
+  region: 'region',
+  country: 'country',
+  eventTime: 'eventTime',
+  processed: 'processed',
+  processedAt: 'processedAt',
+  rawData: 'rawData',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type EarthquakeEventScalarFieldEnum = (typeof EarthquakeEventScalarFieldEnum)[keyof typeof EarthquakeEventScalarFieldEnum]
+
+
+export const UserAlertPreferencesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  alertsEnabled: 'alertsEnabled',
+  pushEnabled: 'pushEnabled',
+  emailEnabled: 'emailEnabled',
+  minMagnitude: 'minMagnitude',
+  maxDistanceKm: 'maxDistanceKm',
+  criticalMagnitude: 'criticalMagnitude',
+  quietHoursEnabled: 'quietHoursEnabled',
+  quietHoursStart: 'quietHoursStart',
+  quietHoursEnd: 'quietHoursEnd',
+  cooldownMinutes: 'cooldownMinutes',
+  dailyLimit: 'dailyLimit',
+  emailAddress: 'emailAddress',
+  language: 'language',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserAlertPreferencesScalarFieldEnum = (typeof UserAlertPreferencesScalarFieldEnum)[keyof typeof UserAlertPreferencesScalarFieldEnum]
+
+
+export const PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  preferencesId: 'preferencesId',
+  type: 'type',
+  endpoint: 'endpoint',
+  p256dhKey: 'p256dhKey',
+  authKey: 'authKey',
+  fcmToken: 'fcmToken',
+  deviceName: 'deviceName',
+  browser: 'browser',
+  platform: 'platform',
+  active: 'active',
+  lastUsed: 'lastUsed',
+  failureCount: 'failureCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PushSubscriptionScalarFieldEnum = (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum]
+
+
+export const AlertNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  preferencesId: 'preferencesId',
+  earthquakeId: 'earthquakeId',
+  title: 'title',
+  body: 'body',
+  priority: 'priority',
+  distanceKm: 'distanceKm',
+  relevantLocationId: 'relevantLocationId',
+  relevantLocationName: 'relevantLocationName',
+  status: 'status',
+  pushSent: 'pushSent',
+  emailSent: 'emailSent',
+  createdAt: 'createdAt',
+  sentAt: 'sentAt',
+  readAt: 'readAt'
+} as const
+
+export type AlertNotificationScalarFieldEnum = (typeof AlertNotificationScalarFieldEnum)[keyof typeof AlertNotificationScalarFieldEnum]
+
+
+export const EarthquakePollingStatusScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  lastPollAt: 'lastPollAt',
+  lastSuccessAt: 'lastSuccessAt',
+  lastEventTime: 'lastEventTime',
+  eventsProcessed: 'eventsProcessed',
+  errorCount: 'errorCount',
+  lastError: 'lastError',
+  isHealthy: 'isHealthy'
+} as const
+
+export type EarthquakePollingStatusScalarFieldEnum = (typeof EarthquakePollingStatusScalarFieldEnum)[keyof typeof EarthquakePollingStatusScalarFieldEnum]
 
 
 export const SortOrder = {
