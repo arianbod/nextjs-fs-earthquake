@@ -2,6 +2,8 @@
   "Navigation": {
     "home": "Ana Sayfa",
     "dashboard": "Kontrol Paneli",
+    "portfolio": "Portföy",
+    "safetyHub": "Güvenlik Merkezi",
     "alerts": "Uyarılar",
     "compare": "Karşılaştır",
     "assessments": "Değerlendirmeler",
@@ -170,6 +172,230 @@
     "west": "Batı",
     "satellite": "Uydu Görünümü",
     "streetView": "Sokak Görünümü"
+  },
+  "Steps": {
+    "location": {
+      "title": "Bina Konumu",
+      "description": "Sadece binanızın nerede olduğunu söyleyin - gerisini biz hallederiz!",
+      "analyzing": "Konumunuz Analiz Ediliyor",
+      "requestingAccess": "Konum erişimi isteniyor...",
+      "accessingGPS": "GPS koordinatlarına erişiliyor...",
+      "analyzingArea": "Bölgeniz analiz ediliyor...",
+      "gatheringData": "Konum verileri toplanıyor...",
+      "preparingInsights": "Bilgiler hazırlanıyor...",
+      "almostReady": "Neredeyse hazır...",
+      "processingData": "Konum verileri işleniyor...",
+      "analysisComplete": "Analiz tamamlandı!",
+      "progress": "İlerleme",
+      "accessingCoordinates": "GPS koordinatlarına erişiliyor",
+      "analyzingSeismic": "Sismik veriler analiz ediliyor",
+      "processingZones": "Deprem bölgeleri işleniyor",
+      "finalizingAssessment": "Değerlendirme tamamlanıyor",
+      "locationAccessError": "Konum Erişim Hatası",
+      "locationRequired": "Konum Gerekli",
+      "enableLocationAccess": "Konum Erişimine İzin Ver",
+      "tryAgain": "Tekrar Dene",
+      "needLocationAccess": "Doğru sismik risk değerlendirmesi için konumunuza ihtiyacımız var. Lütfen tarayıcı ayarlarınızdan konum erişimini etkinleştirin.",
+      "googleMapsImages": "Google Haritalar Görüntüleri",
+      "satelliteAndStreetView": "Konumunuzdan uydu ve sokak görünümü görüntüleri",
+      "loadingImages": "Google Haritalar görüntüleri yükleniyor...",
+      "satelliteView": "Uydu Görünümü",
+      "streetViewNorth": "Sokak Görünümü (Kuzey)",
+      "additionalAngles": "Ek Açılar",
+      "imagesCaptured": "Google Haritalar'dan görüntüler yakalandı",
+      "seismicZoneInfo": "Sismik Bölge Bilgisi",
+      "zone": "Bölge",
+      "soilType": "Zemin Tipi",
+      "toBeDetermined": "Belirlenecek",
+      "locationCollected": "Konum verileri başarıyla toplandı!",
+      "dataGathered": "Konum bilgileri, sokak görünümü görüntüleri ve sismik bölge verileri toplandı.",
+      "images": "görüntü",
+      "loading": "Yükleniyor...",
+      "unavailable": "kullanılamıyor"
+    },
+    "weather": {
+      "title": "Çevresel Bilgiler",
+      "description": "Sürpriz! Konumunuzu analiz ettik ve size harika bir şey göstereceğiz...",
+      "includingSatellite": "Binanızın uydu görünümü dahil!",
+      "gatheringData": "Çevresel Veriler Toplanıyor",
+      "fetchingWeather": "Konumunuz için hava durumu ve sismik bilgiler alınıyor...",
+      "locationInfo": "Konum Bilgisi",
+      "city": "Şehir",
+      "coordinates": "Koordinatlar",
+      "elevation": "Yükseklik",
+      "aboveSeaLevel": "m deniz seviyesinin üzerinde",
+      "surpriseFindBuilding": "🎉 Sürpriz! Binanızı Bulduk!",
+      "wow": "✨ HARİKA",
+      "collectingVisualData": "Siz kurulum yaparken, biz birden fazla kaynaktan görsel veri topluyorduk...",
+      "aiMagic": "AI Sihri İş Başında!",
+      "aiMagicDesc": "Binanızın uydu ve sokak görünümü görüntülerini otomatik olarak yakaladık. AI'mız bunları sonraki adımdaki fotoğraflarınızla birleştirerek kapsamlı bir yapısal değerlendirme yapacak.",
+      "currentConditions": "Mevcut Koşullar",
+      "liveWeatherData": "Yapısal değerlendirme için canlı hava durumu verileri",
+      "currentHumidity": "Mevcut Nem",
+      "currentWind": "km/s Mevcut Rüzgar",
+      "rainChance": "Bugünün Yağmur Olasılığı",
+      "todayHigh": "Bugün En Yüksek",
+      "todayLow": "Bugün En Düşük",
+      "current": "Mevcut",
+      "criticalWeatherHistory": "Kritik Hava Durumu Geçmişi",
+      "extremeWeatherAffects": "Yapısal bütünlüğü etkileyen aşırı hava olayları",
+      "temperatureExtremes": "Sıcaklık Aşırılıkları",
+      "highest": "En Yüksek",
+      "lowest": "En Düşük",
+      "rainfallExtremes": "Yağış Aşırılıkları",
+      "heaviest": "En Yoğun",
+      "occurred": "Gerçekleştiği Tarih",
+      "windExtremes": "Rüzgar Aşırılıkları",
+      "strongest": "En Güçlü",
+      "floodRisk": "Sel Riski",
+      "floodZone": "Sel Bölgesi",
+      "lastEvent": "Son Olay",
+      "riskFactors": "Risk Faktörleri",
+      "stormActivity": "Fırtına Aktivitesi",
+      "annualStorms": "Yıllık Fırtınalar",
+      "severeStorms": "/yıl Şiddetli Fırtınalar",
+      "peakSeason": "Yoğun Dönem",
+      "lastSevere": "Son Şiddetli",
+      "whyMatters": "Bu Neden Değerlendirmeniz İçin Önemli",
+      "whyMattersDesc": "Yukarıdaki aşırı hava durumu desenleri yapısal bütünlüğü doğrudan etkiler. Yüksek sıcaklıklar genleşme/daralma stresi yaratır, yoğun yağışlar temelleri zayıflatabilir ve zemin stabilitesini artırabilir, güçlü rüzgarlar ise kapsamlı bir güvenlik değerlendirmesi için sismik yüklerle birlikte değerlendirilmesi gereken yanal kuvvetler oluşturur.",
+      "seismicRiskAssessment": "Sismik Risk Değerlendirmesi",
+      "earthquakeZoneClass": "Deprem Bölgesi Sınıflandırması",
+      "soilClassification": "Zemin Sınıflandırması",
+      "type": "Tip",
+      "recentSeismicActivity": "Son Sismik Aktivite",
+      "lastWeek": "Geçen Hafta",
+      "lastMonth": "Geçen Ay",
+      "lastYear": "Geçen Yıl",
+      "nearestFaultLine": "En Yakın Fay Hattı",
+      "faultName": "Fay Adı",
+      "distance": "Mesafe",
+      "faultType": "Fay Tipi",
+      "lastMajorEvent": "Son Büyük Olay",
+      "riskAssessmentOverview": "Risk Değerlendirme Özeti",
+      "howDataAffects": "Bu Veriler Değerlendirmenizi Nasıl Etkiler",
+      "howDataAffectsDesc": "Yukarıdaki çevresel veriler binanızın sismik risk değerlendirmesi için önemli bağlam sağlar. Hava durumu desenleri zamanla zemin koşullarını ve yapı malzemelerini etkilerken, sismik bölge sınıflandırması yapınız için güvenlik gereksinimlerini doğrudan etkiler. Bu bilgiler otomatik olarak nihai güvenlik puanınıza dahil edilecektir.",
+      "backToLocation": "Konuma Geri Dön",
+      "continueToPhoto": "Fotoğraf Yüklemeye Devam Et"
+    },
+    "aiPhoto": {
+      "title": "AI Fotoğraf Analizi",
+      "snapBuilding": "Binanızı fotoğraflayın",
+      "aiDetectsEverything": "AI her şeyi tespit ediyor",
+      "uploadFromGallery": "veya galeriden yükleyin",
+      "skipForNow": "şimdilik atla",
+      "analyzeWithAI": "AI ile Analiz Et",
+      "analyzing": "Analiz ediliyor...",
+      "analysisComplete": "Analiz Tamamlandı!",
+      "nameAssessment": "Değerlendirmenizi Adlandırın",
+      "titlePlaceholder": "örn: Antalya'daki Evim",
+      "descriptionPlaceholder": "İsteğe bağlı: Bu bina hakkında notlar ekleyin...",
+      "aiSuggestedTitle": "AI bu başlığı bina analizine göre önerdi",
+      "stories": "Kat",
+      "type": "Tip",
+      "era": "Dönem",
+      "condition": "Durum",
+      "continue": "Devam Et",
+      "reAnalyze": "Yeniden analiz et",
+      "tryAgain": "Tekrar dene",
+      "skip": "Atla",
+      "back": "Geri"
+    },
+    "finalReview": {
+      "title": "Son İnceleme ve Onay",
+      "description": "Deprem güvenliği değerlendirmenizi oluşturmadan önce toplanan tüm verileri gözden geçirin",
+      "validatingData": "Değerlendirme Verileri Doğrulanıyor",
+      "consistencyChecks": "Son tutarlılık kontrolleri yapılıyor...",
+      "dataValidationStatus": "Veri Doğrulama Durumu",
+      "dataPoints": "Veri Noktaları",
+      "aiConfidence": "AI Güveni",
+      "images": "Görüntüler",
+      "dataSources": "Veri Kaynakları",
+      "errorsFound": "Hatalar Bulundu:",
+      "warnings": "Uyarılar:",
+      "buildingDimensions": "Bina Boyutları",
+      "length": "Uzunluk",
+      "width": "Genişlik",
+      "height": "Yükseklik",
+      "stories": "Kat",
+      "area": "Alan",
+      "buildingCharacteristics": "Bina Özellikleri",
+      "buildingType": "Bina Tipi",
+      "material": "Malzeme",
+      "structuralSystem": "Yapısal Sistem",
+      "constructionYear": "İnşaat Yılı",
+      "locationSeismic": "Konum ve Sismik",
+      "earthquakeZone": "Deprem Bölgesi",
+      "soilType": "Zemin Tipi",
+      "structuralAssessment": "Yapısal Değerlendirme",
+      "planIrregularity": "Plan Düzensizliği",
+      "verticalIrregularity": "Dikey Düzensizlik",
+      "softStory": "Yumuşak Kat",
+      "conditionLabel": "Durum",
+      "regular": "Düzenli",
+      "good": "İyi",
+      "imagesCollected": "Toplanan Görüntüler",
+      "googleImages": "Google Görüntüleri",
+      "yourPhotos": "Fotoğraflarınız",
+      "totalImages": "Toplam Görüntü",
+      "storageSize": "Depolama Boyutu",
+      "aiAnalysisQuality": "AI Analiz Kalitesi",
+      "overallConfidence": "Genel Güven",
+      "lastUpdated": "Son Güncelleme",
+      "status": "Durum",
+      "complete": "Tamamlandı",
+      "incomplete": "Tamamlanmadı",
+      "imagesUsedAnalysis": "Analizde Kullanılan Görüntüler",
+      "allImagesContributed": "Bina değerlendirmenize katkıda bulunan tüm görüntüler",
+      "readyToGenerate": "Sonuç Oluşturmaya Hazır",
+      "dataCollectedValidated": "Tüm veriler toplandı ve doğrulandı. Deprem güvenliği değerlendirmeniz şu kullanılarak oluşturulacak:",
+      "usingAIAnalysis": "AI tarafından analiz edilmiş bina özellikleri, konuma özel sismik veriler ve çevresel faktörler.",
+      "confirmDataAccurate": "Yukarıdaki verilerin doğru ve eksiksiz olduğunu onaylıyorum",
+      "backToReview": "İncelemeye Geri Dön",
+      "generateAssessment": "Güvenlik Değerlendirmesini Oluştur",
+      "na": "Yok"
+    },
+    "result": {
+      "preparingResults": "Sonuçlarınız hazırlanıyor...",
+      "noAssessmentData": "Değerlendirme Verisi Yok",
+      "completeAssessment": "Binanızın güvenlik raporunu görmek için değerlendirmeyi tamamlayın.",
+      "startAssessment": "Değerlendirmeye Başla",
+      "restartAssessment": "Değerlendirmeyi Yeniden Başlat",
+      "analyzingSafetyData": "Güvenlik verileri analiz ediliyor...",
+      "assessmentFor": "Değerlendirme",
+      "yourBuilding": "Binanız",
+      "home": "Ana Sayfa",
+      "dashboard": "Kontrol Paneli",
+      "new": "Yeni",
+      "keySafetyFindings": "Temel Güvenlik Bulguları",
+      "downloadPDF": "PDF İndir",
+      "share": "Paylaş",
+      "emailReport": "Raporu E-postala",
+      "maintenanceTips": "Bakım İpuçları",
+      "priorityActions": "Öncelikli Eylemler",
+      "keepBuildingSafe": "Binanızı güvende tutun",
+      "stepsToImprove": "Güvenliği artırmak için adımlar",
+      "regularInspections": "Düzenli Denetimler",
+      "scheduleAnnual": "Yıllık yapısal denetimler planlayın",
+      "emergencyPlan": "Acil Durum Planı",
+      "createEarthquakePlan": "Deprem hazırlık planı oluşturun",
+      "documentation": "Dokümantasyon",
+      "keepReportAccessible": "Bu raporu erişilebilir tutun",
+      "professionalEvaluation": "Profesyonel Değerlendirme",
+      "consultStructuralEngineer": "Bir yapı mühendisine danışın",
+      "retrofitOptions": "Güçlendirme Seçenekleri",
+      "exploreSeismicStrengthening": "Sismik güçlendirme seçeneklerini araştırın",
+      "occupantSafety": "Bina Sakinlerinin Güvenliği",
+      "reviewEvacuationRoutes": "Tahliye yollarını gözden geçirin",
+      "wantDetailedData": "Detaylı teknik veriler ister misiniz?",
+      "safetyCertificate": "Güvenlik Sertifikası",
+      "buildingPassedAssessment": "Binanız değerlendirmeyi geçti",
+      "needExpertAdvice": "Uzman Tavsiyesi mi Gerekiyor?",
+      "certifiedEngineers": "Sertifikalı yapı mühendislerimiz detaylı yerinde değerlendirme sağlayabilir",
+      "scheduleConsultation": "Danışma Randevusu Al",
+      "disclaimerFooter": "Bu değerlendirme sağlanan bilgilere dayanmaktadır ve genel bir rehber niteliğindedir. Kapsamlı yapısal analiz için lisanslı bir profesyonel mühendise danışın.",
+      "scrollForDetails": "Detaylar için aşağı kaydırın",
+      "linkCopied": "Bağlantı panoya kopyalandı"
+    }
   },
   "Results": {
     "title": "Güvenlik Değerlendirme Sonuçları",
@@ -523,7 +749,8 @@
       "deleted": "Değerlendirme silindi",
       "duplicated": "Değerlendirme çoğaltıldı",
       "linkCopied": "Bağlantı panoya kopyalandı"
-    }
+    },
+    "dueForReassessment": "Yeniden değerlendirme gerekiyor"
   },
   "Common": {
     "next": "İleri",
@@ -583,14 +810,65 @@
   },
   "Home": {
     "letsStart": "Başlayalım",
+    "hero": {
+      "badge": "AI Destekli Güvenlik Değerlendirmesi",
+      "title": "Binanızın Deprem Güvenliğini Öğrenin",
+      "subtitle": "Fotoğraf yükleyin. Anında AI analizi alın. Dakikalar içinde güvenlik puanınızı alın. Form yok, karmaşıklık yok.",
+      "cta": "Ücretsiz Değerlendirme Başlat",
+      "watchDemo": "Demo İzle",
+      "videoComingSoon": "Demo videosu yakında"
+    },
+    "showcase": {
+      "title": "Her Bina Tipini Değerlendirin",
+      "subtitle": "Modern apartmanlardan tarihi evlere, AI'mız tüm yapı tiplerini analiz eder"
+    },
+    "howItWorks": {
+      "title": "Üç Basit Adım",
+      "stepLabel": "{number}. Adım",
+      "step1": {
+        "title": "Konumunuzu Belirleyin",
+        "desc": "Binanızı uydu ve sokak görünümünden otomatik olarak tespit ederiz"
+      },
+      "step2": {
+        "title": "Fotoğraf Yükleyin",
+        "desc": "AI'mız bina fotoğraflarınızı yapısal özellikler için analiz eder"
+      },
+      "step3": {
+        "title": "Sonuçları Alın",
+        "desc": "Güvenlik puanınızı, sertifikanızı ve önerilerinizi anında alın"
+      }
+    },
+    "features": {
+      "aiPowered": "AI Destekli",
+      "certified": "Sertifikalı Sonuçlar",
+      "ai": {
+        "title": "Akıllı Fotoğraf Analizi",
+        "desc": "Claude AI Görüntü teknolojimiz fotoğraflarınızdan bina özelliklerini otomatik olarak tespit eder.",
+        "point1": "Otomatik yapı tipi tespiti",
+        "point2": "İnşaat dönemi belirleme",
+        "point3": "Zafiyet kalıbı tanıma"
+      },
+      "report": {
+        "title": "Kapsamlı Güvenlik Raporu",
+        "desc": "Uygulanabilir önerilerle birlikte detaylı deprem güvenliği değerlendirmesi alın.",
+        "point1": "100 üzerinden güvenlik puanı",
+        "point2": "İndirilebilir PDF sertifika",
+        "point3": "Öncelikli eylem önerileri"
+      }
+    },
+    "cta": {
+      "title": "En Önemli Olanı Koruyun",
+      "subtitle": "Binanızın deprem güvenlik puanını sadece 5 dakikada alın.",
+      "button": "Değerlendirmenizi Başlatın",
+      "note": "Ücretsiz. Kredi kartı gerekmez. Anında sonuçlar."
+    },
+    "footer": {
+      "academic": "Akademik Destek ve Doğrulama"
+    },
     "riskLevels": {
       "high": "Yüksek Risk",
       "moderate": "Orta Risk",
       "low": "Düşük Risk"
-    },
-    "howItWorks": {
-      "title": "Nasıl Çalışır",
-      "description": "Basit 3 adımlı sürecimiz binanız için doğru deprem risk değerlendirmesi sağlar"
     },
     "steps": {
       "step1Title": "Bina Detaylarını Girin",
@@ -792,7 +1070,18 @@
     "autoRefresh": "Otomatik yenileme her dakika",
     "earthquakeAlert": "Deprem Uyarısı",
     "newEarthquake": "Yeni Deprem Tespit Edildi",
-    "clickForDetails": "Detaylar için tıklayın"
+    "clickForDetails": "Detaylar için tıklayın",
+    "reassessmentReminders": "Yeniden Değerlendirme Hatırlatıcıları",
+    "reassessmentDescription": "Değerlendirmelerinizin güncellenmesi gerektiğinde bildirim alın",
+    "enableReassessmentReminders": "Hatırlatıcıları Etkinleştir",
+    "reassessmentRemindersNote": "Değerlendirmelerinizin güncellenmesi gerektiğinde bildirim alın",
+    "reminderFrequency": "Hatırlatma Sıklığı",
+    "selectFrequency": "Sıklık seçin",
+    "frequency30Days": "30 gün",
+    "frequency90Days": "90 gün (Önerilen)",
+    "frequency6Months": "6 ay",
+    "frequency1Year": "1 yıl",
+    "frequencyDescription": "Binalarınızı ne sıklıkla yeniden değerlendirmek istediğinizi belirleyin"
   },
   "Pages": {
     "about": {
@@ -819,6 +1108,276 @@
     },
     "welcome": {
       "greeting": "QuakeWise'a Hoş Geldiniz"
+    }
+  },
+  "SafetyHub": {
+    "title": "Güvenlik Merkezi",
+    "description": "Deprem öncesi, sırası ve sonrası için kapsamlı güvenlik rehberiniz",
+    "yourBuilding": "Binanız",
+    "risk": "Risk",
+    "noAddress": "Adres belirtilmedi",
+    "safetyScore": "Güvenlik Puanı",
+    "noAssessment": "Henüz değerlendirme yok. Binanızın risk profilini görmek için bir değerlendirme tamamlayın.",
+    "disclaimer": "Bu rehber AFAD ve FEMA önerilerine dayanmaktadır. Acil durumlarda her zaman yerel yetkililerin resmi talimatlarına uyun.",
+    "before": {
+      "tab": "Öncesi",
+      "tabShort": "Önce",
+      "overallProgress": "Hazırlık İlerlemesi",
+      "itemsComplete": "öğe tamamlandı",
+      "allComplete": "Mükemmel! Tamamen hazırsınız.",
+      "keepGoing": "Devam edin! Her adım önemli.",
+      "categories": {
+        "supplies": "Acil Durum Malzemeleri",
+        "family": "Aile Planı",
+        "home": "Ev Güvenliği",
+        "documents": "Belgeler"
+      },
+      "items": {
+        "water": "3 günlük su kaynağı (kişi başı 4 litre/gün)",
+        "food": "3 günlük bozulmayan gıda stoku",
+        "flashlight": "Yedek pillerle el feneri",
+        "batteries": "Tüm cihazlar için yedek piller",
+        "firstAid": "İlk yardım çantası",
+        "medications": "7 günlük ilaç tedariki",
+        "radio": "Pilli veya el dinamolu radyo",
+        "charger": "Telefon şarj cihazı veya powerbank",
+        "cash": "Küçük kupürlü nakit para",
+        "blankets": "Acil durum battaniyeleri veya uyku tulumları",
+        "whistle": "Yardım çağırmak için düdük",
+        "mask": "Toz maskeleri (N95)",
+        "meetingPoint": "Aile buluşma noktası belirlendi",
+        "emergencyContacts": "Acil durum kişileri listesi paylaşıldı",
+        "childPlan": "Okul/kreş teslim alma planı",
+        "petPlan": "Evcil hayvan acil durum planı",
+        "secureHeavyItems": "Ağır eşyalar duvara sabitlendi",
+        "gasShutoff": "Gazı nasıl kapatacağınızı bilin",
+        "waterShutoff": "Suyu nasıl kapatacağınızı bilin",
+        "exitRoutes": "Çıkış yolları belirlendi",
+        "extinguisher": "Yangın söndürücü erişilebilir durumda",
+        "smokeDetector": "Duman dedektörleri test edildi",
+        "structuralCheck": "Yapısal sorunlar giderildi",
+        "glassFilm": "Büyük camlara güvenlik filmi",
+        "idCopies": "Kimlik kopyaları güvenli şekilde saklandı",
+        "insuranceDocs": "Sigorta belgeleri erişilebilir durumda",
+        "medicalRecords": "Tıbbi kayıtlar yedeklendi",
+        "propertyDocs": "Tapu belgeleri güvenli şekilde saklandı",
+        "emergencyNumbers": "Acil durum numaraları listesi"
+      },
+      "emergencyKit": {
+        "title": "Acil Durum Çantası Rehberi",
+        "description": "Deprem hazırlığı için gerekli malzemeler",
+        "days": "Gün",
+        "waterSupply": "Kişi başı su",
+        "foodSupply": "Kişi başı gıda",
+        "firstAidKit": "İlk Yardım Çantası",
+        "perPerson": "Hane başına",
+        "downloadGuide": "Tam Çanta Rehberini İndir"
+      },
+      "assessmentLink": {
+        "title": "Bina Değerlendirmeniz",
+        "description": "Detaylı önerilerle birlikte tam deprem güvenliği değerlendirmenizi görüntüleyin.",
+        "viewResults": "Tam Sonuçları Görüntüle"
+      },
+      "afadLink": "AFAD'da daha fazla bilgi"
+    },
+    "during": {
+      "tab": "Sırası",
+      "tabShort": "Sırası",
+      "listenButton": "Dinle",
+      "swipeHint": "← Sonraki adım için kaydırın →",
+      "steps": {
+        "drop": {
+          "title": "ÇÖMEL",
+          "instruction": "Elleriniz ve dizleriniz üzerine çökün",
+          "detail": "Bu sizi düşmekten korur ve gerekirse hareket etmenizi sağlar"
+        },
+        "cover": {
+          "title": "KORUN",
+          "instruction": "Başınızı ve boynunuzu koruyun",
+          "detail": "Sağlam bir masa veya sıranın altına girin. Sığınak yoksa kollarınızla başınızı koruyun"
+        },
+        "holdOn": {
+          "title": "TUTUN",
+          "instruction": "Sığınağınıza sıkıca tutunun",
+          "detail": "Sarsıntı durana kadar onunla birlikte hareket etmeye hazır olun"
+        }
+      },
+      "tips": {
+        "stayAway": {
+          "title": "Uzak Durun",
+          "detail": "Pencerelerden, camlardan ve ağır eşyalardan"
+        },
+        "stayInside": {
+          "title": "İçeride Kalın",
+          "detail": "Sarsıntı durana kadar, çoğu yaralanma hareket sırasında olur"
+        }
+      },
+      "shakingStopped": {
+        "question": "Sarsıntı durdu mu?",
+        "button": "Sonrası Aşamasına Git"
+      }
+    },
+    "after": {
+      "tab": "Sonrası",
+      "tabShort": "Sonra",
+      "safetyCheck": {
+        "title": "Önce Güvenlik",
+        "question": "Evinizde herkes güvende ve yaralanmamış mı?",
+        "yesButton": "Evet, herkes güvende",
+        "noButton": "112 Acil'i Ara"
+      },
+      "safetyConfirmed": "İyi haber! Şimdi binanızda hasar kontrolü yapalım.",
+      "emergencyContacts": {
+        "title": "Acil Durum Numaraları"
+      },
+      "damageAssessment": {
+        "title": "Hasar Değerlendirmesi",
+        "description": "Binanzda görünür hasarların fotoğraflarını çekin. Yapay zekamız bunları analiz edecek.",
+        "addPhoto": "Fotoğraf Ekle",
+        "analyzing": "Hasar analiz ediliyor...",
+        "analyzeButton": "Hasarı Analiz Et",
+        "tips": {
+          "title": "Ne fotoğraflayın:",
+          "cracks": "Duvarlarda, zeminlerde veya tavanlardaki çatlaklar",
+          "tilting": "Eğilen veya kayan yapılar",
+          "windows": "Kırık camlar veya hasarlı çerçeveler"
+        }
+      },
+      "severity": {
+        "low": "Düşük",
+        "moderate": "Orta",
+        "high": "Yüksek",
+        "severe": "Ciddi",
+        "damage": "Hasar"
+      },
+      "result": {
+        "recommendations": "Öneriler",
+        "defaultSummary": "Gönderilen fotoğraflara dayanarak, binanızın deprem sonrası durumunu değerlendirdik.",
+        "disclaimer": "Bu yapay zeka değerlendirmesi yalnızca ön değerlendirmedir. Profesyonel yapı mühendisliği incelemesinin yerini alamaz. Profesyonel onay olmadan hasarlı binalara girmeyin.",
+        "startReassessment": "Tam Yeniden Değerlendirme Başlat",
+        "newAssessment": "Yeni Fotoğraf Çek"
+      },
+      "utilityCheck": {
+        "title": "Tesisatı Kontrol Edin",
+        "gas": {
+          "title": "Gaz Hatları",
+          "action": "Gaz kokusu kontrol edin, gerekirse kapatın"
+        },
+        "water": {
+          "title": "Su Şebekesi",
+          "action": "Sızıntı kontrol edin, gerekirse kapatın"
+        }
+      },
+      "resources": {
+        "title": "İyileşme Kaynakları",
+        "afadDesc": "Afet ve Acil Durum Yönetimi Başkanlığı",
+        "redCrescent": "Türk Kızılay",
+        "redCrescentDesc": "İnsani yardım ve destek hizmetleri"
+      },
+      "errors": {
+        "maxPhotos": "En fazla 3 fotoğraf yükleyebilirsiniz",
+        "analysisFailed": "Analiz başarısız oldu. Lütfen tekrar deneyin."
+      }
+    }
+  },
+  "Portfolio": {
+    "title": "Mülk Portföyü",
+    "addProperty": "Mülk Ekle",
+    "noLocation": "Konum yok",
+    "needsReassessment": "Yeniden Değerlendirme Gerekli",
+    "stats": {
+      "total": "Toplam",
+      "avgScore": "Ort. Puan",
+      "riskBreakdown": "Risk Dağılımı",
+      "completed": "Tamamlanan",
+      "needsAttention": "Dikkat Gerekli",
+      "noData": "Henüz veri yok"
+    },
+    "risk": {
+      "low": "Düşük",
+      "moderate": "Orta",
+      "high": "Yüksek",
+      "veryHigh": "Çok Yüksek"
+    },
+    "status": {
+      "COMPLETE": "Tamamlandı",
+      "IN_PROGRESS": "Devam Ediyor",
+      "DRAFT": "Taslak"
+    },
+    "filters": {
+      "allRisk": "Tüm Riskler",
+      "allStatus": "Tüm Durumlar",
+      "allCities": "Tüm Şehirler",
+      "allGroups": "Tüm Gruplar",
+      "status": "Durum",
+      "city": "Şehir",
+      "group": "Grup",
+      "clear": "Temizle"
+    },
+    "search": {
+      "placeholder": "Mülk ara...",
+      "noResults": "Filtrelere uyan mülk bulunamadı"
+    },
+    "selection": {
+      "selectAll": "Tümünü Seç",
+      "deselectAll": "Seçimi Kaldır"
+    },
+    "actions": {
+      "view": "Sonuçları Görüntüle",
+      "rename": "Yeniden Adlandır",
+      "addToGroup": "Gruba Ekle",
+      "renamePrompt": "Bu mülk için yeni bir isim girin:",
+      "renamed": "Mülk başarıyla yeniden adlandırıldı"
+    },
+    "bulk": {
+      "selected": "seçili",
+      "addToGroup": "Gruba Ekle",
+      "setPriority": "Öncelik Belirle",
+      "export": "Dışa Aktar",
+      "exporting": "Dışa aktarılıyor...",
+      "exportStarted": "Dışa aktarma başladı",
+      "exportComplete": "Dışa aktarma tamamlandı",
+      "priorityUpdated": "Öncelik güncellendi"
+    },
+    "group": {
+      "createTitle": "Grup Oluştur",
+      "editTitle": "Grubu Düzenle",
+      "createDescription": "Mülklerinizi organize etmek için yeni bir grup oluşturun",
+      "editDescription": "Grup bilgilerini güncelleyin",
+      "createButton": "Yeni Grup",
+      "name": "Grup Adı",
+      "namePlaceholder": "örn. İstanbul Mülkleri",
+      "description": "Açıklama",
+      "descriptionPlaceholder": "Bu grup için isteğe bağlı açıklama",
+      "color": "Renk",
+      "icon": "Simge",
+      "preview": "Önizleme",
+      "cancel": "İptal",
+      "create": "Grup Oluştur",
+      "save": "Değişiklikleri Kaydet",
+      "created": "Grup başarıyla oluşturuldu"
+    },
+    "addToGroup": {
+      "title": "Gruba Ekle",
+      "descriptionSingle": "Bu mülk için grupları seçin",
+      "descriptionMultiple": "{count} mülk için grupları seçin",
+      "noGroups": "Henüz grup yok. Mülklerinizi organize etmek için bir grup oluşturun.",
+      "properties": "mülk",
+      "createNew": "Yeni Grup Oluştur",
+      "cancel": "İptal",
+      "save": "Kaydet",
+      "success": "Gruplar başarıyla güncellendi"
+    },
+    "empty": {
+      "title": "Henüz Mülk Yok",
+      "description": "Mülk portföyünüzü oluşturmak için ilk bina değerlendirmenizi başlatın.",
+      "addFirst": "İlk Mülkü Ekle"
+    },
+    "errors": {
+      "loadFailed": "Portföy yüklenemedi",
+      "createFailed": "Grup oluşturulamadı",
+      "updateFailed": "Güncelleme başarısız",
+      "exportFailed": "Dışa aktarma başarısız"
     }
   }
 }

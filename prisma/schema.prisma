@@ -211,17 +211,27 @@ model Assessment {
   extraLoad           Json?               @map("extra_load") // Step 10: additional load factors
   neighborBuildings   Json?               @map("neighbor_buildings") // Step 11: adjacent buildings
 
+  // Reassessment tracking
+  lastReminderSentAt  DateTime?           @map("last_reminder_sent_at") // When last reassessment reminder was sent
+
+  // Portfolio features
+  nickname            String?             // Custom display name for portfolio
+  priority            Int                 @default(0) // Sort priority (higher = more important)
+  tags                String[]            @default([]) // Free-form tags for filtering
+
   // Relations
   location            Location?
   buildingInfo        BuildingInfo?
   safetyResult        SafetyResult?
   images              AssessmentImage[]
+  groups              AssessmentGroup[]   // Portfolio group memberships
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
   @@index([userId, createdAt])
   @@index([userId, status])
+  @@index([userId, priority])
   @@map("assessments")
 }
 
@@ -500,6 +510,10 @@ model UserAlertPreferences {
   // Language
   language            String              @default("tr")
 
+  // Reassessment reminders
+  reassessmentRemindersEnabled  Boolean   @default(true) @map("reassessment_reminders_enabled")
+  reassessmentFrequencyDays     Int       @default(365) @map("reassessment_frequency_days") // Days between reminders
+
   createdAt           DateTime            @default(now()) @map("created_at")
   updatedAt           DateTime            @updatedAt @map("updated_at")
 
@@ -626,4 +640,42 @@ model EarthquakePollingStatus {
   isHealthy       Boolean             @default(true) @map("is_healthy")
 
   @@map("earthquake_polling_status")
+}
+
+// ============================================
+// PORTFOLIO MANAGEMENT MODELS
+// ============================================
+
+// Property groups for organizing assessments
+model PropertyGroup {
+  id              String              @id @default(cuid())
+  userId          String              @map("user_id") // Clerk user ID
+  name            String              // Group name (e.g., "Istanbul Properties", "High Priority")
+  description     String?             // Optional description
+  color           String              @default("#3B82F6") // Badge color (hex)
+  icon            String              @default("folder") // Lucide icon name
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  assessments     AssessmentGroup[]
+
+  @@index([userId])
+  @@index([userId, name])
+  @@map("property_groups")
+}
+
+// Many-to-many relation between assessments and groups
+model AssessmentGroup {
+  assessmentId    String              @map("assessment_id")
+  groupId         String              @map("group_id")
+  addedAt         DateTime            @default(now()) @map("added_at")
+
+  // Relations
+  assessment      Assessment          @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  group           PropertyGroup       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([assessmentId, groupId])
+  @@index([groupId])
+  @@map("assessment_groups")
 }

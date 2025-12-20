@@ -103,6 +103,16 @@ export async function PUT(request) {
       }
     }
 
+    // Validate reassessment frequency
+    if (body.reassessmentFrequencyDays !== undefined) {
+      if (body.reassessmentFrequencyDays < 7 || body.reassessmentFrequencyDays > 730) {
+        return NextResponse.json(
+          { error: 'reassessmentFrequencyDays must be between 7 and 730' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Build update data - only include fields that are provided
     const updateData = {};
     const allowedFields = [
@@ -119,6 +129,9 @@ export async function PUT(request) {
       'dailyLimit',
       'emailAddress',
       'language',
+      // Reassessment reminders
+      'reassessmentRemindersEnabled',
+      'reassessmentFrequencyDays',
     ];
 
     for (const field of allowedFields) {

@@ -74,6 +74,25 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
+  // Handle reassessment reminder clicks
+  if (event.action === 'reassess' || data.type === 'reassessment_reminder') {
+    // Navigate to the assessment result page with reassess flag
+    const urlToOpen = data.url || `/result/${data.assessmentId}?reassess=true`;
+    event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((windowClients) => {
+          for (const client of windowClients) {
+            if (client.url.includes(self.location.origin)) {
+              client.navigate(urlToOpen);
+              return client.focus();
+            }
+          }
+          return clients.openWindow(urlToOpen);
+        })
+    );
+    return;
+  }
+
   // Default action or 'view' action - open the app
   const urlToOpen = data.url || '/dashboard';
 

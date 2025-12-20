@@ -30,6 +30,8 @@ import {
 	TrendingUp,
 	Bell,
 	GitCompareArrows,
+	Shield,
+	Briefcase,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -96,6 +98,8 @@ const Navbar = () => {
 	const navLinks = [
 		{ href: '/', label: t('home'), icon: HomeIcon, showAlways: true },
 		{ href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard, requiresAuth: true },
+		{ href: '/portfolio', label: t('portfolio'), icon: Briefcase, requiresAuth: true },
+		{ href: '/safety-hub', label: t('safetyHub'), icon: Shield, showAlways: true },
 		{ href: '/alerts', label: t('alerts'), icon: Bell, requiresAuth: true },
 		{ href: '/compare', label: t('compare'), icon: GitCompareArrows, requiresAuth: true },
 		{ href: '/history', label: t('assessments'), icon: History, requiresAuth: true },

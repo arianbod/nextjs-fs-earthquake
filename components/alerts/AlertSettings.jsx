@@ -8,7 +8,8 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Bell, Mail, Clock, MapPin, Loader2, Shield, AlertTriangle } from 'lucide-react';
+import { Bell, Mail, Clock, MapPin, Loader2, Shield, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -281,6 +282,64 @@ export default function AlertSettings() {
           <p className="text-xs text-muted-foreground">
             {t('quietHoursNote') || 'Critical alerts (M5.0+) will always be delivered'}
           </p>
+        </CardContent>
+      </Card>
+
+      {/* Reassessment Reminders */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="w-5 h-5" />
+            {t('reassessmentReminders') || 'Reassessment Reminders'}
+          </CardTitle>
+          <CardDescription>
+            {t('reassessmentDescription') || 'Get notified when your assessments are due for review'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="font-medium">
+                {t('enableReassessmentReminders') || 'Enable Reminders'}
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                {t('reassessmentRemindersNote') || 'Receive notifications when assessments need updating'}
+              </p>
+            </div>
+            <Switch
+              checked={localPrefs.reassessmentRemindersEnabled}
+              onCheckedChange={(checked) =>
+                setLocalPrefs((prev) => ({ ...prev, reassessmentRemindersEnabled: checked }))
+              }
+            />
+          </div>
+
+          {localPrefs.reassessmentRemindersEnabled && (
+            <div className="pl-4 border-l-2 border-muted space-y-3">
+              <div>
+                <Label htmlFor="frequency">{t('reminderFrequency') || 'Reminder Frequency'}</Label>
+                <Select
+                  value={String(localPrefs.reassessmentFrequencyDays || 365)}
+                  onValueChange={(value) =>
+                    setLocalPrefs((prev) => ({ ...prev, reassessmentFrequencyDays: Number(value) }))
+                  }
+                >
+                  <SelectTrigger id="frequency" className="mt-1">
+                    <SelectValue placeholder={t('selectFrequency') || 'Select frequency'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="30">{t('frequency30Days') || '30 days'}</SelectItem>
+                    <SelectItem value="90">{t('frequency90Days') || '90 days (Recommended)'}</SelectItem>
+                    <SelectItem value="180">{t('frequency6Months') || '6 months'}</SelectItem>
+                    <SelectItem value="365">{t('frequency1Year') || '1 year'}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('frequencyDescription') || 'How often you want to be reminded to reassess your buildings'}
+                </p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

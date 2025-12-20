@@ -2,6 +2,8 @@
   "Navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
+    "safetyHub": "Safety Hub",
     "alerts": "Alerts",
     "compare": "Compare",
     "assessments": "Assessments",
@@ -170,6 +172,230 @@
     "west": "West",
     "satellite": "Satellite View",
     "streetView": "Street View"
+  },
+  "Steps": {
+    "location": {
+      "title": "Building Location",
+      "description": "Just tell us where your building is - we'll handle the rest!",
+      "analyzing": "Analyzing Your Location",
+      "requestingAccess": "Requesting location access...",
+      "accessingGPS": "Accessing GPS coordinates...",
+      "analyzingArea": "Analyzing your area...",
+      "gatheringData": "Gathering location data...",
+      "preparingInsights": "Preparing insights...",
+      "almostReady": "Almost ready...",
+      "processingData": "Processing location data...",
+      "analysisComplete": "Analysis complete!",
+      "progress": "Progress",
+      "accessingCoordinates": "Accessing GPS coordinates",
+      "analyzingSeismic": "Analyzing seismic data",
+      "processingZones": "Processing earthquake zones",
+      "finalizingAssessment": "Finalizing assessment",
+      "locationAccessError": "Location Access Error",
+      "locationRequired": "Location Required",
+      "enableLocationAccess": "Enable Location Access",
+      "tryAgain": "Try Again",
+      "needLocationAccess": "We need your location for accurate seismic risk assessment. Please enable location access in your browser settings.",
+      "googleMapsImages": "Google Maps Images",
+      "satelliteAndStreetView": "Satellite and street view images from your location",
+      "loadingImages": "Loading Google Maps images...",
+      "satelliteView": "Satellite View",
+      "streetViewNorth": "Street View (North)",
+      "additionalAngles": "Additional Angles",
+      "imagesCaptured": "Images captured from Google Maps",
+      "seismicZoneInfo": "Seismic Zone Information",
+      "zone": "Zone",
+      "soilType": "Soil Type",
+      "toBeDetermined": "To be determined",
+      "locationCollected": "Location data collected successfully!",
+      "dataGathered": "Location information, street view images, and seismic zone data gathered.",
+      "images": "images",
+      "loading": "Loading...",
+      "unavailable": "unavailable"
+    },
+    "weather": {
+      "title": "Environmental Insights",
+      "description": "Surprise! We analyzed your location and we're going to show you something amazing...",
+      "includingSatellite": "Including a satellite view of your building!",
+      "gatheringData": "Gathering Environmental Data",
+      "fetchingWeather": "Fetching weather and seismic information for your location...",
+      "locationInfo": "Location Information",
+      "city": "City",
+      "coordinates": "Coordinates",
+      "elevation": "Elevation",
+      "aboveSeaLevel": "m above sea level",
+      "surpriseFindBuilding": "Surprise! We Found Your Building!",
+      "wow": "WOW",
+      "collectingVisualData": "While you were setting up, we were collecting visual data from multiple sources...",
+      "aiMagic": "AI Magic at Work!",
+      "aiMagicDesc": "We automatically captured satellite and street view images of your building. Our AI will combine these with your photos in the next step for a comprehensive structural assessment.",
+      "currentConditions": "Current Conditions",
+      "liveWeatherData": "Live weather data for structural assessment",
+      "currentHumidity": "Current Humidity",
+      "currentWind": "km/h Current Wind",
+      "rainChance": "Today's Rain Chance",
+      "todayHigh": "Today High",
+      "todayLow": "Today Low",
+      "current": "Current",
+      "criticalWeatherHistory": "Critical Weather History",
+      "extremeWeatherAffects": "Extreme weather events affecting structural integrity",
+      "temperatureExtremes": "Temperature Extremes",
+      "highest": "Highest",
+      "lowest": "Lowest",
+      "rainfallExtremes": "Rainfall Extremes",
+      "heaviest": "Heaviest",
+      "occurred": "Occurred",
+      "windExtremes": "Wind Extremes",
+      "strongest": "Strongest",
+      "floodRisk": "Flood Risk",
+      "floodZone": "Flood Zone",
+      "lastEvent": "Last Event",
+      "riskFactors": "Risk Factors",
+      "stormActivity": "Storm Activity",
+      "annualStorms": "Annual Storms",
+      "severeStorms": "/yr Severe Storms",
+      "peakSeason": "Peak Season",
+      "lastSevere": "Last Severe",
+      "whyMatters": "Why This Matters for Your Assessment",
+      "whyMattersDesc": "The extreme weather patterns above directly impact structural integrity. High temperatures create expansion/contraction stress, heavy rainfall can weaken foundations and increase soil liquefaction risk, and strong winds create lateral forces that must be considered alongside seismic loads for a comprehensive safety assessment.",
+      "seismicRiskAssessment": "Seismic Risk Assessment",
+      "earthquakeZoneClass": "Earthquake Zone Classification",
+      "soilClassification": "Soil Classification",
+      "type": "Type",
+      "recentSeismicActivity": "Recent Seismic Activity",
+      "lastWeek": "Last Week",
+      "lastMonth": "Last Month",
+      "lastYear": "Last Year",
+      "nearestFaultLine": "Nearest Fault Line",
+      "faultName": "Fault Name",
+      "distance": "Distance",
+      "faultType": "Fault Type",
+      "lastMajorEvent": "Last Major Event",
+      "riskAssessmentOverview": "Risk Assessment Overview",
+      "howDataAffects": "How This Data Affects Your Assessment",
+      "howDataAffectsDesc": "The environmental data above provides crucial context for your building's seismic risk assessment. Weather patterns affect soil conditions and material integrity over time, while seismic zone classification directly impacts the safety requirements for your structure. This information will be automatically factored into your final safety score.",
+      "backToLocation": "Back to Location",
+      "continueToPhoto": "Continue to Photo Upload"
+    },
+    "aiPhoto": {
+      "title": "AI Photo Analysis",
+      "snapBuilding": "Snap your building",
+      "aiDetectsEverything": "AI detects everything",
+      "uploadFromGallery": "or upload from gallery",
+      "skipForNow": "skip for now",
+      "analyzeWithAI": "Analyze with AI",
+      "analyzing": "Analyzing...",
+      "analysisComplete": "Analysis Complete!",
+      "nameAssessment": "Name Your Assessment",
+      "titlePlaceholder": "e.g., My Home in Antalya",
+      "descriptionPlaceholder": "Optional: Add notes about this building...",
+      "aiSuggestedTitle": "AI suggested this title based on the building analysis",
+      "stories": "Stories",
+      "type": "Type",
+      "era": "Era",
+      "condition": "Condition",
+      "continue": "Continue",
+      "reAnalyze": "Re-analyze",
+      "tryAgain": "Try again",
+      "skip": "Skip",
+      "back": "Back"
+    },
+    "finalReview": {
+      "title": "Final Review & Confirmation",
+      "description": "Review all collected data before generating your earthquake safety assessment",
+      "validatingData": "Validating Assessment Data",
+      "consistencyChecks": "Performing final consistency checks...",
+      "dataValidationStatus": "Data Validation Status",
+      "dataPoints": "Data Points",
+      "aiConfidence": "AI Confidence",
+      "images": "Images",
+      "dataSources": "Data Sources",
+      "errorsFound": "Errors Found:",
+      "warnings": "Warnings:",
+      "buildingDimensions": "Building Dimensions",
+      "length": "Length",
+      "width": "Width",
+      "height": "Height",
+      "stories": "Stories",
+      "area": "Area",
+      "buildingCharacteristics": "Building Characteristics",
+      "buildingType": "Building Type",
+      "material": "Material",
+      "structuralSystem": "Structural System",
+      "constructionYear": "Construction Year",
+      "locationSeismic": "Location & Seismic",
+      "earthquakeZone": "Earthquake Zone",
+      "soilType": "Soil Type",
+      "structuralAssessment": "Structural Assessment",
+      "planIrregularity": "Plan Irregularity",
+      "verticalIrregularity": "Vertical Irregularity",
+      "softStory": "Soft Story",
+      "conditionLabel": "Condition",
+      "regular": "Regular",
+      "good": "Good",
+      "imagesCollected": "Images Collected",
+      "googleImages": "Google Images",
+      "yourPhotos": "Your Photos",
+      "totalImages": "Total Images",
+      "storageSize": "Storage Size",
+      "aiAnalysisQuality": "AI Analysis Quality",
+      "overallConfidence": "Overall Confidence",
+      "lastUpdated": "Last Updated",
+      "status": "Status",
+      "complete": "Complete",
+      "incomplete": "Incomplete",
+      "imagesUsedAnalysis": "Images Used in Analysis",
+      "allImagesContributed": "All images that contributed to your building assessment",
+      "readyToGenerate": "Ready to Generate Results",
+      "dataCollectedValidated": "All data has been collected and validated. Your earthquake safety assessment will be generated using:",
+      "usingAIAnalysis": "AI-analyzed building characteristics, location-specific seismic data, and environmental factors.",
+      "confirmDataAccurate": "I confirm that the data above is accurate and complete",
+      "backToReview": "Back to Review",
+      "generateAssessment": "Generate Safety Assessment",
+      "na": "N/A"
+    },
+    "result": {
+      "preparingResults": "Preparing your results...",
+      "noAssessmentData": "No Assessment Data",
+      "completeAssessment": "Complete the assessment to see your building's safety report.",
+      "startAssessment": "Start Assessment",
+      "restartAssessment": "Restart Assessment",
+      "analyzingSafetyData": "Analyzing safety data...",
+      "assessmentFor": "Assessment for",
+      "yourBuilding": "Your Building",
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "new": "New",
+      "keySafetyFindings": "Key Safety Findings",
+      "downloadPDF": "Download PDF",
+      "share": "Share",
+      "emailReport": "Email Report",
+      "maintenanceTips": "Maintenance Tips",
+      "priorityActions": "Priority Actions",
+      "keepBuildingSafe": "Keep your building safe",
+      "stepsToImprove": "Steps to improve safety",
+      "regularInspections": "Regular Inspections",
+      "scheduleAnnual": "Schedule annual structural inspections",
+      "emergencyPlan": "Emergency Plan",
+      "createEarthquakePlan": "Create earthquake preparedness plan",
+      "documentation": "Documentation",
+      "keepReportAccessible": "Keep this report accessible",
+      "professionalEvaluation": "Professional Evaluation",
+      "consultStructuralEngineer": "Consult a structural engineer",
+      "retrofitOptions": "Retrofit Options",
+      "exploreSeismicStrengthening": "Explore seismic strengthening",
+      "occupantSafety": "Occupant Safety",
+      "reviewEvacuationRoutes": "Review evacuation routes",
+      "wantDetailedData": "Want detailed technical data?",
+      "safetyCertificate": "Safety Certificate",
+      "buildingPassedAssessment": "Your building passed the assessment",
+      "needExpertAdvice": "Need Expert Advice?",
+      "certifiedEngineers": "Our certified structural engineers can provide a detailed on-site assessment",
+      "scheduleConsultation": "Schedule Consultation",
+      "disclaimerFooter": "This assessment is based on the information provided and serves as a general guide. For comprehensive structural analysis, consult a licensed professional engineer.",
+      "scrollForDetails": "Scroll for details",
+      "linkCopied": "Link copied to clipboard"
+    }
   },
   "Results": {
     "title": "Safety Assessment Results",
@@ -523,7 +749,8 @@
       "deleted": "Assessment deleted",
       "duplicated": "Assessment duplicated",
       "linkCopied": "Link copied to clipboard"
-    }
+    },
+    "dueForReassessment": "Due for reassessment"
   },
   "Common": {
     "next": "Next",
@@ -583,14 +810,65 @@
   },
   "Home": {
     "letsStart": "Let's Start",
+    "hero": {
+      "badge": "AI-Powered Safety Assessment",
+      "title": "Know Your Building's Earthquake Safety",
+      "subtitle": "Upload photos. Get instant AI analysis. Receive your safety score in minutes. No forms, no complexity.",
+      "cta": "Start Free Assessment",
+      "watchDemo": "Watch Demo",
+      "videoComingSoon": "Demo video coming soon"
+    },
+    "showcase": {
+      "title": "Assess Any Building Type",
+      "subtitle": "From modern apartments to historic homes, our AI analyzes all structural types"
+    },
+    "howItWorks": {
+      "title": "Three Simple Steps",
+      "stepLabel": "Step {number}",
+      "step1": {
+        "title": "Set Your Location",
+        "desc": "We automatically detect your building from satellite and street view"
+      },
+      "step2": {
+        "title": "Upload Photos",
+        "desc": "Our AI analyzes your building photos for structural characteristics"
+      },
+      "step3": {
+        "title": "Get Results",
+        "desc": "Receive your safety score, certificate, and recommendations instantly"
+      }
+    },
+    "features": {
+      "aiPowered": "AI Powered",
+      "certified": "Certified Results",
+      "ai": {
+        "title": "Intelligent Photo Analysis",
+        "desc": "Our Claude AI Vision technology automatically detects building characteristics from your photos.",
+        "point1": "Automatic structure type detection",
+        "point2": "Construction era identification",
+        "point3": "Vulnerability pattern recognition"
+      },
+      "report": {
+        "title": "Comprehensive Safety Report",
+        "desc": "Receive a detailed earthquake safety assessment with actionable recommendations.",
+        "point1": "Safety score out of 100",
+        "point2": "Downloadable PDF certificate",
+        "point3": "Priority action recommendations"
+      }
+    },
+    "cta": {
+      "title": "Protect What Matters Most",
+      "subtitle": "Get your building's earthquake safety score in just 5 minutes.",
+      "button": "Start Your Assessment",
+      "note": "Free. No credit card required. Instant results."
+    },
+    "footer": {
+      "academic": "Academic Support & Validation"
+    },
     "riskLevels": {
       "high": "High Risk",
       "moderate": "Moderate Risk",
       "low": "Low Risk"
-    },
-    "howItWorks": {
-      "title": "How It Works",
-      "description": "Our simple 3-step process provides accurate earthquake risk assessment for your building"
     },
     "steps": {
       "step1Title": "Input Building Details",
@@ -805,6 +1083,287 @@
     "critical": "Critical",
     "high": "High",
     "normal": "Normal",
-    "low": "Low"
+    "low": "Low",
+    "reassessmentReminders": "Reassessment Reminders",
+    "reassessmentDescription": "Get notified when your assessments are due for review",
+    "enableReassessmentReminders": "Enable Reminders",
+    "reassessmentRemindersNote": "Receive notifications when assessments need updating",
+    "reminderFrequency": "Reminder Frequency",
+    "selectFrequency": "Select frequency",
+    "frequency30Days": "30 days",
+    "frequency90Days": "90 days (Recommended)",
+    "frequency6Months": "6 months",
+    "frequency1Year": "1 year",
+    "frequencyDescription": "How often you want to be reminded to reassess your buildings"
+  },
+  "SafetyHub": {
+    "title": "Safety Hub",
+    "description": "Your complete earthquake safety companion - before, during, and after an earthquake",
+    "yourBuilding": "Your Building",
+    "risk": "Risk",
+    "noAddress": "No address set",
+    "safetyScore": "Safety Score",
+    "noAssessment": "No assessment yet. Complete one to see your building's risk profile.",
+    "disclaimer": "This guidance is based on AFAD and FEMA recommendations. Always follow official instructions from local authorities during emergencies.",
+    "before": {
+      "tab": "Before",
+      "tabShort": "Before",
+      "overallProgress": "Preparedness Progress",
+      "itemsComplete": "items complete",
+      "allComplete": "Excellent! You're fully prepared.",
+      "keepGoing": "Keep going! Every step counts.",
+      "categories": {
+        "supplies": "Emergency Supplies",
+        "family": "Family Plan",
+        "home": "Home Safety",
+        "documents": "Documents"
+      },
+      "items": {
+        "water": "3-day water supply (1 gallon/person/day)",
+        "food": "3-day non-perishable food supply",
+        "flashlight": "Flashlight with extra batteries",
+        "batteries": "Extra batteries for all devices",
+        "firstAid": "First aid kit",
+        "medications": "7-day supply of medications",
+        "radio": "Battery-powered or hand-crank radio",
+        "charger": "Phone charger or power bank",
+        "cash": "Cash in small bills",
+        "blankets": "Emergency blankets or sleeping bags",
+        "whistle": "Whistle to signal for help",
+        "mask": "Dust masks (N95)",
+        "meetingPoint": "Family meeting point established",
+        "emergencyContacts": "Emergency contacts list shared",
+        "childPlan": "School/daycare pickup plan",
+        "petPlan": "Pet emergency plan",
+        "secureHeavyItems": "Heavy items secured to walls",
+        "gasShutoff": "Know how to shut off gas",
+        "waterShutoff": "Know how to shut off water",
+        "exitRoutes": "Exit routes identified",
+        "extinguisher": "Fire extinguisher accessible",
+        "smokeDetector": "Smoke detectors tested",
+        "structuralCheck": "Structural issues addressed",
+        "glassFilm": "Safety film on large windows",
+        "idCopies": "ID copies stored safely",
+        "insuranceDocs": "Insurance documents accessible",
+        "medicalRecords": "Medical records backed up",
+        "propertyDocs": "Property deeds stored safely",
+        "emergencyNumbers": "Emergency numbers list"
+      },
+      "emergencyKit": {
+        "title": "Emergency Kit Guide",
+        "description": "Essential items for earthquake preparedness",
+        "days": "Days",
+        "waterSupply": "Water per person",
+        "foodSupply": "Food per person",
+        "firstAidKit": "First Aid Kit",
+        "perPerson": "Per household",
+        "downloadGuide": "Download Full Kit Guide"
+      },
+      "assessmentLink": {
+        "title": "Your Building Assessment",
+        "description": "View your complete earthquake safety assessment with detailed recommendations.",
+        "viewResults": "View Full Results"
+      },
+      "afadLink": "Learn more at AFAD"
+    },
+    "during": {
+      "tab": "During",
+      "tabShort": "During",
+      "listenButton": "Listen",
+      "swipeHint": "← Swipe for next step →",
+      "steps": {
+        "drop": {
+          "title": "DROP",
+          "instruction": "Get on your hands and knees",
+          "detail": "This protects you from falling and allows you to move if needed"
+        },
+        "cover": {
+          "title": "COVER",
+          "instruction": "Cover your head and neck",
+          "detail": "Get under a sturdy desk or table. If no shelter, cover head with arms"
+        },
+        "holdOn": {
+          "title": "HOLD ON",
+          "instruction": "Hold on to your shelter",
+          "detail": "Be prepared to move with it until the shaking stops"
+        }
+      },
+      "tips": {
+        "stayAway": {
+          "title": "Stay Away",
+          "detail": "From windows, glass, and heavy objects"
+        },
+        "stayInside": {
+          "title": "Stay Inside",
+          "detail": "Until shaking stops, most injuries occur while moving"
+        }
+      },
+      "shakingStopped": {
+        "question": "Has the shaking stopped?",
+        "button": "Go to After Phase"
+      }
+    },
+    "after": {
+      "tab": "After",
+      "tabShort": "After",
+      "safetyCheck": {
+        "title": "First Things First",
+        "question": "Is everyone in your household safe and uninjured?",
+        "yesButton": "Yes, everyone is safe",
+        "noButton": "Call 112 Emergency"
+      },
+      "safetyConfirmed": "Good news! Now let's check your building for damage.",
+      "emergencyContacts": {
+        "title": "Emergency Numbers"
+      },
+      "damageAssessment": {
+        "title": "Damage Assessment",
+        "description": "Take photos of any visible damage to your building. Our AI will analyze them.",
+        "addPhoto": "Add Photo",
+        "analyzing": "Analyzing damage...",
+        "analyzeButton": "Analyze Damage",
+        "tips": {
+          "title": "What to photograph:",
+          "cracks": "Cracks in walls, floors, or ceilings",
+          "tilting": "Any tilting or leaning structures",
+          "windows": "Broken windows or damaged frames"
+        }
+      },
+      "severity": {
+        "low": "Low",
+        "moderate": "Moderate",
+        "high": "High",
+        "severe": "Severe",
+        "damage": "Damage"
+      },
+      "result": {
+        "recommendations": "Recommendations",
+        "defaultSummary": "Based on the photos provided, we've assessed your building's post-earthquake condition.",
+        "disclaimer": "This AI assessment is preliminary only. It cannot replace professional structural engineering inspection. Do not enter damaged buildings without professional clearance.",
+        "startReassessment": "Start Full Reassessment",
+        "newAssessment": "Take New Photos"
+      },
+      "utilityCheck": {
+        "title": "Check Utilities",
+        "gas": {
+          "title": "Gas Lines",
+          "action": "Smell for gas, shut off if needed"
+        },
+        "water": {
+          "title": "Water Supply",
+          "action": "Check for leaks, shut off if needed"
+        }
+      },
+      "resources": {
+        "title": "Recovery Resources",
+        "afadDesc": "Disaster and Emergency Management Authority",
+        "redCrescent": "Turkish Red Crescent",
+        "redCrescentDesc": "Humanitarian aid and support services"
+      },
+      "errors": {
+        "maxPhotos": "Maximum 3 photos allowed",
+        "analysisFailed": "Analysis failed. Please try again."
+      }
+    }
+  },
+  "Portfolio": {
+    "title": "Property Portfolio",
+    "addProperty": "Add Property",
+    "noLocation": "No location",
+    "needsReassessment": "Needs Reassessment",
+    "stats": {
+      "total": "Total",
+      "avgScore": "Avg Score",
+      "riskBreakdown": "Risk Breakdown",
+      "completed": "Completed",
+      "needsAttention": "Needs Attention",
+      "noData": "No data yet"
+    },
+    "risk": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High",
+      "veryHigh": "Very High"
+    },
+    "status": {
+      "COMPLETE": "Complete",
+      "IN_PROGRESS": "In Progress",
+      "DRAFT": "Draft"
+    },
+    "filters": {
+      "allRisk": "All Risk",
+      "allStatus": "All Status",
+      "allCities": "All Cities",
+      "allGroups": "All Groups",
+      "status": "Status",
+      "city": "City",
+      "group": "Group",
+      "clear": "Clear"
+    },
+    "search": {
+      "placeholder": "Search properties...",
+      "noResults": "No properties match your filters"
+    },
+    "selection": {
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All"
+    },
+    "actions": {
+      "view": "View Results",
+      "rename": "Rename",
+      "addToGroup": "Add to Group",
+      "renamePrompt": "Enter a new name for this property:",
+      "renamed": "Property renamed successfully"
+    },
+    "bulk": {
+      "selected": "selected",
+      "addToGroup": "Add to Group",
+      "setPriority": "Set Priority",
+      "export": "Export",
+      "exporting": "Exporting...",
+      "exportStarted": "Export started",
+      "exportComplete": "Export complete",
+      "priorityUpdated": "Priority updated"
+    },
+    "group": {
+      "createTitle": "Create Group",
+      "editTitle": "Edit Group",
+      "createDescription": "Create a new group to organize your properties",
+      "editDescription": "Update the group details",
+      "createButton": "New Group",
+      "name": "Group Name",
+      "namePlaceholder": "e.g., Istanbul Properties",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description for this group",
+      "color": "Color",
+      "icon": "Icon",
+      "preview": "Preview",
+      "cancel": "Cancel",
+      "create": "Create Group",
+      "save": "Save Changes",
+      "created": "Group created successfully"
+    },
+    "addToGroup": {
+      "title": "Add to Group",
+      "descriptionSingle": "Select groups for this property",
+      "descriptionMultiple": "Select groups for {count} properties",
+      "noGroups": "No groups yet. Create one to organize your properties.",
+      "properties": "properties",
+      "createNew": "Create New Group",
+      "cancel": "Cancel",
+      "save": "Save",
+      "success": "Groups updated successfully"
+    },
+    "empty": {
+      "title": "No Properties Yet",
+      "description": "Start your first building assessment to build your property portfolio.",
+      "addFirst": "Add First Property"
+    },
+    "errors": {
+      "loadFailed": "Failed to load portfolio",
+      "createFailed": "Failed to create group",
+      "updateFailed": "Failed to update",
+      "exportFailed": "Failed to export"
+    }
   }
 }

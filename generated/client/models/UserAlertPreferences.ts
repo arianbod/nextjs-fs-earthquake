@@ -32,6 +32,7 @@ export type UserAlertPreferencesAvgAggregateOutputType = {
   criticalMagnitude: number | null
   cooldownMinutes: number | null
   dailyLimit: number | null
+  reassessmentFrequencyDays: number | null
 }
 
 export type UserAlertPreferencesSumAggregateOutputType = {
@@ -40,6 +41,7 @@ export type UserAlertPreferencesSumAggregateOutputType = {
   criticalMagnitude: number | null
   cooldownMinutes: number | null
   dailyLimit: number | null
+  reassessmentFrequencyDays: number | null
 }
 
 export type UserAlertPreferencesMinAggregateOutputType = {
@@ -58,6 +60,8 @@ export type UserAlertPreferencesMinAggregateOutputType = {
   dailyLimit: number | null
   emailAddress: string | null
   language: string | null
+  reassessmentRemindersEnabled: boolean | null
+  reassessmentFrequencyDays: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -78,6 +82,8 @@ export type UserAlertPreferencesMaxAggregateOutputType = {
   dailyLimit: number | null
   emailAddress: string | null
   language: string | null
+  reassessmentRemindersEnabled: boolean | null
+  reassessmentFrequencyDays: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -98,6 +104,8 @@ export type UserAlertPreferencesCountAggregateOutputType = {
   dailyLimit: number
   emailAddress: number
   language: number
+  reassessmentRemindersEnabled: number
+  reassessmentFrequencyDays: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -110,6 +118,7 @@ export type UserAlertPreferencesAvgAggregateInputType = {
   criticalMagnitude?: true
   cooldownMinutes?: true
   dailyLimit?: true
+  reassessmentFrequencyDays?: true
 }
 
 export type UserAlertPreferencesSumAggregateInputType = {
@@ -118,6 +127,7 @@ export type UserAlertPreferencesSumAggregateInputType = {
   criticalMagnitude?: true
   cooldownMinutes?: true
   dailyLimit?: true
+  reassessmentFrequencyDays?: true
 }
 
 export type UserAlertPreferencesMinAggregateInputType = {
@@ -136,6 +146,8 @@ export type UserAlertPreferencesMinAggregateInputType = {
   dailyLimit?: true
   emailAddress?: true
   language?: true
+  reassessmentRemindersEnabled?: true
+  reassessmentFrequencyDays?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -156,6 +168,8 @@ export type UserAlertPreferencesMaxAggregateInputType = {
   dailyLimit?: true
   emailAddress?: true
   language?: true
+  reassessmentRemindersEnabled?: true
+  reassessmentFrequencyDays?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -176,6 +190,8 @@ export type UserAlertPreferencesCountAggregateInputType = {
   dailyLimit?: true
   emailAddress?: true
   language?: true
+  reassessmentRemindersEnabled?: true
+  reassessmentFrequencyDays?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -283,6 +299,8 @@ export type UserAlertPreferencesGroupByOutputType = {
   dailyLimit: number
   emailAddress: string | null
   language: string
+  reassessmentRemindersEnabled: boolean
+  reassessmentFrequencyDays: number
   createdAt: Date
   updatedAt: Date
   _count: UserAlertPreferencesCountAggregateOutputType | null
@@ -326,6 +344,8 @@ export type UserAlertPreferencesWhereInput = {
   dailyLimit?: Prisma.IntFilter<"UserAlertPreferences"> | number
   emailAddress?: Prisma.StringNullableFilter<"UserAlertPreferences"> | string | null
   language?: Prisma.StringFilter<"UserAlertPreferences"> | string
+  reassessmentRemindersEnabled?: Prisma.BoolFilter<"UserAlertPreferences"> | boolean
+  reassessmentFrequencyDays?: Prisma.IntFilter<"UserAlertPreferences"> | number
   createdAt?: Prisma.DateTimeFilter<"UserAlertPreferences"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserAlertPreferences"> | Date | string
   subscriptions?: Prisma.PushSubscriptionListRelationFilter
@@ -348,6 +368,8 @@ export type UserAlertPreferencesOrderByWithRelationInput = {
   dailyLimit?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrder
+  reassessmentRemindersEnabled?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   subscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput
@@ -373,6 +395,8 @@ export type UserAlertPreferencesWhereUniqueInput = Prisma.AtLeast<{
   dailyLimit?: Prisma.IntFilter<"UserAlertPreferences"> | number
   emailAddress?: Prisma.StringNullableFilter<"UserAlertPreferences"> | string | null
   language?: Prisma.StringFilter<"UserAlertPreferences"> | string
+  reassessmentRemindersEnabled?: Prisma.BoolFilter<"UserAlertPreferences"> | boolean
+  reassessmentFrequencyDays?: Prisma.IntFilter<"UserAlertPreferences"> | number
   createdAt?: Prisma.DateTimeFilter<"UserAlertPreferences"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserAlertPreferences"> | Date | string
   subscriptions?: Prisma.PushSubscriptionListRelationFilter
@@ -395,6 +419,8 @@ export type UserAlertPreferencesOrderByWithAggregationInput = {
   dailyLimit?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrderInput | Prisma.SortOrder
   language?: Prisma.SortOrder
+  reassessmentRemindersEnabled?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserAlertPreferencesCountOrderByAggregateInput
@@ -423,6 +449,8 @@ export type UserAlertPreferencesScalarWhereWithAggregatesInput = {
   dailyLimit?: Prisma.IntWithAggregatesFilter<"UserAlertPreferences"> | number
   emailAddress?: Prisma.StringNullableWithAggregatesFilter<"UserAlertPreferences"> | string | null
   language?: Prisma.StringWithAggregatesFilter<"UserAlertPreferences"> | string
+  reassessmentRemindersEnabled?: Prisma.BoolWithAggregatesFilter<"UserAlertPreferences"> | boolean
+  reassessmentFrequencyDays?: Prisma.IntWithAggregatesFilter<"UserAlertPreferences"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserAlertPreferences"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserAlertPreferences"> | Date | string
 }
@@ -443,6 +471,8 @@ export type UserAlertPreferencesCreateInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutPreferencesInput
@@ -465,6 +495,8 @@ export type UserAlertPreferencesUncheckedCreateInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutPreferencesInput
@@ -487,6 +519,8 @@ export type UserAlertPreferencesUpdateInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscriptions?: Prisma.PushSubscriptionUpdateManyWithoutPreferencesNestedInput
@@ -509,6 +543,8 @@ export type UserAlertPreferencesUncheckedUpdateInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutPreferencesNestedInput
@@ -531,6 +567,8 @@ export type UserAlertPreferencesCreateManyInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -551,6 +589,8 @@ export type UserAlertPreferencesUpdateManyMutationInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -571,6 +611,8 @@ export type UserAlertPreferencesUncheckedUpdateManyInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -591,6 +633,8 @@ export type UserAlertPreferencesCountOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  reassessmentRemindersEnabled?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -601,6 +645,7 @@ export type UserAlertPreferencesAvgOrderByAggregateInput = {
   criticalMagnitude?: Prisma.SortOrder
   cooldownMinutes?: Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
 }
 
 export type UserAlertPreferencesMaxOrderByAggregateInput = {
@@ -619,6 +664,8 @@ export type UserAlertPreferencesMaxOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  reassessmentRemindersEnabled?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -639,6 +686,8 @@ export type UserAlertPreferencesMinOrderByAggregateInput = {
   dailyLimit?: Prisma.SortOrder
   emailAddress?: Prisma.SortOrder
   language?: Prisma.SortOrder
+  reassessmentRemindersEnabled?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -649,6 +698,7 @@ export type UserAlertPreferencesSumOrderByAggregateInput = {
   criticalMagnitude?: Prisma.SortOrder
   cooldownMinutes?: Prisma.SortOrder
   dailyLimit?: Prisma.SortOrder
+  reassessmentFrequencyDays?: Prisma.SortOrder
 }
 
 export type UserAlertPreferencesScalarRelationFilter = {
@@ -700,6 +750,8 @@ export type UserAlertPreferencesCreateWithoutSubscriptionsInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   notifications?: Prisma.AlertNotificationCreateNestedManyWithoutPreferencesInput
@@ -721,6 +773,8 @@ export type UserAlertPreferencesUncheckedCreateWithoutSubscriptionsInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   notifications?: Prisma.AlertNotificationUncheckedCreateNestedManyWithoutPreferencesInput
@@ -758,6 +812,8 @@ export type UserAlertPreferencesUpdateWithoutSubscriptionsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notifications?: Prisma.AlertNotificationUpdateManyWithoutPreferencesNestedInput
@@ -779,6 +835,8 @@ export type UserAlertPreferencesUncheckedUpdateWithoutSubscriptionsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notifications?: Prisma.AlertNotificationUncheckedUpdateManyWithoutPreferencesNestedInput
@@ -800,6 +858,8 @@ export type UserAlertPreferencesCreateWithoutNotificationsInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutPreferencesInput
@@ -821,6 +881,8 @@ export type UserAlertPreferencesUncheckedCreateWithoutNotificationsInput = {
   dailyLimit?: number
   emailAddress?: string | null
   language?: string
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   subscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutPreferencesInput
@@ -858,6 +920,8 @@ export type UserAlertPreferencesUpdateWithoutNotificationsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscriptions?: Prisma.PushSubscriptionUpdateManyWithoutPreferencesNestedInput
@@ -879,6 +943,8 @@ export type UserAlertPreferencesUncheckedUpdateWithoutNotificationsInput = {
   dailyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   emailAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   language?: Prisma.StringFieldUpdateOperationsInput | string
+  reassessmentRemindersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reassessmentFrequencyDays?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutPreferencesNestedInput
@@ -940,6 +1006,8 @@ export type UserAlertPreferencesSelect<ExtArgs extends runtime.Types.Extensions.
   dailyLimit?: boolean
   emailAddress?: boolean
   language?: boolean
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   subscriptions?: boolean | Prisma.UserAlertPreferences$subscriptionsArgs<ExtArgs>
@@ -963,6 +1031,8 @@ export type UserAlertPreferencesSelectCreateManyAndReturn<ExtArgs extends runtim
   dailyLimit?: boolean
   emailAddress?: boolean
   language?: boolean
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["userAlertPreferences"]>
@@ -983,6 +1053,8 @@ export type UserAlertPreferencesSelectUpdateManyAndReturn<ExtArgs extends runtim
   dailyLimit?: boolean
   emailAddress?: boolean
   language?: boolean
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["userAlertPreferences"]>
@@ -1003,11 +1075,13 @@ export type UserAlertPreferencesSelectScalar = {
   dailyLimit?: boolean
   emailAddress?: boolean
   language?: boolean
+  reassessmentRemindersEnabled?: boolean
+  reassessmentFrequencyDays?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserAlertPreferencesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "alertsEnabled" | "pushEnabled" | "emailEnabled" | "minMagnitude" | "maxDistanceKm" | "criticalMagnitude" | "quietHoursEnabled" | "quietHoursStart" | "quietHoursEnd" | "cooldownMinutes" | "dailyLimit" | "emailAddress" | "language" | "createdAt" | "updatedAt", ExtArgs["result"]["userAlertPreferences"]>
+export type UserAlertPreferencesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "alertsEnabled" | "pushEnabled" | "emailEnabled" | "minMagnitude" | "maxDistanceKm" | "criticalMagnitude" | "quietHoursEnabled" | "quietHoursStart" | "quietHoursEnd" | "cooldownMinutes" | "dailyLimit" | "emailAddress" | "language" | "reassessmentRemindersEnabled" | "reassessmentFrequencyDays" | "createdAt" | "updatedAt", ExtArgs["result"]["userAlertPreferences"]>
 export type UserAlertPreferencesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subscriptions?: boolean | Prisma.UserAlertPreferences$subscriptionsArgs<ExtArgs>
   notifications?: boolean | Prisma.UserAlertPreferences$notificationsArgs<ExtArgs>
@@ -1038,6 +1112,8 @@ export type $UserAlertPreferencesPayload<ExtArgs extends runtime.Types.Extension
     dailyLimit: number
     emailAddress: string | null
     language: string
+    reassessmentRemindersEnabled: boolean
+    reassessmentFrequencyDays: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userAlertPreferences"]>
@@ -1480,6 +1556,8 @@ export interface UserAlertPreferencesFieldRefs {
   readonly dailyLimit: Prisma.FieldRef<"UserAlertPreferences", 'Int'>
   readonly emailAddress: Prisma.FieldRef<"UserAlertPreferences", 'String'>
   readonly language: Prisma.FieldRef<"UserAlertPreferences", 'String'>
+  readonly reassessmentRemindersEnabled: Prisma.FieldRef<"UserAlertPreferences", 'Boolean'>
+  readonly reassessmentFrequencyDays: Prisma.FieldRef<"UserAlertPreferences", 'Int'>
   readonly createdAt: Prisma.FieldRef<"UserAlertPreferences", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserAlertPreferences", 'DateTime'>
 }

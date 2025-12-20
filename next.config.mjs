@@ -5,7 +5,14 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     typescript: { ignoreBuildErrors: true },
-    eslint: { ignoreDuringBuilds: true },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+            },
+        ],
+    },
     webpack: (config) => {
         // Disable webpack minification completely to avoid the constructor error
         config.optimization = {

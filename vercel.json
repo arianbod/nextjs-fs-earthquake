@@ -14,6 +14,10 @@
     {
       "path": "/api/alerts/cron/poll-earthquakes",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/reminders/cron/check-due-assessments",
+      "schedule": "0 8 * * *"
     }
   ],
   "buildCommand": "next build",

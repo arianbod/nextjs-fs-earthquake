@@ -46,6 +46,7 @@ export type AssessmentMinAggregateOutputType = {
   version: string | null
   title: string | null
   description: string | null
+  lastReminderSentAt: Date | null
 }
 
 export type AssessmentMaxAggregateOutputType = {
@@ -60,6 +61,7 @@ export type AssessmentMaxAggregateOutputType = {
   version: string | null
   title: string | null
   description: string | null
+  lastReminderSentAt: Date | null
 }
 
 export type AssessmentCountAggregateOutputType = {
@@ -83,6 +85,7 @@ export type AssessmentCountAggregateOutputType = {
   specificConditions: number
   extraLoad: number
   neighborBuildings: number
+  lastReminderSentAt: number
   _all: number
 }
 
@@ -107,6 +110,7 @@ export type AssessmentMinAggregateInputType = {
   version?: true
   title?: true
   description?: true
+  lastReminderSentAt?: true
 }
 
 export type AssessmentMaxAggregateInputType = {
@@ -121,6 +125,7 @@ export type AssessmentMaxAggregateInputType = {
   version?: true
   title?: true
   description?: true
+  lastReminderSentAt?: true
 }
 
 export type AssessmentCountAggregateInputType = {
@@ -144,6 +149,7 @@ export type AssessmentCountAggregateInputType = {
   specificConditions?: true
   extraLoad?: true
   neighborBuildings?: true
+  lastReminderSentAt?: true
   _all?: true
 }
 
@@ -254,6 +260,7 @@ export type AssessmentGroupByOutputType = {
   specificConditions: runtime.JsonValue | null
   extraLoad: runtime.JsonValue | null
   neighborBuildings: runtime.JsonValue | null
+  lastReminderSentAt: Date | null
   _count: AssessmentCountAggregateOutputType | null
   _avg: AssessmentAvgAggregateOutputType | null
   _sum: AssessmentSumAggregateOutputType | null
@@ -300,6 +307,7 @@ export type AssessmentWhereInput = {
   specificConditions?: Prisma.JsonNullableFilter<"Assessment">
   extraLoad?: Prisma.JsonNullableFilter<"Assessment">
   neighborBuildings?: Prisma.JsonNullableFilter<"Assessment">
+  lastReminderSentAt?: Prisma.DateTimeNullableFilter<"Assessment"> | Date | string | null
   location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
   buildingInfo?: Prisma.XOR<Prisma.BuildingInfoNullableScalarRelationFilter, Prisma.BuildingInfoWhereInput> | null
   safetyResult?: Prisma.XOR<Prisma.SafetyResultNullableScalarRelationFilter, Prisma.SafetyResultWhereInput> | null
@@ -327,6 +335,7 @@ export type AssessmentOrderByWithRelationInput = {
   specificConditions?: Prisma.SortOrderInput | Prisma.SortOrder
   extraLoad?: Prisma.SortOrderInput | Prisma.SortOrder
   neighborBuildings?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.LocationOrderByWithRelationInput
   buildingInfo?: Prisma.BuildingInfoOrderByWithRelationInput
   safetyResult?: Prisma.SafetyResultOrderByWithRelationInput
@@ -357,6 +366,7 @@ export type AssessmentWhereUniqueInput = Prisma.AtLeast<{
   specificConditions?: Prisma.JsonNullableFilter<"Assessment">
   extraLoad?: Prisma.JsonNullableFilter<"Assessment">
   neighborBuildings?: Prisma.JsonNullableFilter<"Assessment">
+  lastReminderSentAt?: Prisma.DateTimeNullableFilter<"Assessment"> | Date | string | null
   location?: Prisma.XOR<Prisma.LocationNullableScalarRelationFilter, Prisma.LocationWhereInput> | null
   buildingInfo?: Prisma.XOR<Prisma.BuildingInfoNullableScalarRelationFilter, Prisma.BuildingInfoWhereInput> | null
   safetyResult?: Prisma.XOR<Prisma.SafetyResultNullableScalarRelationFilter, Prisma.SafetyResultWhereInput> | null
@@ -384,6 +394,7 @@ export type AssessmentOrderByWithAggregationInput = {
   specificConditions?: Prisma.SortOrderInput | Prisma.SortOrder
   extraLoad?: Prisma.SortOrderInput | Prisma.SortOrder
   neighborBuildings?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastReminderSentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.AssessmentCountOrderByAggregateInput
   _avg?: Prisma.AssessmentAvgOrderByAggregateInput
   _max?: Prisma.AssessmentMaxOrderByAggregateInput
@@ -415,6 +426,7 @@ export type AssessmentScalarWhereWithAggregatesInput = {
   specificConditions?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
   extraLoad?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
   neighborBuildings?: Prisma.JsonNullableWithAggregatesFilter<"Assessment">
+  lastReminderSentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Assessment"> | Date | string | null
 }
 
 export type AssessmentCreateInput = {
@@ -438,6 +450,7 @@ export type AssessmentCreateInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationCreateNestedOneWithoutAssessmentInput
   buildingInfo?: Prisma.BuildingInfoCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultCreateNestedOneWithoutAssessmentInput
@@ -465,6 +478,7 @@ export type AssessmentUncheckedCreateInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationUncheckedCreateNestedOneWithoutAssessmentInput
   buildingInfo?: Prisma.BuildingInfoUncheckedCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultUncheckedCreateNestedOneWithoutAssessmentInput
@@ -492,6 +506,7 @@ export type AssessmentUpdateInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUpdateOneWithoutAssessmentNestedInput
   buildingInfo?: Prisma.BuildingInfoUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUpdateOneWithoutAssessmentNestedInput
@@ -519,6 +534,7 @@ export type AssessmentUncheckedUpdateInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUncheckedUpdateOneWithoutAssessmentNestedInput
   buildingInfo?: Prisma.BuildingInfoUncheckedUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUncheckedUpdateOneWithoutAssessmentNestedInput
@@ -546,6 +562,7 @@ export type AssessmentCreateManyInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
 }
 
 export type AssessmentUpdateManyMutationInput = {
@@ -569,6 +586,7 @@ export type AssessmentUpdateManyMutationInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AssessmentUncheckedUpdateManyInput = {
@@ -592,6 +610,7 @@ export type AssessmentUncheckedUpdateManyInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type AssessmentCountOrderByAggregateInput = {
@@ -615,6 +634,7 @@ export type AssessmentCountOrderByAggregateInput = {
   specificConditions?: Prisma.SortOrder
   extraLoad?: Prisma.SortOrder
   neighborBuildings?: Prisma.SortOrder
+  lastReminderSentAt?: Prisma.SortOrder
 }
 
 export type AssessmentAvgOrderByAggregateInput = {
@@ -633,6 +653,7 @@ export type AssessmentMaxOrderByAggregateInput = {
   version?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  lastReminderSentAt?: Prisma.SortOrder
 }
 
 export type AssessmentMinOrderByAggregateInput = {
@@ -647,6 +668,7 @@ export type AssessmentMinOrderByAggregateInput = {
   version?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  lastReminderSentAt?: Prisma.SortOrder
 }
 
 export type AssessmentSumOrderByAggregateInput = {
@@ -739,6 +761,7 @@ export type AssessmentCreateWithoutLocationInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   buildingInfo?: Prisma.BuildingInfoCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultCreateNestedOneWithoutAssessmentInput
   images?: Prisma.AssessmentImageCreateNestedManyWithoutAssessmentInput
@@ -765,6 +788,7 @@ export type AssessmentUncheckedCreateWithoutLocationInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   buildingInfo?: Prisma.BuildingInfoUncheckedCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultUncheckedCreateNestedOneWithoutAssessmentInput
   images?: Prisma.AssessmentImageUncheckedCreateNestedManyWithoutAssessmentInput
@@ -807,6 +831,7 @@ export type AssessmentUpdateWithoutLocationInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buildingInfo?: Prisma.BuildingInfoUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUpdateOneWithoutAssessmentNestedInput
   images?: Prisma.AssessmentImageUpdateManyWithoutAssessmentNestedInput
@@ -833,6 +858,7 @@ export type AssessmentUncheckedUpdateWithoutLocationInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   buildingInfo?: Prisma.BuildingInfoUncheckedUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUncheckedUpdateOneWithoutAssessmentNestedInput
   images?: Prisma.AssessmentImageUncheckedUpdateManyWithoutAssessmentNestedInput
@@ -859,6 +885,7 @@ export type AssessmentCreateWithoutBuildingInfoInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultCreateNestedOneWithoutAssessmentInput
   images?: Prisma.AssessmentImageCreateNestedManyWithoutAssessmentInput
@@ -885,6 +912,7 @@ export type AssessmentUncheckedCreateWithoutBuildingInfoInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationUncheckedCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultUncheckedCreateNestedOneWithoutAssessmentInput
   images?: Prisma.AssessmentImageUncheckedCreateNestedManyWithoutAssessmentInput
@@ -927,6 +955,7 @@ export type AssessmentUpdateWithoutBuildingInfoInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUpdateOneWithoutAssessmentNestedInput
   images?: Prisma.AssessmentImageUpdateManyWithoutAssessmentNestedInput
@@ -953,6 +982,7 @@ export type AssessmentUncheckedUpdateWithoutBuildingInfoInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUncheckedUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUncheckedUpdateOneWithoutAssessmentNestedInput
   images?: Prisma.AssessmentImageUncheckedUpdateManyWithoutAssessmentNestedInput
@@ -979,6 +1009,7 @@ export type AssessmentCreateWithoutSafetyResultInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationCreateNestedOneWithoutAssessmentInput
   buildingInfo?: Prisma.BuildingInfoCreateNestedOneWithoutAssessmentInput
   images?: Prisma.AssessmentImageCreateNestedManyWithoutAssessmentInput
@@ -1005,6 +1036,7 @@ export type AssessmentUncheckedCreateWithoutSafetyResultInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationUncheckedCreateNestedOneWithoutAssessmentInput
   buildingInfo?: Prisma.BuildingInfoUncheckedCreateNestedOneWithoutAssessmentInput
   images?: Prisma.AssessmentImageUncheckedCreateNestedManyWithoutAssessmentInput
@@ -1047,6 +1079,7 @@ export type AssessmentUpdateWithoutSafetyResultInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUpdateOneWithoutAssessmentNestedInput
   buildingInfo?: Prisma.BuildingInfoUpdateOneWithoutAssessmentNestedInput
   images?: Prisma.AssessmentImageUpdateManyWithoutAssessmentNestedInput
@@ -1073,6 +1106,7 @@ export type AssessmentUncheckedUpdateWithoutSafetyResultInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUncheckedUpdateOneWithoutAssessmentNestedInput
   buildingInfo?: Prisma.BuildingInfoUncheckedUpdateOneWithoutAssessmentNestedInput
   images?: Prisma.AssessmentImageUncheckedUpdateManyWithoutAssessmentNestedInput
@@ -1099,6 +1133,7 @@ export type AssessmentCreateWithoutImagesInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationCreateNestedOneWithoutAssessmentInput
   buildingInfo?: Prisma.BuildingInfoCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultCreateNestedOneWithoutAssessmentInput
@@ -1125,6 +1160,7 @@ export type AssessmentUncheckedCreateWithoutImagesInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Date | string | null
   location?: Prisma.LocationUncheckedCreateNestedOneWithoutAssessmentInput
   buildingInfo?: Prisma.BuildingInfoUncheckedCreateNestedOneWithoutAssessmentInput
   safetyResult?: Prisma.SafetyResultUncheckedCreateNestedOneWithoutAssessmentInput
@@ -1167,6 +1203,7 @@ export type AssessmentUpdateWithoutImagesInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUpdateOneWithoutAssessmentNestedInput
   buildingInfo?: Prisma.BuildingInfoUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUpdateOneWithoutAssessmentNestedInput
@@ -1193,6 +1230,7 @@ export type AssessmentUncheckedUpdateWithoutImagesInput = {
   specificConditions?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   extraLoad?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   neighborBuildings?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  lastReminderSentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   location?: Prisma.LocationUncheckedUpdateOneWithoutAssessmentNestedInput
   buildingInfo?: Prisma.BuildingInfoUncheckedUpdateOneWithoutAssessmentNestedInput
   safetyResult?: Prisma.SafetyResultUncheckedUpdateOneWithoutAssessmentNestedInput
@@ -1250,6 +1288,7 @@ export type AssessmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   specificConditions?: boolean
   extraLoad?: boolean
   neighborBuildings?: boolean
+  lastReminderSentAt?: boolean
   location?: boolean | Prisma.Assessment$locationArgs<ExtArgs>
   buildingInfo?: boolean | Prisma.Assessment$buildingInfoArgs<ExtArgs>
   safetyResult?: boolean | Prisma.Assessment$safetyResultArgs<ExtArgs>
@@ -1278,6 +1317,7 @@ export type AssessmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   specificConditions?: boolean
   extraLoad?: boolean
   neighborBuildings?: boolean
+  lastReminderSentAt?: boolean
 }, ExtArgs["result"]["assessment"]>
 
 export type AssessmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1301,6 +1341,7 @@ export type AssessmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   specificConditions?: boolean
   extraLoad?: boolean
   neighborBuildings?: boolean
+  lastReminderSentAt?: boolean
 }, ExtArgs["result"]["assessment"]>
 
 export type AssessmentSelectScalar = {
@@ -1324,9 +1365,10 @@ export type AssessmentSelectScalar = {
   specificConditions?: boolean
   extraLoad?: boolean
   neighborBuildings?: boolean
+  lastReminderSentAt?: boolean
 }
 
-export type AssessmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "createdAt" | "updatedAt" | "completedAt" | "status" | "currentStep" | "assessmentType" | "version" | "title" | "description" | "weather" | "aiPhotoAnalysis" | "structuralSystem" | "irregularities" | "planDefinition" | "manipulations" | "specificConditions" | "extraLoad" | "neighborBuildings", ExtArgs["result"]["assessment"]>
+export type AssessmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "createdAt" | "updatedAt" | "completedAt" | "status" | "currentStep" | "assessmentType" | "version" | "title" | "description" | "weather" | "aiPhotoAnalysis" | "structuralSystem" | "irregularities" | "planDefinition" | "manipulations" | "specificConditions" | "extraLoad" | "neighborBuildings" | "lastReminderSentAt", ExtArgs["result"]["assessment"]>
 export type AssessmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   location?: boolean | Prisma.Assessment$locationArgs<ExtArgs>
   buildingInfo?: boolean | Prisma.Assessment$buildingInfoArgs<ExtArgs>
@@ -1366,6 +1408,7 @@ export type $AssessmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     specificConditions: runtime.JsonValue | null
     extraLoad: runtime.JsonValue | null
     neighborBuildings: runtime.JsonValue | null
+    lastReminderSentAt: Date | null
   }, ExtArgs["result"]["assessment"]>
   composites: {}
 }
@@ -1813,6 +1856,7 @@ export interface AssessmentFieldRefs {
   readonly specificConditions: Prisma.FieldRef<"Assessment", 'Json'>
   readonly extraLoad: Prisma.FieldRef<"Assessment", 'Json'>
   readonly neighborBuildings: Prisma.FieldRef<"Assessment", 'Json'>
+  readonly lastReminderSentAt: Prisma.FieldRef<"Assessment", 'DateTime'>
 }
     
 

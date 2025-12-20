@@ -195,7 +195,8 @@ export const AssessmentScalarFieldEnum = {
   manipulations: 'manipulations',
   specificConditions: 'specificConditions',
   extraLoad: 'extraLoad',
-  neighborBuildings: 'neighborBuildings'
+  neighborBuildings: 'neighborBuildings',
+  lastReminderSentAt: 'lastReminderSentAt'
 } as const
 
 export type AssessmentScalarFieldEnum = (typeof AssessmentScalarFieldEnum)[keyof typeof AssessmentScalarFieldEnum]
@@ -350,6 +351,8 @@ export const UserAlertPreferencesScalarFieldEnum = {
   dailyLimit: 'dailyLimit',
   emailAddress: 'emailAddress',
   language: 'language',
+  reassessmentRemindersEnabled: 'reassessmentRemindersEnabled',
+  reassessmentFrequencyDays: 'reassessmentFrequencyDays',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
