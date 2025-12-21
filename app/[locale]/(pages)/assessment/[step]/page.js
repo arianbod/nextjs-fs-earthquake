@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserInput } from '@/context/UserInputContext';
 import AssessmentSteps from '@/components/AssessmentSteps';
@@ -82,6 +82,9 @@ const SaveStatusIndicator = ({ status, onRetry }) => {
 };
 
 export default function AssessmentStep({ params }) {
+    // Unwrap params Promise (Next.js 15+)
+    const resolvedParams = use(params);
+
     const router = useRouter();
     const searchParams = useSearchParams();
     const {
@@ -96,7 +99,7 @@ export default function AssessmentStep({ params }) {
         startNewAssessment,
     } = useUserInput();
 
-    const currentStep = parseInt(params.step);
+    const currentStep = parseInt(resolvedParams.step);
     const assessmentIdFromUrl = searchParams.get('id');
     const [isInitializing, setIsInitializing] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
