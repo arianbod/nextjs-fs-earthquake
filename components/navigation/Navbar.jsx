@@ -39,6 +39,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import AssessmentSteps from '@/components/AssessmentSteps';
 import { getLastDraftAssessment, getDashboardStats } from '@/lib/actions/assessment';
 
@@ -139,7 +140,7 @@ const Navbar = () => {
 	};
 
 	return (
-		<>
+		<TooltipProvider>
 			<nav
 				className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
 					scrolled
@@ -148,7 +149,7 @@ const Navbar = () => {
 				}`}
 			>
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center justify-between h-16 lg:h-18">
+					<div className="flex items-center justify-between h-16">
 						{/* Logo */}
 						<Link href="/" className="flex items-center gap-2.5 group shrink-0">
 							<motion.div
@@ -427,7 +428,7 @@ const Navbar = () => {
 			</nav>
 
 			{/* Spacer for fixed navbar */}
-			<div className={`${isAssessmentPath ? 'h-28 sm:h-[104px]' : 'h-16 lg:h-18'}`} />
+			<div className={`${isAssessmentPath ? 'h-28 sm:h-[104px]' : 'h-16'}`} />
 
 			{/* Mobile Menu Overlay */}
 			<AnimatePresence>
@@ -577,7 +578,7 @@ const Navbar = () => {
 					</>
 				)}
 			</AnimatePresence>
-		</>
+		</TooltipProvider>
 	);
 };
 
