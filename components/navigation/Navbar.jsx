@@ -12,10 +12,9 @@ import ThemeToggle from './ThemeToggle';
 import LanguageToggle from './LanguageToggle';
 import {
 	Menu,
+	X,
 	HomeIcon,
 	InfoIcon,
-	BarChart4,
-	HelpCircle,
 	LayoutDashboard,
 	History,
 	Play,
@@ -23,33 +22,23 @@ import {
 	Sparkles,
 	Clock,
 	CheckCircle2,
-	AlertCircle,
-	ArrowRight,
 	Zap,
 	Building2,
-	TrendingUp,
 	Bell,
 	GitCompareArrows,
 	Shield,
 	Briefcase,
+	ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-	DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '@/components/ui/tooltip';
 import AssessmentSteps from '@/components/AssessmentSteps';
 import { getLastDraftAssessment, getDashboardStats } from '@/lib/actions/assessment';
 
@@ -59,8 +48,8 @@ const Navbar = () => {
 	const { user, isLoaded, isSignedIn } = useUser();
 	const [draftAssessment, setDraftAssessment] = useState(null);
 	const [stats, setStats] = useState(null);
-	const [isSheetOpen, setIsSheetOpen] = useState(false);
-	const [showQuickStats, setShowQuickStats] = useState(false);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const [scrolled, setScrolled] = useState(false);
 
 	const t = useTranslations('Navigation');
 	const tGreeting = useTranslations('Greeting');
@@ -69,7 +58,16 @@ const Navbar = () => {
 	const currentStepMatch = pathname.match(/\/assessment\/(\d+)/);
 	const currentStep = currentStepMatch ? parseInt(currentStepMatch[1]) : 0;
 
-	// Load draft assessment and stats on mount
+	// Track scroll for navbar style
+	useEffect(() => {
+		const handleScroll = () => {
+			setScrolled(window.scrollY > 10);
+		};
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, []);
+
+	// Load draft assessment and stats
 	useEffect(() => {
 		if (isSignedIn) {
 			loadUserData();
@@ -94,19 +92,32 @@ const Navbar = () => {
 		}
 	};
 
-	// Navigation links with smart ordering
-	const navLinks = [
+	// Navigation links
+	const mainNavLinks = [
 		{ href: '/', label: t('home'), icon: HomeIcon, showAlways: true },
 		{ href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard, requiresAuth: true },
 		{ href: '/portfolio', label: t('portfolio'), icon: Briefcase, requiresAuth: true },
 		{ href: '/safety-hub', label: t('safetyHub'), icon: Shield, showAlways: true },
+	];
+
+	const moreNavLinks = [
 		{ href: '/alerts', label: t('alerts'), icon: Bell, requiresAuth: true },
 		{ href: '/compare', label: t('compare'), icon: GitCompareArrows, requiresAuth: true },
 		{ href: '/history', label: t('assessments'), icon: History, requiresAuth: true },
 		{ href: '/about', label: t('about'), icon: InfoIcon, showAlways: true },
 	];
 
-	const filteredNavLinks = navLinks.filter(
+	const allNavLinks = [...mainNavLinks, ...moreNavLinks];
+
+	const filteredMainLinks = mainNavLinks.filter(
+		(link) => link.showAlways || (link.requiresAuth && isSignedIn)
+	);
+
+	const filteredMoreLinks = moreNavLinks.filter(
+		(link) => link.showAlways || (link.requiresAuth && isSignedIn)
+	);
+
+	const filteredAllLinks = allNavLinks.filter(
 		(link) => link.showAlways || (link.requiresAuth && isSignedIn)
 	);
 
@@ -115,10 +126,11 @@ const Navbar = () => {
 		if (draftAssessment) {
 			const step = Math.min(draftAssessment.currentStep || 1, 4);
 			router.push(`/assessment/${step}?id=${draftAssessment.id}`);
+			setMobileMenuOpen(false);
 		}
 	};
 
-	// Greeting based on time of day
+	// Greeting
 	const getGreeting = () => {
 		const hour = new Date().getHours();
 		if (hour < 12) return tGreeting('morning');
@@ -127,16 +139,22 @@ const Navbar = () => {
 	};
 
 	return (
-		<TooltipProvider>
-			<nav className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 shadow-sm backdrop-blur-md">
-				<div className="container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 py-2">
-					<div className="flex items-center justify-between">
-						{/* Logo and Title */}
-						<Link href="/" className="flex items-center space-x-2 group">
+		<>
+			<nav
+				className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+					scrolled
+						? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-lg shadow-black/5'
+						: 'bg-white/60 dark:bg-gray-900/60 backdrop-blur-md'
+				}`}
+			>
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div className="flex items-center justify-between h-16 lg:h-18">
+						{/* Logo */}
+						<Link href="/" className="flex items-center gap-2.5 group shrink-0">
 							<motion.div
-								className="relative w-8 h-8"
-								whileHover={{ rotate: [0, -10, 10, 0] }}
-								transition={{ duration: 0.5 }}
+								className="relative w-9 h-9 sm:w-10 sm:h-10"
+								whileHover={{ scale: 1.05 }}
+								whileTap={{ scale: 0.95 }}
 							>
 								<Image
 									src="/images/logo.png"
@@ -145,410 +163,221 @@ const Navbar = () => {
 									className="object-contain"
 								/>
 							</motion.div>
-							<span className="font-bold text-xl hidden sm:inline-block group-hover:text-blue-600 transition-colors">
-								QuakeWise
-							</span>
-							{isAssessmentPath && (
-								<motion.div
-									initial={{ opacity: 0, x: -10 }}
-									animate={{ opacity: 1, x: 0 }}
-									className="hidden sm:flex items-center ml-4 text-sm text-gray-600 dark:text-gray-400"
-								>
-									<span className="mx-2">|</span>
-									<span className="flex items-center gap-1">
-										<Zap className="w-3 h-3 text-blue-500" />
-										Step {currentStep}/{AssessmentSteps.length}
+							<div className="flex flex-col">
+								<span className="font-bold text-lg sm:text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+									QuakeWise
+								</span>
+								{isAssessmentPath && (
+									<span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium hidden sm:block">
+										Step {currentStep} of {AssessmentSteps.length}
 									</span>
-								</motion.div>
-							)}
+								)}
+							</div>
 						</Link>
 
 						{/* Desktop Navigation */}
-						<div className="hidden md:flex items-center space-x-1">
-							{filteredNavLinks.map((link) => {
+						<div className="hidden lg:flex items-center gap-1">
+							{filteredMainLinks.map((link) => {
 								const isActive = pathname === link.href;
 								const Icon = link.icon;
 
 								return (
 									<Link key={link.href} href={link.href}>
-										<motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-											<Button
-												variant={isActive ? 'default' : 'ghost'}
-												size="sm"
-												className={`text-sm gap-1.5 transition-all ${
-													isActive
-														? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-														: 'hover:bg-blue-50 dark:hover:bg-blue-900/20'
-												}`}
-											>
-												<Icon className="h-4 w-4" />
-												<span>{link.label}</span>
-												{link.href === '/dashboard' && stats?.inProgress > 0 && (
-													<Badge
-														variant="secondary"
-														className="ml-1 h-5 px-1.5 text-xs bg-amber-100 text-amber-700"
-													>
-														{stats.inProgress}
-													</Badge>
-												)}
-											</Button>
-										</motion.div>
+										<Button
+											variant="ghost"
+											size="sm"
+											className={`h-9 px-3 text-sm font-medium transition-all ${
+												isActive
+													? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+													: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+											}`}
+										>
+											<Icon className="h-4 w-4 mr-1.5" />
+											{link.label}
+											{link.href === '/dashboard' && stats?.inProgress > 0 && (
+												<Badge className="ml-1.5 h-5 px-1.5 text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+													{stats.inProgress}
+												</Badge>
+											)}
+										</Button>
 									</Link>
 								);
 							})}
 
-							{/* Start/Continue Assessment Button */}
-							{isSignedIn && (
+							{/* More Dropdown */}
+							{filteredMoreLinks.length > 0 && (
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
-										<motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-											<Button
-												size="sm"
-												className="ml-2 gap-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-md"
-											>
-												<Sparkles className="h-4 w-4" />
-												<span className="hidden lg:inline">
-													{draftAssessment ? t('continue') : t('newAssessment')}
-												</span>
-												<span className="lg:hidden">{t('start')}</span>
-												<ChevronDown className="h-3 w-3" />
-											</Button>
-										</motion.div>
+										<Button
+											variant="ghost"
+											size="sm"
+											className="h-9 px-3 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+										>
+											More
+											<ChevronDown className="h-3.5 w-3.5 ml-1" />
+										</Button>
 									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end" className="w-64">
-										<DropdownMenuLabel className="flex items-center gap-2">
-											<Building2 className="h-4 w-4" />
-											{t('assessmentOptions')}
-										</DropdownMenuLabel>
-										<DropdownMenuSeparator />
-
-										{/* Resume Draft */}
-										{draftAssessment && (
-											<>
-												<DropdownMenuItem
-													onClick={handleQuickResume}
-													className="flex flex-col items-start py-3 cursor-pointer"
-												>
-													<div className="flex items-center gap-2 text-blue-600 font-medium">
-														<Play className="h-4 w-4" />
-														{t('continueAssessment')}
-													</div>
-													<span className="text-xs text-muted-foreground mt-1 ml-6">
-														{t('resumeStep', { step: draftAssessment.currentStep || 1, total: AssessmentSteps.length })}
-													</span>
-													{draftAssessment.location?.city && (
-														<span className="text-xs text-muted-foreground ml-6">
-															{draftAssessment.location.city}
-														</span>
-													)}
+									<DropdownMenuContent align="end" className="w-48">
+										{filteredMoreLinks.map((link) => {
+											const Icon = link.icon;
+											const isActive = pathname === link.href;
+											return (
+												<DropdownMenuItem key={link.href} asChild>
+													<Link
+														href={link.href}
+														className={`flex items-center gap-2 ${isActive ? 'text-blue-600' : ''}`}
+													>
+														<Icon className="h-4 w-4" />
+														{link.label}
+													</Link>
 												</DropdownMenuItem>
-												<DropdownMenuSeparator />
-											</>
-										)}
-
-										{/* New Assessment */}
-										<DropdownMenuItem asChild>
-											<Link
-												href="/assessment/1"
-												className="flex items-center gap-2 py-2 cursor-pointer"
-											>
-												<Sparkles className="h-4 w-4 text-emerald-500" />
-												<span>{t('startAssessment')}</span>
-											</Link>
-										</DropdownMenuItem>
+											);
+										})}
 									</DropdownMenuContent>
 								</DropdownMenu>
 							)}
-
-							{!isSignedIn && isLoaded && (
-								<Link href="/assessment/1">
-									<motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-										<Button
-											size="sm"
-											className="ml-2 gap-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-										>
-											<Sparkles className="h-4 w-4" />
-											{t('startAssessment')}
-										</Button>
-									</motion.div>
-								</Link>
-							)}
 						</div>
 
-						{/* Right Side Actions */}
-						<div className="flex items-center space-x-2">
-							{/* Quick Stats Indicator (Desktop) */}
-							{isSignedIn && stats && (
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<motion.button
-											className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-											onClick={() => router.push('/dashboard')}
-											whileHover={{ scale: 1.05 }}
-											whileTap={{ scale: 0.95 }}
-										>
-											<TrendingUp className="h-4 w-4 text-blue-500" />
-											<span className="text-sm font-medium">{stats.totalCompleted || 0}</span>
-										</motion.button>
-									</TooltipTrigger>
-									<TooltipContent>
-										<p>{t('completedAssessments', { count: stats.totalCompleted || 0 })}</p>
-									</TooltipContent>
-								</Tooltip>
-							)}
-
-							{/* Help Button */}
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Link href="/about" className="hidden md:flex">
-										<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+						{/* Right Side */}
+						<div className="flex items-center gap-2 sm:gap-3">
+							{/* CTA Button - Desktop */}
+							<div className="hidden sm:block">
+								{isSignedIn ? (
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
 											<Button
-												variant="ghost"
-												size="icon"
-												className="transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20"
+												size="sm"
+												className="h-9 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/30 transition-all"
 											>
-												<HelpCircle className="h-5 w-5" />
+												<Sparkles className="h-4 w-4 mr-1.5" />
+												<span className="hidden md:inline">
+													{draftAssessment ? t('continue') : t('newAssessment')}
+												</span>
+												<span className="md:hidden">{t('start')}</span>
+												<ChevronDown className="h-3.5 w-3.5 ml-1.5" />
 											</Button>
-										</motion.div>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align="end" className="w-56">
+											{draftAssessment && (
+												<>
+													<DropdownMenuItem
+														onClick={handleQuickResume}
+														className="flex flex-col items-start py-3 cursor-pointer"
+													>
+														<div className="flex items-center gap-2 text-blue-600 font-medium">
+															<Play className="h-4 w-4" />
+															{t('continueAssessment')}
+														</div>
+														<span className="text-xs text-muted-foreground mt-1 ml-6">
+															Step {draftAssessment.currentStep || 1} of {AssessmentSteps.length}
+														</span>
+													</DropdownMenuItem>
+													<DropdownMenuSeparator />
+												</>
+											)}
+											<DropdownMenuItem asChild>
+												<Link href="/assessment/1" className="flex items-center gap-2">
+													<Sparkles className="h-4 w-4 text-blue-500" />
+													{t('startNewAssessment')}
+												</Link>
+											</DropdownMenuItem>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								) : isLoaded ? (
+									<Link href="/assessment/1">
+										<Button
+											size="sm"
+											className="h-9 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/25"
+										>
+											<Sparkles className="h-4 w-4 mr-1.5" />
+											{t('startAssessment')}
+										</Button>
 									</Link>
-								</TooltipTrigger>
-								<TooltipContent>
-									<p>{t('help')}</p>
-								</TooltipContent>
-							</Tooltip>
+								) : null}
+							</div>
 
-							<LanguageToggle />
-							<ThemeToggle />
+							{/* Divider */}
+							<div className="hidden sm:block w-px h-6 bg-gray-200 dark:bg-gray-700" />
 
-							{/* User Button with greeting */}
-							{isSignedIn && user && (
-								<div className="hidden lg:flex items-center gap-2 pl-2 border-l border-gray-200 dark:border-gray-700">
-									<span className="text-xs text-muted-foreground">{getGreeting()}</span>
-									<UserButton afterSignOutUrl="/" />
+							{/* Settings Group */}
+							<div className="flex items-center gap-1">
+								<LanguageToggle />
+								<ThemeToggle />
+							</div>
+
+							{/* User Section */}
+							{isSignedIn && user ? (
+								<div className="hidden md:flex items-center gap-2 pl-2 border-l border-gray-200 dark:border-gray-700">
+									<div className="text-right hidden lg:block">
+										<p className="text-xs text-gray-500 dark:text-gray-400">{getGreeting()}</p>
+										<p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[100px]">
+											{user.firstName || 'User'}
+										</p>
+									</div>
+									<UserButton
+										afterSignOutUrl="/"
+										appearance={{
+											elements: {
+												avatarBox: 'w-8 h-8',
+											},
+										}}
+									/>
 								</div>
-							)}
-
-							{!isSignedIn && isLoaded && (
-								<div className="hidden md:flex">
+							) : isLoaded ? (
+								<div className="hidden md:block">
 									<Link href="/sign-in">
-										<Button variant="outline" size="sm">
+										<Button variant="ghost" size="sm" className="h-9">
 											{t('signIn')}
 										</Button>
 									</Link>
 								</div>
-							)}
+							) : null}
 
-							<div className="lg:hidden">
-								<UserButton afterSignOutUrl="/" />
+							{/* Mobile User */}
+							<div className="md:hidden">
+								{isSignedIn && <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: 'w-8 h-8' } }} />}
 							</div>
 
-							{/* Mobile Menu */}
-							<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-								<SheetTrigger asChild className="md:hidden">
-									<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-										<Button variant="ghost" size="icon" className="transition-colors">
+							{/* Mobile Menu Button */}
+							<Button
+								variant="ghost"
+								size="sm"
+								className="lg:hidden h-9 w-9 p-0"
+								onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+							>
+								<AnimatePresence mode="wait">
+									{mobileMenuOpen ? (
+										<motion.div
+											key="close"
+											initial={{ rotate: -90, opacity: 0 }}
+											animate={{ rotate: 0, opacity: 1 }}
+											exit={{ rotate: 90, opacity: 0 }}
+											transition={{ duration: 0.15 }}
+										>
+											<X className="h-5 w-5" />
+										</motion.div>
+									) : (
+										<motion.div
+											key="menu"
+											initial={{ rotate: 90, opacity: 0 }}
+											animate={{ rotate: 0, opacity: 1 }}
+											exit={{ rotate: -90, opacity: 0 }}
+											transition={{ duration: 0.15 }}
+										>
 											<Menu className="h-5 w-5" />
-											<span className="sr-only">Open menu</span>
-										</Button>
-									</motion.div>
-								</SheetTrigger>
-								<SheetContent side="left" className="w-[280px] sm:w-[320px] p-0">
-									<div className="flex flex-col h-full">
-										{/* Mobile Header */}
-										<div className="p-6 border-b border-gray-200 dark:border-gray-700">
-											<div className="flex items-center gap-3">
-												<div className="relative w-10 h-10">
-													<Image
-														src="/images/logo.png"
-														alt="QuakeWise"
-														fill
-														className="object-contain"
-													/>
-												</div>
-												<div>
-													<span className="font-bold text-xl block">QuakeWise</span>
-													{isSignedIn && user && (
-														<span className="text-xs text-muted-foreground">
-															{getGreeting()}, {user.firstName || 'there'}
-														</span>
-													)}
-												</div>
-											</div>
-										</div>
-
-										{/* Quick Resume Card */}
-										{isSignedIn && draftAssessment && (
-											<div className="p-4 mx-4 mt-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-												<p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-2 flex items-center gap-1">
-													<Clock className="h-3 w-3" />
-													{t('continueWhereLeft')}
-												</p>
-												<SheetClose asChild>
-													<Button
-														size="sm"
-														className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
-														onClick={handleQuickResume}
-													>
-														<Play className="h-4 w-4" />
-														{t('resumeStepButton', { step: draftAssessment.currentStep || 1 })}
-													</Button>
-												</SheetClose>
-											</div>
-										)}
-
-										{/* Mobile Navigation */}
-										<div className="flex-1 overflow-y-auto p-4">
-											<div className="space-y-1">
-												{filteredNavLinks.map((link, index) => {
-													const isActive = pathname === link.href;
-													const Icon = link.icon;
-
-													return (
-														<motion.div
-															key={link.href}
-															initial={{ opacity: 0, x: -20 }}
-															animate={{ opacity: 1, x: 0 }}
-															transition={{ delay: index * 0.05 }}
-														>
-															<SheetClose asChild>
-																<Link href={link.href}>
-																	<Button
-																		variant={isActive ? 'default' : 'ghost'}
-																		className={`w-full justify-start text-sm gap-3 ${
-																			isActive
-																				? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-																				: ''
-																		}`}
-																	>
-																		<Icon className="h-4 w-4" />
-																		<span>{link.label}</span>
-																		{link.href === '/dashboard' && stats?.inProgress > 0 && (
-																			<Badge
-																				variant="secondary"
-																				className="ml-auto h-5 px-1.5 text-xs"
-																			>
-																				{stats.inProgress}
-																			</Badge>
-																		)}
-																	</Button>
-																</Link>
-															</SheetClose>
-														</motion.div>
-													);
-												})}
-											</div>
-
-											{/* Start New Assessment */}
-											<div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-												<SheetClose asChild>
-													<Link href="/assessment/1">
-														<Button className="w-full gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600">
-															<Sparkles className="h-4 w-4" />
-															{t('startNewAssessment')}
-														</Button>
-													</Link>
-												</SheetClose>
-											</div>
-
-											{/* Assessment Steps (when in assessment) */}
-											{isAssessmentPath && (
-												<div className="mt-6">
-													<h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
-														{t('assessmentProgress')}
-													</h3>
-													<div className="space-y-1">
-														{AssessmentSteps.slice(0, 4).map((step, index) => {
-															const stepNumber = index + 1;
-															const isActive = currentStep === stepNumber;
-															const isComplete = currentStep > stepNumber;
-
-															return (
-																<SheetClose key={stepNumber} asChild>
-																	<Link href={`/assessment/${stepNumber}`}>
-																		<Button
-																			variant={isActive ? 'secondary' : 'ghost'}
-																			size="sm"
-																			className="w-full justify-start text-sm gap-2"
-																		>
-																			<span
-																				className={`w-5 h-5 flex items-center justify-center rounded-full text-xs ${
-																					isComplete
-																						? 'bg-green-500 text-white'
-																						: isActive
-																						? 'bg-blue-500 text-white'
-																						: 'bg-gray-200 dark:bg-gray-700'
-																				}`}
-																			>
-																				{isComplete ? (
-																					<CheckCircle2 className="h-3 w-3" />
-																				) : (
-																					stepNumber
-																				)}
-																			</span>
-																			<span className="truncate">{step.title}</span>
-																		</Button>
-																	</Link>
-																</SheetClose>
-															);
-														})}
-													</div>
-												</div>
-											)}
-										</div>
-
-										{/* Mobile Stats Footer */}
-										{isSignedIn && stats && (
-											<div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-												<div className="grid grid-cols-3 gap-2 text-center">
-													<div>
-														<p className="text-lg font-bold text-blue-600">
-															{stats.totalCompleted || 0}
-														</p>
-														<p className="text-xs text-muted-foreground">Completed</p>
-													</div>
-													<div>
-														<p className="text-lg font-bold text-amber-600">
-															{stats.inProgress || 0}
-														</p>
-														<p className="text-xs text-muted-foreground">In Progress</p>
-													</div>
-													<div>
-														<p className="text-lg font-bold text-emerald-600">
-															{stats.averageScore ? Math.round(stats.averageScore) : '--'}%
-														</p>
-														<p className="text-xs text-muted-foreground">Avg Score</p>
-													</div>
-												</div>
-											</div>
-										)}
-
-										{/* Mobile Help */}
-										<div className="p-4 border-t border-gray-200 dark:border-gray-700">
-											<SheetClose asChild>
-												<Link href="/about">
-													<Button variant="outline" className="w-full gap-2">
-														<HelpCircle className="h-4 w-4" />
-														{t('help')}
-													</Button>
-												</Link>
-											</SheetClose>
-										</div>
-									</div>
-								</SheetContent>
-							</Sheet>
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</Button>
 						</div>
 					</div>
 				</div>
 
-				{/* Progress indicator for assessment pages (sticky under navbar) */}
+				{/* Assessment Progress Bar */}
 				{isAssessmentPath && (
-					<motion.div
-						initial={{ opacity: 0, y: -10 }}
-						animate={{ opacity: 1, y: 0 }}
-						className="hidden md:block border-t border-gray-100 dark:border-gray-800"
-					>
-						<div className="container mx-auto px-4">
-							<div className="flex items-center gap-1 py-2">
+					<div className="border-t border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-800/50 backdrop-blur-sm">
+						<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+							<div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-hide">
 								{AssessmentSteps.slice(0, 4).map((step, index) => {
 									const stepNumber = index + 1;
 									const isActive = currentStep === stepNumber;
@@ -558,34 +387,32 @@ const Navbar = () => {
 										<React.Fragment key={stepNumber}>
 											<Link
 												href={`/assessment/${stepNumber}`}
-												className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-all ${
+												className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
 													isActive
-														? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+														? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
 														: isComplete
-														? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-														: 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+														? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+														: 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400'
 												}`}
 											>
 												<span
-													className={`w-4 h-4 flex items-center justify-center rounded-full text-[10px] ${
+													className={`w-5 h-5 flex items-center justify-center rounded-full text-[11px] font-semibold ${
 														isComplete
 															? 'bg-green-500 text-white'
 															: isActive
 															? 'bg-blue-500 text-white'
-															: 'bg-gray-300 dark:bg-gray-600'
+															: 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
 													}`}
 												>
-													{isComplete ? <CheckCircle2 className="h-2.5 w-2.5" /> : stepNumber}
+													{isComplete ? <CheckCircle2 className="h-3 w-3" /> : stepNumber}
 												</span>
-												<span className="hidden lg:inline">{step.title}</span>
+												<span className="hidden sm:inline">{step.title}</span>
 											</Link>
 											{index < 3 && (
 												<div
-													className={`flex-1 h-0.5 mx-1 rounded ${
+													className={`w-8 sm:w-12 h-0.5 rounded-full shrink-0 ${
 														isComplete
-															? 'bg-green-400'
-															: currentStep > stepNumber
-															? 'bg-blue-400'
+															? 'bg-green-400 dark:bg-green-500'
 															: 'bg-gray-200 dark:bg-gray-700'
 													}`}
 												/>
@@ -595,10 +422,162 @@ const Navbar = () => {
 								})}
 							</div>
 						</div>
-					</motion.div>
+					</div>
 				)}
 			</nav>
-		</TooltipProvider>
+
+			{/* Spacer for fixed navbar */}
+			<div className={`${isAssessmentPath ? 'h-28 sm:h-[104px]' : 'h-16 lg:h-18'}`} />
+
+			{/* Mobile Menu Overlay */}
+			<AnimatePresence>
+				{mobileMenuOpen && (
+					<>
+						{/* Backdrop */}
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+							onClick={() => setMobileMenuOpen(false)}
+						/>
+
+						{/* Menu Panel */}
+						<motion.div
+							initial={{ opacity: 0, y: -10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+							className="fixed top-16 left-0 right-0 z-40 lg:hidden"
+						>
+							<div className="bg-white dark:bg-gray-900 shadow-xl border-b border-gray-200 dark:border-gray-800 max-h-[calc(100vh-4rem)] overflow-y-auto">
+								{/* Quick Resume */}
+								{isSignedIn && draftAssessment && (
+									<div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100 dark:border-blue-800">
+										<div className="flex items-center gap-3">
+											<div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+												<Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+											</div>
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+													Continue Assessment
+												</p>
+												<p className="text-xs text-gray-500 dark:text-gray-400">
+													Step {draftAssessment.currentStep || 1} of {AssessmentSteps.length}
+												</p>
+											</div>
+											<Button
+												size="sm"
+												onClick={handleQuickResume}
+												className="shrink-0 bg-blue-600 hover:bg-blue-700"
+											>
+												<Play className="h-4 w-4 mr-1" />
+												Resume
+											</Button>
+										</div>
+									</div>
+								)}
+
+								{/* Navigation Links */}
+								<div className="p-2">
+									{filteredAllLinks.map((link, index) => {
+										const isActive = pathname === link.href;
+										const Icon = link.icon;
+
+										return (
+											<motion.div
+												key={link.href}
+												initial={{ opacity: 0, x: -10 }}
+												animate={{ opacity: 1, x: 0 }}
+												transition={{ delay: index * 0.03 }}
+											>
+												<Link
+													href={link.href}
+													onClick={() => setMobileMenuOpen(false)}
+													className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+														isActive
+															? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+															: 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+													}`}
+												>
+													<Icon className="h-5 w-5" />
+													<span className="font-medium">{link.label}</span>
+													{link.href === '/dashboard' && stats?.inProgress > 0 && (
+														<Badge className="ml-auto bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+															{stats.inProgress}
+														</Badge>
+													)}
+													{isActive && (
+														<div className="ml-auto w-2 h-2 rounded-full bg-blue-500" />
+													)}
+												</Link>
+											</motion.div>
+										);
+									})}
+								</div>
+
+								{/* CTA Section */}
+								<div className="p-4 border-t border-gray-100 dark:border-gray-800">
+									<Link
+										href="/assessment/1"
+										onClick={() => setMobileMenuOpen(false)}
+									>
+										<Button className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
+											<Sparkles className="h-5 w-5 mr-2" />
+											{t('startNewAssessment')}
+											<ArrowRight className="h-4 w-4 ml-2" />
+										</Button>
+									</Link>
+								</div>
+
+								{/* Stats Footer */}
+								{isSignedIn && stats && (
+									<div className="px-4 pb-4">
+										<div className="grid grid-cols-3 gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+											<div className="text-center">
+												<p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+													{stats.totalCompleted || 0}
+												</p>
+												<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+													Completed
+												</p>
+											</div>
+											<div className="text-center border-x border-gray-200 dark:border-gray-700">
+												<p className="text-xl font-bold text-amber-600 dark:text-amber-400">
+													{stats.inProgress || 0}
+												</p>
+												<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+													In Progress
+												</p>
+											</div>
+											<div className="text-center">
+												<p className="text-xl font-bold text-green-600 dark:text-green-400">
+													{stats.averageScore ? Math.round(stats.averageScore) : '--'}
+												</p>
+												<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+													Avg Score
+												</p>
+											</div>
+										</div>
+									</div>
+								)}
+
+								{/* Sign In for guests */}
+								{!isSignedIn && isLoaded && (
+									<div className="p-4 border-t border-gray-100 dark:border-gray-800">
+										<Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>
+											<Button variant="outline" className="w-full">
+												{t('signIn')}
+											</Button>
+										</Link>
+									</div>
+								)}
+							</div>
+						</motion.div>
+					</>
+				)}
+			</AnimatePresence>
+		</>
 	);
 };
 
