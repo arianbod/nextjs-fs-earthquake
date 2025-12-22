@@ -19,6 +19,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 
+// Sanitize external URLs to prevent XSS via javascript: or data: URLs
+const sanitizeExternalUrl = (url) => {
+	if (!url || typeof url !== 'string') return null;
+
+	try {
+		const parsed = new URL(url);
+		// Only allow http and https protocols
+		if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+			return null;
+		}
+		// Validate it's from USGS domain (trusted source)
+		if (!parsed.hostname.endsWith('.usgs.gov') && parsed.hostname !== 'usgs.gov') {
+			return null;
+		}
+		return parsed.href;
+	} catch {
+		return null;
+	}
+};
+
 // Dynamically import map components to avoid SSR issues
 const MapContainer = dynamic(
 	() => import('react-leaflet').then(mod => mod.MapContainer),
@@ -411,14 +431,17 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 														<p className="text-xs text-gray-500 mb-2">
 															{formatDate(properties.time)} • {t('depth')}: {geometry.coordinates[2].toFixed(1)} km
 														</p>
+														{/* XSS mitigated: sanitizeExternalUrl validates protocol (http/https only) and domain (usgs.gov only) */}
+													{sanitizeExternalUrl(properties.url) && (
 														<a
-															href={properties.url}
+															href={sanitizeExternalUrl(properties.url)}
 															target="_blank"
 															rel="noopener noreferrer"
 															className="text-xs text-orange-600 hover:text-orange-700"
 														>
 															{t('viewOnUsgs')} →
 														</a>
+													)}
 													</div>
 												</Popup>
 											</CircleMarker>
@@ -531,8 +554,10 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 																		</span>
 																	</div>
 																</div>
+																{/* XSS mitigated: sanitizeExternalUrl validates protocol (http/https only) and domain (usgs.gov only) */}
+															{sanitizeExternalUrl(properties.url) && (
 																<a
-																	href={properties.url}
+																	href={sanitizeExternalUrl(properties.url)}
 																	target="_blank"
 																	rel="noopener noreferrer"
 																	className="inline-block mt-2 text-orange-600 hover:text-orange-700"
@@ -540,6 +565,7 @@ export function HistoricalEarthquakeMap({ latitude, longitude, className }) {
 																>
 																	{t('viewOnUsgs')} →
 																</a>
+															)}
 															</motion.div>
 														)}
 													</AnimatePresence>

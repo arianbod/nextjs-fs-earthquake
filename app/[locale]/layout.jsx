@@ -5,10 +5,7 @@ import Script from 'next/script';
 import { NextIntlClientProvider } from 'next-intl';
 import Providers from '../providers';
 import Navbar from '@/components/navigation/Navbar';
-import { Progress } from '@/components/ui/progress';
-import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { usePathname } from 'next/navigation';
-import AssessmentSteps from '@/components/AssessmentSteps';
 import { Toaster } from 'sonner';
 import "../globals.css"
 import '../voice-assistant-bundle.css'
@@ -29,13 +26,6 @@ const LocaleLayout = ({ children, params }) => {
   // Extract locale from params or pathname
   const localeMatch = pathname.match(/^\/(en|tr)/);
   const locale = localeMatch ? localeMatch[1] : 'en';
-
-  const isAssessmentPath = pathname.includes('/assessment/');
-  const match = pathname.match(/\/assessment\/(\d+)/);
-  const currentStep = match ? parseInt(match[1], 10) : 0;
-  const progress = currentStep
-    ? (currentStep / AssessmentSteps.length) * 100
-    : 0;
 
   return (
     <html lang={locale} className="min-h-screen">
@@ -138,21 +128,6 @@ Based on your assessment results, we provide:
             <div className="grid grid-cols-1 h-screen">
               <div className="flex flex-col h-full">
                 <Navbar />
-
-                {/* Assessment progress bar */}
-                {isAssessmentPath && (
-                  <div className="container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 py-1 lg:py-2 mt-2 lg:mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Assessment Progress</span>
-                      <span className="text-sm font-medium">{Math.round(progress)}%</span>
-                    </div>
-                    <Progress
-                      value={progress}
-                      className="h-2 bg-gray-200 dark:bg-gray-700"
-                    />
-                    <Breadcrumb currentStep={currentStep} />
-                  </div>
-                )}
 
                 {/* Page children */}
                 <main className="flex-grow overflow-y-auto container mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">

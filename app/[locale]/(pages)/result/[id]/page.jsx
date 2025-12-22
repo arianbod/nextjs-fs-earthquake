@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useUserInput } from '@/context/UserInputContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +10,7 @@ import EnhancedCertificate from '@/components/EnhancedCertificate';
 import SafetyCalculator from '@/components/SafetyCalculator';
 import { getAssessment } from '@/lib/actions/assessment';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 // New wow-factor components
 import { ScoreReveal } from '@/components/results/ScoreReveal';
@@ -38,6 +39,10 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 const ResultPage = () => {
+	const t = useTranslations('Steps.result');
+	const pathname = usePathname();
+	const locale = pathname?.startsWith('/tr') ? 'tr' : 'en';
+
 	const params = useParams();
 	const assessmentId = params.id;
 	const { user, isLoaded: isUserLoaded } = useUser();
@@ -99,9 +104,9 @@ const ResultPage = () => {
 
 	// Copy shareable link
 	const copyShareableLink = () => {
-		const url = `${window.location.origin}/result/${savedAssessmentId || assessmentId}`;
+		const url = `${window.location.origin}/${locale}/result/${savedAssessmentId || assessmentId}`;
 		navigator.clipboard.writeText(url);
-		toast.success('Link copied to clipboard');
+		toast.success(t('linkCopied'));
 	};
 
 	// Calculate safety result
@@ -177,7 +182,7 @@ const ResultPage = () => {
 						transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
 						className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-violet-200 border-t-violet-500"
 					/>
-					<p className="text-gray-500">Preparing your results...</p>
+					<p className="text-gray-500">{t('preparingResults')}</p>
 				</motion.div>
 			</div>
 		);
@@ -195,13 +200,13 @@ const ResultPage = () => {
 					<div className="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
 						<AlertTriangle className="w-10 h-10 text-amber-500" />
 					</div>
-					<h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">No Assessment Data</h2>
+					<h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">{t('noAssessmentData')}</h2>
 					<p className="text-gray-500 mb-8">
-						Complete the assessment to see your building's safety report.
+						{t('completeAssessment')}
 					</p>
-					<Link href="/assessment/1">
+					<Link href={`/${locale}/assessment/1`}>
 						<Button size="lg" className="w-full h-14 text-lg bg-gradient-to-r from-violet-500 to-purple-600">
-							Start Assessment
+							{t('startAssessment')}
 						</Button>
 					</Link>
 				</motion.div>
@@ -223,8 +228,8 @@ const ResultPage = () => {
 					</div>
 					<h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">Error</h2>
 					<p className="text-red-500 mb-8">{error}</p>
-					<Link href="/assessment/1">
-						<Button size="lg" className="w-full h-14 text-lg">Restart Assessment</Button>
+					<Link href={`/${locale}/assessment/1`}>
+						<Button size="lg" className="w-full h-14 text-lg">{t('restartAssessment')}</Button>
 					</Link>
 				</motion.div>
 			</div>
@@ -247,7 +252,7 @@ const ResultPage = () => {
 					>
 						<Shield className="w-10 h-10 text-white" />
 					</motion.div>
-					<p className="text-gray-500">Analyzing safety data...</p>
+					<p className="text-gray-500">{t('analyzingSafetyData')}</p>
 				</motion.div>
 			</div>
 		);
@@ -283,16 +288,16 @@ const ResultPage = () => {
 				className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800"
 			>
 				<div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-					<Link href="/">
+					<Link href={`/${locale}`}>
 						<Button variant="ghost" size="sm" className="gap-1">
-							<HomeIcon className="h-4 w-4" /> Home
+							<HomeIcon className="h-4 w-4" /> {t('home')}
 						</Button>
 					</Link>
 					<div className="flex items-center gap-2">
 						{assessmentSaved && user && (
-							<Link href="/dashboard">
+							<Link href={`/${locale}/dashboard`}>
 								<Button variant="outline" size="sm" className="gap-1 border-emerald-500 text-emerald-600">
-									<LayoutDashboard className="h-4 w-4" /> Dashboard
+									<LayoutDashboard className="h-4 w-4" /> {t('dashboard')}
 								</Button>
 							</Link>
 						)}
@@ -301,8 +306,8 @@ const ResultPage = () => {
 								<Copy className="h-4 w-4" />
 							</Button>
 						)}
-						<Link href="/assessment/1">
-							<Button variant="outline" size="sm">New</Button>
+						<Link href={`/${locale}/assessment/1`}>
+							<Button variant="outline" size="sm">{t('new')}</Button>
 						</Link>
 					</div>
 				</div>
@@ -329,9 +334,9 @@ const ResultPage = () => {
 								animate={{ opacity: 1, y: 0 }}
 								className="text-center mb-10"
 							>
-								<p className="text-gray-500 dark:text-gray-400 text-sm mb-1">Assessment for</p>
+								<p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{t('assessmentFor')}</p>
 								<h2 className="text-xl font-bold text-gray-900 dark:text-white">
-									{userInput.address || userInput.city || 'Your Building'}
+									{userInput.address || userInput.city || t('yourBuilding')}
 								</h2>
 							</motion.div>
 
@@ -386,7 +391,7 @@ const ResultPage = () => {
 									<CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
 										<CardTitle className="flex items-center gap-2">
 											<Target className="w-5 h-5 text-violet-500" />
-											Key Safety Findings
+											{t('keySafetyFindings')}
 										</CardTitle>
 									</CardHeader>
 									<CardContent className="pt-6">
@@ -437,7 +442,7 @@ const ResultPage = () => {
 										onClick={() => generatePDF(safetyResult, userInput, savedAssessmentId || assessmentId)}
 									>
 										<Download className="h-5 w-5" />
-										Download PDF
+										{t('downloadPDF')}
 									</Button>
 									<Button
 										size="lg"
@@ -447,7 +452,7 @@ const ResultPage = () => {
 										disabled={!savedAssessmentId || savedAssessmentId === 'preview'}
 									>
 										<Share2 className="h-5 w-5" />
-										Share
+										{t('share')}
 									</Button>
 									<Button
 										size="lg"
@@ -456,7 +461,7 @@ const ResultPage = () => {
 										onClick={() => setShowEmailModal(true)}
 									>
 										<Mail className="h-5 w-5" />
-										Email Report
+										{t('emailReport')}
 									</Button>
 								</div>
 							</motion.div>
@@ -473,12 +478,12 @@ const ResultPage = () => {
 									<CardHeader>
 										<CardTitle className="flex items-center gap-2">
 											<Lightbulb className="h-5 w-5 text-amber-500" />
-											{isPassingScore ? 'Maintenance Tips' : 'Priority Actions'}
+											{isPassingScore ? t('maintenanceTips') : t('priorityActions')}
 										</CardTitle>
 										<CardDescription>
 											{isPassingScore
-												? 'Keep your building safe'
-												: 'Steps to improve safety'}
+												? t('keepBuildingSafe')
+												: t('stepsToImprove')}
 										</CardDescription>
 									</CardHeader>
 									<CardContent>
@@ -489,22 +494,22 @@ const ResultPage = () => {
 														icon={CheckCircle2}
 														iconColor="text-emerald-500"
 														bgColor="bg-emerald-50 dark:bg-emerald-900/20"
-														title="Regular Inspections"
-														description="Schedule annual structural inspections"
+														title={t('regularInspections')}
+														description={t('scheduleAnnual')}
 													/>
 													<RecommendationItem
 														icon={Shield}
 														iconColor="text-blue-500"
 														bgColor="bg-blue-50 dark:bg-blue-900/20"
-														title="Emergency Plan"
-														description="Create earthquake preparedness plan"
+														title={t('emergencyPlan')}
+														description={t('createEarthquakePlan')}
 													/>
 													<RecommendationItem
 														icon={FileText}
 														iconColor="text-gray-500"
 														bgColor="bg-gray-50 dark:bg-gray-800"
-														title="Documentation"
-														description="Keep this report accessible"
+														title={t('documentation')}
+														description={t('keepReportAccessible')}
 													/>
 												</>
 											) : (
@@ -513,22 +518,22 @@ const ResultPage = () => {
 														icon={AlertTriangle}
 														iconColor="text-red-500"
 														bgColor="bg-red-50 dark:bg-red-900/20"
-														title="Professional Evaluation"
-														description="Consult a structural engineer"
+														title={t('professionalEvaluation')}
+														description={t('consultStructuralEngineer')}
 													/>
 													<RecommendationItem
 														icon={Wrench}
 														iconColor="text-amber-500"
 														bgColor="bg-amber-50 dark:bg-amber-900/20"
-														title="Retrofit Options"
-														description="Explore seismic strengthening"
+														title={t('retrofitOptions')}
+														description={t('exploreSeismicStrengthening')}
 													/>
 													<RecommendationItem
 														icon={Users}
 														iconColor="text-orange-500"
 														bgColor="bg-orange-50 dark:bg-orange-900/20"
-														title="Occupant Safety"
-														description="Review evacuation routes"
+														title={t('occupantSafety')}
+														description={t('reviewEvacuationRoutes')}
 													/>
 												</>
 											)}
@@ -545,7 +550,7 @@ const ResultPage = () => {
 								className="mb-10"
 							>
 								<div className="flex flex-col items-center gap-4 py-6 border-t border-gray-200 dark:border-gray-700">
-									<p className="text-sm text-gray-500">Want detailed technical data?</p>
+									<p className="text-sm text-gray-500">{t('wantDetailedData')}</p>
 									<ExpertModeToggle expertMode={expertMode} setExpertMode={setExpertMode} />
 								</div>
 
@@ -576,10 +581,10 @@ const ResultPage = () => {
 										<CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20">
 											<CardTitle className="flex items-center gap-2">
 												<Award className="h-5 w-5 text-emerald-500" />
-												Safety Certificate
+												{t('safetyCertificate')}
 											</CardTitle>
 											<CardDescription>
-												Your building passed the assessment
+												{t('buildingPassedAssessment')}
 											</CardDescription>
 										</CardHeader>
 										<CardContent className="pt-6">
@@ -600,15 +605,15 @@ const ResultPage = () => {
 									<CardContent className="py-8 text-center">
 										<Sparkles className="w-10 h-10 text-violet-500 mx-auto mb-4" />
 										<h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-											Need Expert Advice?
+											{t('needExpertAdvice')}
 										</h3>
 										<p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-											Our certified structural engineers can provide a detailed on-site assessment
+											{t('certifiedEngineers')}
 										</p>
 										<div className="flex flex-col sm:flex-row gap-3 justify-center">
 											<Button size="lg" className="gap-2 bg-gradient-to-r from-violet-500 to-purple-600">
 												<Phone className="h-4 w-4" />
-												Schedule Consultation
+												{t('scheduleConsultation')}
 											</Button>
 										</div>
 									</CardContent>
@@ -623,8 +628,7 @@ const ResultPage = () => {
 								className="text-center text-xs text-gray-400 py-8"
 							>
 								<p>
-									This assessment is based on the information provided and serves as a general guide.
-									For comprehensive structural analysis, consult a licensed professional engineer.
+									{t('disclaimerFooter')}
 								</p>
 							</motion.footer>
 						</motion.div>
@@ -644,7 +648,7 @@ const ResultPage = () => {
 							className="flex flex-col items-center text-gray-400"
 						>
 							<ChevronDown className="w-6 h-6" />
-							<span className="text-xs">Scroll for details</span>
+							<span className="text-xs">{t('scrollForDetails')}</span>
 						</motion.div>
 					</motion.div>
 				)}

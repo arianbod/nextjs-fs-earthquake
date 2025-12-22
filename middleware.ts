@@ -15,6 +15,7 @@ const isPublicRoute = createRouteMatcher([
 	'/:locale/sign-up(.*)',
 	'/:locale/about',
 	'/:locale/welcome',
+	'/:locale/safety-hub',
 ]);
 
 const isIgnoredRoute = createRouteMatcher([

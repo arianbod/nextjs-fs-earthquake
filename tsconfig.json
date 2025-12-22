@@ -15,7 +15,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "allowImportingTsExtensions": true,
     "baseUrl": ".", // <-- added
     "paths": {
@@ -38,7 +38,8 @@
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    "generated/**/*.ts"
+    "generated/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

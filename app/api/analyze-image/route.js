@@ -15,6 +15,7 @@ import {
   BuildingAnalysisSchema,
   FloorPlanAnalysisSchema,
   SatelliteAnalysisSchema,
+  DamageAssessmentSchema,
 } from '@/lib/schemas/aiAnalysisSchemas';
 
 // Configure runtime for Vercel deployment
@@ -75,6 +76,32 @@ function detectImageType(buffer) {
 function formatAnalysisResult(raw, type) {
   if (!raw || typeof raw !== 'object') {
     raw = { rawAnalysis: raw };
+  }
+
+  // Damage assessment formatting
+  if (type === 'damage_assessment') {
+    return {
+      severity: raw?.severity || 'moderate',
+      summary: raw?.summary || 'Damage assessment completed.',
+      damageTypes: raw?.damageTypes || [],
+      structuralConcerns: raw?.structuralConcerns || [],
+      immediateActions: raw?.immediateActions || [],
+      recommendations: raw?.recommendations || [],
+      safetyStatus: raw?.safetyStatus || {
+        safeToEnter: 'unknown',
+        evacuationRecommended: false,
+        professionalInspectionNeeded: true,
+      },
+      affectedSystems: raw?.affectedSystems || {
+        structural: false,
+        electrical: 'unknown',
+        plumbing: 'unknown',
+        gas: 'unknown',
+      },
+      confidence: raw?.confidence || 'medium',
+      disclaimer: raw?.disclaimer || 'This AI assessment is preliminary only. It cannot replace professional structural engineering inspection.',
+      rawData: raw,
+    };
   }
 
   if (type === 'floorPlan' || type === 'architecturalPlan') {
@@ -196,6 +223,11 @@ Extract ALL possible structural details including dimensions, materials, reinfor
 
   satellite: `You are an expert analyst examining satellite/aerial imagery of buildings.
 Estimate building dimensions, footprint shape, and surrounding conditions from the aerial view.`,
+
+  damage_assessment: `You are an expert structural engineer conducting post-earthquake damage assessment.
+Analyze the provided photos of building damage to evaluate structural integrity and safety.
+Be conservative in your safety assessments - when in doubt, recommend professional inspection.
+Focus on visible structural damage, cracks, tilting, spalling, and any signs of structural compromise.`,
 };
 
 // ============================================================================
@@ -249,6 +281,34 @@ STRUCTURAL ANALYSIS:
 4. Estimated number of stories (based on shadows and context)
 5. Adjacent buildings proximity
 6. Site conditions and surroundings`,
+
+  damage_assessment: `Analyze these post-earthquake damage photos and assess:
+
+DAMAGE IDENTIFICATION:
+- Type of damage visible (cracks, spalling, tilting, collapse, etc.)
+- Location of each damage type
+- Severity of each damage (low, moderate, high, severe)
+
+SAFETY ASSESSMENT:
+- Is the building safe to enter?
+- Is evacuation recommended?
+- Is professional structural inspection needed?
+
+STRUCTURAL CONCERNS:
+- Any signs of structural compromise
+- Load-bearing elements affected
+- Foundation or column damage
+
+UTILITY SYSTEMS:
+- Any visible damage to electrical systems
+- Plumbing concerns (leaks, broken pipes)
+- Gas line concerns (smell, visible damage)
+
+RECOMMENDATIONS:
+- Immediate actions to take
+- Next steps for the building occupants
+
+Always err on the side of caution. If damage appears significant, recommend professional inspection.`,
 };
 
 // ============================================================================
@@ -260,6 +320,7 @@ const SCHEMA_MAP = {
   floorPlan: FloorPlanAnalysisSchema,
   architecturalPlan: FloorPlanAnalysisSchema,
   satellite: SatelliteAnalysisSchema,
+  damage_assessment: DamageAssessmentSchema,
 };
 
 // ============================================================================
@@ -466,6 +527,6 @@ export async function GET(request) {
     timestamp: new Date().toISOString(),
     runtime: 'nodejs',
     structuredOutputs: true,
-    supportedTypes: ['building', 'floorPlan', 'architecturalPlan', 'satellite'],
+    supportedTypes: ['building', 'floorPlan', 'architecturalPlan', 'satellite', 'damage_assessment'],
   });
 }

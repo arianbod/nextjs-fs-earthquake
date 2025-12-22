@@ -20,9 +20,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => {
+	const t = useTranslations('Steps.aiPhoto');
+	const pathname = usePathname();
+	const locale = pathname?.startsWith('/tr') ? 'tr' : 'en';
+
 	const { storeUploadedPhotos, saveAiPhotoAnalysisToDb, saveTitleAndDescription } = useUserInput();
 	const [images, setImages] = useState([]);
 	const [analyzing, setAnalyzing] = useState(false);
@@ -226,7 +232,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						transition={{ delay: 0.2 }}
 						className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
 					>
-						Snap your building
+						{t('snapBuilding')}
 					</motion.h1>
 
 					<motion.p
@@ -235,7 +241,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						transition={{ delay: 0.3 }}
 						className="text-gray-500 dark:text-gray-400 mb-8"
 					>
-						AI detects everything
+						{t('aiDetectsEverything')}
 					</motion.p>
 
 					<motion.button
@@ -245,7 +251,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						onClick={() => fileRef.current?.click()}
 						className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4"
 					>
-						or upload from gallery
+						{t('uploadFromGallery')}
 					</motion.button>
 
 					<motion.button
@@ -255,7 +261,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						onClick={skip}
 						className="text-xs text-gray-400 hover:text-gray-600"
 					>
-						skip for now
+						{t('skipForNow')}
 					</motion.button>
 				</motion.div>
 			)}
@@ -313,7 +319,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 							className="w-full h-14 text-lg gap-3 bg-gradient-to-r from-blue-500 via-violet-500 to-purple-600 hover:opacity-90 shadow-xl shadow-violet-500/25"
 						>
 							<Sparkles className="w-5 h-5" />
-							Analyze with AI
+							{t('analyzeWithAI')}
 						</Button>
 					</motion.div>
 				</motion.div>
@@ -356,7 +362,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						className="flex items-center gap-2 text-violet-600 dark:text-violet-400 mb-4"
 					>
 						<Loader2 className="w-5 h-5 animate-spin" />
-						<span className="font-medium">Analyzing...</span>
+						<span className="font-medium">{t('analyzing')}</span>
 					</motion.div>
 
 					{/* Progress bar */}
@@ -387,7 +393,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						<div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
 							<Check className="w-5 h-5 text-white" strokeWidth={3} />
 						</div>
-						<span className="text-lg font-bold text-gray-900 dark:text-white">Analysis Complete!</span>
+						<span className="text-lg font-bold text-gray-900 dark:text-white">{t('analysisComplete')}</span>
 					</motion.div>
 
 					{/* Editable Title & Description */}
@@ -401,26 +407,26 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 						>
 							<div className="flex items-center gap-2 mb-3">
 								<Pencil className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-								<span className="text-sm font-medium text-blue-700 dark:text-blue-300">Name Your Assessment</span>
+								<span className="text-sm font-medium text-blue-700 dark:text-blue-300">{t('nameAssessment')}</span>
 							</div>
 
 							<Input
 								value={editableTitle}
 								onChange={(e) => setEditableTitle(e.target.value)}
-								placeholder="e.g., My Home in Antalya"
+								placeholder={t('titlePlaceholder')}
 								className="mb-2 bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-700 focus:border-blue-400"
 							/>
 
 							<Textarea
 								value={editableDescription}
 								onChange={(e) => setEditableDescription(e.target.value)}
-								placeholder="Optional: Add notes about this building..."
+								placeholder={t('descriptionPlaceholder')}
 								rows={2}
 								className="bg-white dark:bg-gray-800 border-blue-200 dark:border-blue-700 focus:border-blue-400 resize-none text-sm"
 							/>
 
 							<p className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-2">
-								AI suggested this title based on the building analysis
+								{t('aiSuggestedTitle')}
 							</p>
 						</div>
 					</motion.div>
@@ -434,20 +440,20 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 					>
 						<div className="grid grid-cols-2 gap-3">
 							<ResultItem
-								label="Stories"
+								label={t('stories')}
 								value={results?.buildingCharacteristics?.stories || '?'}
 								large
 							/>
 							<ResultItem
-								label="Type"
+								label={t('type')}
 								value={results?.buildingCharacteristics?.type?.split(' ')[0] || '?'}
 							/>
 							<ResultItem
-								label="Era"
+								label={t('era')}
 								value={results?.buildingCharacteristics?.constructionPeriod || '?'}
 							/>
 							<ResultItem
-								label="Condition"
+								label={t('condition')}
 								value={results?.buildingCharacteristics?.materialCondition || '?'}
 							/>
 						</div>
@@ -476,7 +482,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 							size="lg"
 							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-emerald-500 to-green-500 hover:opacity-90 shadow-xl shadow-emerald-500/25"
 						>
-							Continue
+							{t('continue')}
 							<ArrowRight className="w-5 h-5" />
 						</Button>
 						<button
@@ -484,7 +490,7 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 							className="w-full text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center justify-center gap-1.5"
 						>
 							<RotateCcw className="w-3.5 h-3.5" />
-							Re-analyze
+							{t('reAnalyze')}
 						</button>
 					</motion.div>
 				</motion.div>
@@ -500,10 +506,10 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 					<p className="text-sm text-red-600 dark:text-red-400 mb-3">{error}</p>
 					<div className="flex gap-2">
 						<Button size="sm" variant="outline" onClick={() => setError(null)}>
-							Try again
+							{t('tryAgain')}
 						</Button>
 						<Button size="sm" variant="ghost" onClick={skip}>
-							Skip
+							{t('skip')}
 						</Button>
 					</div>
 				</motion.div>
@@ -512,12 +518,12 @@ const AIPhotoStep = ({ userInput, updateUserInput, onNext, saveImagesToDb }) => 
 			{/* Minimal footer nav */}
 			{!analyzing && (
 				<div className="flex justify-between items-center px-4 py-3 border-t border-gray-100 dark:border-gray-800">
-					<Link href="/assessment/2" className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-						Back
+					<Link href={`/${locale}/assessment/2`} className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+						{t('back')}
 					</Link>
 					{!isComplete && hasPhotos && (
 						<button onClick={skip} className="text-sm text-gray-400 hover:text-gray-600">
-							Skip
+							{t('skip')}
 						</button>
 					)}
 				</div>

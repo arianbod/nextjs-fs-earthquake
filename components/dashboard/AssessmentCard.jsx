@@ -22,6 +22,7 @@ import {
   Trash2,
   Play,
   Check,
+  RefreshCw,
 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslations } from 'next-intl';
@@ -41,6 +42,17 @@ const gradeColors = {
   E: 'text-red-600 bg-red-50',
 };
 
+/**
+ * Calculate days since assessment was completed
+ */
+function getDaysSinceCompletion(completedAt) {
+  if (!completedAt) return null;
+  const now = new Date();
+  const completed = new Date(completedAt);
+  const diff = now.getTime() - completed.getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
 export default function AssessmentCard({
   assessment,
   onDuplicate,
@@ -49,6 +61,7 @@ export default function AssessmentCard({
   compareMode = false,
   isSelected = false,
   onToggleSelect,
+  reassessmentFrequencyDays = 365,
 }) {
   const t = useTranslations('Dashboard');
   const tCommon = useTranslations('Common');
@@ -96,6 +109,10 @@ export default function AssessmentCard({
   const isComplete = assessment.status === 'COMPLETE';
   const isDraft = assessment.status === 'DRAFT' || assessment.status === 'IN_PROGRESS';
 
+  // Calculate if reassessment is due
+  const daysSinceCompletion = isComplete ? getDaysSinceCompletion(assessment.completedAt) : null;
+  const isDueForReassessment = daysSinceCompletion !== null && daysSinceCompletion >= reassessmentFrequencyDays;
+
   const handleCopyLink = () => {
     const url = `${window.location.origin}/result/${assessment.id}`;
     navigator.clipboard.writeText(url);
@@ -142,7 +159,7 @@ export default function AssessmentCard({
             </div>
 
             {/* Meta info row */}
-            <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3 flex-wrap">
               <div className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 <span>{formattedDate}</span>
@@ -150,6 +167,12 @@ export default function AssessmentCard({
               <Badge className={status.color} variant="secondary">
                 {status.label}
               </Badge>
+              {isDueForReassessment && (
+                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100" variant="secondary">
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  {t('dueForReassessment') || 'Due for reassessment'}
+                </Badge>
+              )}
             </div>
 
             {/* Score display for complete assessments */}
