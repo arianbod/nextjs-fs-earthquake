@@ -8,6 +8,7 @@ import { useUserInput } from '@/context/UserInputContext';
 import { getZoneByCoordinates, getZoneColor, getZoneDefinition } from '@/utils/turkeySeismicData';
 import { googlePlacesService } from '@/services/googlePlacesService';
 import { streetViewService } from '@/services/streetViewService';
+import { useTranslations } from 'next-intl';
 import {
 	MapPin,
 	AlertTriangle,
@@ -38,6 +39,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 
 const LocationStep = ({ onNext }) => {
+	const t = useTranslations('Steps.location');
 	const { userInput, updateUserInput, storeGoogleImages } = useUserInput();
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
@@ -69,7 +71,7 @@ const LocationStep = ({ onNext }) => {
 		const streetViewUrls = headings.map(heading => ({
 			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
 			heading,
-			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West'
+			description: heading === 0 ? t('north') : heading === 90 ? t('east') : heading === 180 ? t('south') : t('west')
 		}));
 
 		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
@@ -100,7 +102,7 @@ const LocationStep = ({ onNext }) => {
 		const streetViewUrls = headings.map(heading => ({
 			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
 			heading,
-			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West'
+			description: heading === 0 ? t('north') : heading === 90 ? t('east') : heading === 180 ? t('south') : t('west')
 		}));
 		const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=19&size=640x400&maptype=satellite&markers=color:red%7C${latitude},${longitude}&key=${apiKey}`;
 
@@ -250,12 +252,12 @@ const LocationStep = ({ onNext }) => {
 
 		// Enhanced loading simulation with progress steps
 		const loadingSteps = [
-			{ step: 'Requesting location access...', progress: 10 },
-			{ step: 'Accessing GPS coordinates...', progress: 25 },
-			{ step: 'Analyzing your area...', progress: 45 },
-			{ step: 'Gathering location data...', progress: 65 },
-			{ step: 'Preparing insights...', progress: 80 },
-			{ step: 'Almost ready...', progress: 95 }
+			{ step: t('requestingAccess'), progress: 10 },
+			{ step: t('accessingGPS'), progress: 25 },
+			{ step: t('analyzingArea'), progress: 45 },
+			{ step: t('gatheringData'), progress: 65 },
+			{ step: t('preparingInsights'), progress: 80 },
+			{ step: t('almostReady'), progress: 95 }
 		];
 
 		let stepIndex = 0;
@@ -276,7 +278,7 @@ const LocationStep = ({ onNext }) => {
 					const longitude = position.coords.longitude;
 					
 					// Set to processing state
-					setLoadingStep('Processing location data...');
+					setLoadingStep(t('processingData'));
 					setLoadingProgress(90);
 					
 					// Get seismic zone information
@@ -322,8 +324,8 @@ const LocationStep = ({ onNext }) => {
 
 					// Collect enhanced data in background
 					collectEnhancedData(latitude, longitude, detectedCity);
-					
-					setLoadingStep('Analysis complete!');
+
+					setLoadingStep(t('analysisComplete'));
 					setLoadingProgress(100);
 
 					// Ensure minimum display time for smooth UX
@@ -334,16 +336,14 @@ const LocationStep = ({ onNext }) => {
 				(err) => {
 					clearInterval(progressInterval);
 					console.error('Error getting location:', err);
-					setError(
-						"Unable to access location. Please ensure you've given permission."
-					);
+					setError(t('unableToAccessLocation'));
 					setIsLoading(false);
 				},
 				{ timeout: 10000, maximumAge: 0 }
 			);
 		} else {
 			clearInterval(progressInterval);
-			setError('Geolocation is not supported by this browser.');
+			setError(t('geolocationNotSupported'));
 			setIsLoading(false);
 		}
 
@@ -424,10 +424,10 @@ const LocationStep = ({ onNext }) => {
 				<CardHeader className='pb-2 lg:pb-4'>
 					<CardTitle className='text-xl flex items-center gap-2'>
 						<LocateFixed className='h-5 w-5 text-blue-600 dark:text-blue-400' />
-						Building Location
+						{t('title')}
 					</CardTitle>
 					<CardDescription>
-						Just tell us where your building is located - we'll take care of the rest!
+						{t('description')}
 					</CardDescription>
 				</CardHeader>
 
@@ -451,34 +451,34 @@ const LocationStep = ({ onNext }) => {
 									</div>
 									
 									<p className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
-										Analyzing Your Location
+										{t('analyzing')}
 									</p>
 									<p className='text-gray-600 dark:text-gray-400 mb-4'>
 										{loadingStep}
 									</p>
-									
+
 									{/* Progress Bar */}
 									<div className='w-full max-w-sm mx-auto mb-3'>
 										<div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1'>
-											<span>Progress</span>
+											<span>{t('progress')}</span>
 											<span>{loadingProgress}%</span>
 										</div>
 										<Progress value={loadingProgress} className='h-1.5' />
 									</div>
-									
+
 									{/* Step-by-step loading text */}
 									<div className='space-y-1 text-xs text-gray-600 dark:text-gray-400'>
 										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 10 ? 'text-green-600' : ''}`}>
-											{loadingProgress >= 10 ? '✓' : '○'} Accessing GPS coordinates
+											{loadingProgress >= 10 ? '✓' : '○'} {t('accessingCoordinates')}
 										</div>
 										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 60 ? 'text-green-600' : ''}`}>
-											{loadingProgress >= 60 ? '✓' : '○'} Analyzing seismic data
+											{loadingProgress >= 60 ? '✓' : '○'} {t('analyzingSeismic')}
 										</div>
 										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 80 ? 'text-green-600' : ''}`}>
-											{loadingProgress >= 80 ? '✓' : '○'} Processing earthquake zones
+											{loadingProgress >= 80 ? '✓' : '○'} {t('processingZones')}
 										</div>
 										<div className={`flex items-center justify-center gap-1 ${loadingProgress >= 100 ? 'text-green-600' : ''}`}>
-											{loadingProgress >= 100 ? '✓' : '○'} Finalizing assessment
+											{loadingProgress >= 100 ? '✓' : '○'} {t('finalizingAssessment')}
 										</div>
 									</div>
 								</div>
@@ -500,20 +500,18 @@ const LocationStep = ({ onNext }) => {
 								<AlertTriangle className='h-6 w-6 text-red-600 dark:text-red-400 mt-0.5' />
 								<div className='ml-3'>
 									<h3 className='text-lg font-medium text-red-800 dark:text-red-300'>
-										Location Access Error
+										{t('locationAccessError')}
 									</h3>
 									<p className='mt-2 text-red-700 dark:text-red-300'>{error}</p>
 									<p className='mt-2 text-red-700 dark:text-red-300'>
-										We need your location to provide accurate seismic risk
-										assessment. Please enable location access in your browser
-										settings.
+										{t('needLocationAccess')}
 									</p>
 									<Button
 										onClick={requestLocationPermission}
 										className='mt-4'
 										variant='outline'>
 										<LocateFixed className='mr-2 h-4 w-4' />
-										Try Again
+										{t('tryAgain')}
 									</Button>
 								</div>
 							</div>
@@ -537,22 +535,22 @@ const LocationStep = ({ onNext }) => {
 									<CardHeader className='pb-2'>
 										<CardTitle className='flex items-center gap-2'>
 											<Camera className='h-5 w-5 text-blue-600' />
-											Google Maps Images
+											{t('googleMapsImages')}
 											{imagesLoading && (
 												<Badge variant='outline' className='ml-auto'>
 													<Loader2 className='h-3 w-3 mr-1 animate-spin' />
-													Loading...
+													{t('loading')}
 												</Badge>
 											)}
 											{!imagesLoading && googleImages.satellite && (
 												<Badge variant='secondary' className='ml-auto'>
 													<CheckCircle2 className='h-3 w-3 mr-1' />
-													{googleImages.streetViews.length + 1} images
+													{googleImages.streetViews.length + 1} {t('images')}
 												</Badge>
 											)}
 										</CardTitle>
 										<CardDescription>
-											Satellite and street view images from your location
+											{t('satelliteAndStreetView')}
 										</CardDescription>
 									</CardHeader>
 									<CardContent className='pt-2'>
@@ -560,7 +558,7 @@ const LocationStep = ({ onNext }) => {
 											<div className='grid grid-cols-2 gap-3'>
 												<Skeleton className='aspect-video rounded-lg' />
 												<Skeleton className='aspect-video rounded-lg' />
-												<p className='col-span-2 text-xs text-gray-500 text-center'>Loading Google Maps images...</p>
+												<p className='col-span-2 text-xs text-gray-500 text-center'>{t('loadingImages')}</p>
 											</div>
 										) : (
 											<div className='space-y-3'>
@@ -571,15 +569,23 @@ const LocationStep = ({ onNext }) => {
 														<div>
 															<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
 																<Building className='h-3 w-3' />
-																Satellite View
+																{t('satelliteView')}
 															</h4>
 															<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-sm'>
 																<img
 																	src={googleImages.satellite}
-																	alt='Satellite view of building'
+																	alt={t('satelliteView')}
 																	className='w-full h-full object-cover'
 																	onError={(e) => {
-																		e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"><p class="text-gray-500 text-sm">Satellite view unavailable</p></div>';
+																		const parent = e.target.parentElement;
+																		parent.innerHTML = '';
+																		const errorDiv = document.createElement('div');
+																		errorDiv.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800';
+																		const errorText = document.createElement('p');
+																		errorText.className = 'text-gray-500 text-sm';
+																		errorText.textContent = t('satelliteUnavailable');
+																		errorDiv.appendChild(errorText);
+																		parent.appendChild(errorDiv);
 																	}}
 																/>
 															</div>
@@ -591,15 +597,23 @@ const LocationStep = ({ onNext }) => {
 														<div>
 															<h4 className='text-xs font-medium mb-1 flex items-center gap-1'>
 																<Eye className='h-3 w-3' />
-																Street View (North)
+																{t('streetViewNorth')}
 															</h4>
 															<div className='relative aspect-video rounded-lg overflow-hidden border-2 border-blue-200 dark:border-blue-700 shadow-sm'>
 																<img
 																	src={googleImages.streetViews[0].url}
-																	alt='Street view of building'
+																	alt={t('streetViewNorth')}
 																	className='w-full h-full object-cover'
 																	onError={(e) => {
-																		e.target.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800"><p class="text-gray-500 text-sm">Street view unavailable</p></div>';
+																		const parent = e.target.parentElement;
+																		parent.innerHTML = '';
+																		const errorDiv = document.createElement('div');
+																		errorDiv.className = 'flex items-center justify-center h-full bg-gray-100 dark:bg-gray-800';
+																		const errorText = document.createElement('p');
+																		errorText.className = 'text-gray-500 text-sm';
+																		errorText.textContent = t('streetViewUnavailable');
+																		errorDiv.appendChild(errorText);
+																		parent.appendChild(errorDiv);
 																	}}
 																/>
 															</div>
@@ -612,7 +626,7 @@ const LocationStep = ({ onNext }) => {
 													<div>
 														<h4 className='text-xs font-medium mb-2 flex items-center gap-1'>
 															<Sparkles className='h-3 w-3' />
-															Additional Angles
+															{t('additionalAngles')}
 														</h4>
 														<div className='grid grid-cols-3 gap-2'>
 															{googleImages.streetViews.slice(1).map((img, idx) => (
@@ -637,7 +651,7 @@ const LocationStep = ({ onNext }) => {
 												{/* Status */}
 												<div className='flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-2 rounded-lg'>
 													<CheckCircle2 className='h-4 w-4' />
-													<span>Images captured from Google Maps</span>
+													<span>{t('imagesCaptured')}</span>
 												</div>
 											</div>
 										)}
@@ -650,13 +664,13 @@ const LocationStep = ({ onNext }) => {
 									<CardHeader className='pb-2'>
 										<CardTitle className='flex items-center gap-2 text-lg'>
 											<Activity className='h-4 w-4 text-orange-600' />
-											Seismic Zone Information
+											{t('seismicZoneInfo')}
 										</CardTitle>
 									</CardHeader>
 									<CardContent className='pt-2'>
 										<div className='grid grid-cols-2 gap-3'>
 											<div>
-												<p className='text-sm text-gray-600 dark:text-gray-400'>Zone</p>
+												<p className='text-sm text-gray-600 dark:text-gray-400'>{t('zone')}</p>
 												<div className='flex items-center gap-2 mt-1'>
 													<Badge className={`${getZoneColor(seismicZoneInfo.zone)}`}>
 														{seismicZoneInfo.zone}
@@ -665,8 +679,8 @@ const LocationStep = ({ onNext }) => {
 												</div>
 											</div>
 											<div>
-												<p className='text-sm text-gray-600 dark:text-gray-400'>Soil Type</p>
-												<p className='font-medium mt-1'>{seismicZoneInfo.soilType || 'To be determined'}</p>
+												<p className='text-sm text-gray-600 dark:text-gray-400'>{t('soilType')}</p>
+												<p className='font-medium mt-1'>{seismicZoneInfo.soilType || t('toBeDetermined')}</p>
 											</div>
 										</div>
 									</CardContent>
@@ -677,8 +691,8 @@ const LocationStep = ({ onNext }) => {
 							<div className='flex items-start space-x-2 text-xs text-gray-600 dark:text-gray-400 p-3 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg'>
 								<CheckCircle2 className='h-3 w-3 mt-0.5 flex-shrink-0 text-green-600' />
 								<div>
-									<p className='font-medium text-gray-900 dark:text-white text-sm'>Location data collected successfully!</p>
-									<p className='text-xs mt-0.5'>We've gathered location information, street view images, and seismic zone data.</p>
+									<p className='font-medium text-gray-900 dark:text-white text-sm'>{t('locationCollected')}</p>
+									<p className='text-xs mt-0.5'>{t('dataGathered')}</p>
 								</div>
 							</div>
 
@@ -687,7 +701,7 @@ const LocationStep = ({ onNext }) => {
 						<div className='bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 my-4 text-center'>
 							<AlertTriangle className='h-10 w-10 text-yellow-500 mx-auto mb-4' />
 							<h3 className='text-lg font-medium text-yellow-800 dark:text-yellow-300'>
-								Location Required
+								{t('locationRequired')}
 							</h3>
 							<p className='mt-2 text-yellow-700 dark:text-yellow-400'>
 								{stepOneData.error}
@@ -696,7 +710,7 @@ const LocationStep = ({ onNext }) => {
 								onClick={requestLocationPermission}
 								className='mt-4'>
 								<LocateFixed className='mr-2 h-4 w-4' />
-								Allow Location Access
+								{t('allowLocationAccess')}
 							</Button>
 						</div>
 					)}

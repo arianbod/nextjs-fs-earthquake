@@ -1,8 +1,11 @@
 /* eslint-disable */
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useAssistant } from '@/context/AssistantContext';
+import { useTranslations } from 'next-intl';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -15,22 +18,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import Image from 'next/image';
 
-// Restored original messages with better formatting
-const ASSISTANT_MESSAGES = [
-	'🏢 Yapı Güvenliği Rehberi | Building Safety Guide',
-	'📋 Hızlı Değerlendirme | Quick Assessment',
-	'🔍 Yapısal Risk Analizi | Structural Analysis',
-	'🤝 Uzman Desteği | Expert Support',
-	'💡 Güçlendirme Önerileri | Reinforcement Tips',
-	'🏗️ Deprem Güvenliği | Earthquake Safety',
-	'📱 Kolay Kullanım | Easy to Use',
-	'🌟 Profesyonel Danışmanlık | Pro Consultation',
-	'❤️ Güvenilir Sonuçlar | Reliable Results',
-	'🔰 Önleyici Tedbirler | Preventive Measures',
-	'🌍 Bölge Analizi | Location Analysis',
-];
-
 const AnimatedAssistantButton = () => {
+	const t = useTranslations('Assistant');
 	const { toggleAssistant } = useAssistant();
 	const [isButtonVisible, setIsButtonVisible] = useState(true);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -41,6 +30,36 @@ const AnimatedAssistantButton = () => {
 		y: isMobile ? -100 : 0,
 	});
 	const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+
+	// Define message keys
+	const messageKeys = [
+		'buildingSafety',
+		'quickAssessment',
+		'structuralAnalysis',
+		'expertSupport',
+		'reinforcementTips',
+		'earthquakeSafety',
+		'easyToUse',
+		'proConsultation',
+		'reliableResults',
+		'preventiveMeasures',
+		'locationAnalysis'
+	];
+
+	// Define emojis for each tip
+	const emojiMap = {
+		buildingSafety: '🏢',
+		quickAssessment: '📋',
+		structuralAnalysis: '🔍',
+		expertSupport: '🤝',
+		reinforcementTips: '💡',
+		earthquakeSafety: '🏗️',
+		easyToUse: '📱',
+		proConsultation: '🌟',
+		reliableResults: '❤️',
+		preventiveMeasures: '🔰',
+		locationAnalysis: '🌍'
+	};
 
 	useEffect(() => {
 		const checkScreenSize = () => {
@@ -61,12 +80,9 @@ const AnimatedAssistantButton = () => {
 
 		let messageTimeout;
 		const rotateMessage = () => {
-			const newMessage =
-				ASSISTANT_MESSAGES[
-					Math.floor(Math.random() * ASSISTANT_MESSAGES.length)
-				];
+			const randomKey = messageKeys[Math.floor(Math.random() * messageKeys.length)];
 			setTimeout(() => {
-				setCurrentMessage(newMessage);
+				setCurrentMessage(randomKey);
 			}, 500);
 			messageTimeout = setTimeout(rotateMessage, 8000);
 		};
@@ -108,7 +124,7 @@ const AnimatedAssistantButton = () => {
 								overflow: 'hidden',
 							}}>
 							<div className='relative truncate'>
-								{currentMessage}
+								{currentMessage && `${emojiMap[currentMessage]} ${t(`tips.${currentMessage}`)}`}
 								<div
 									className='absolute -bottom-4 right-6 w-4 h-4 bg-white transform rotate-45'
 									style={{
@@ -138,11 +154,11 @@ const AnimatedAssistantButton = () => {
 								}}>
 								<div className='relative flex items-center gap-2'>
 									<span className='font-medium truncate'>
-										Yapı Güvenliği Asistanı
+										{t('buildingSafetyAssistant')}
 									</span>
 									<span className='flex items-center gap-1 flex-shrink-0'>
 										<span className='w-2 h-2 bg-blue-500 rounded-full animate-pulse'></span>
-										<span className='text-xs text-blue-600'>Çevrimiçi</span>
+										<span className='text-xs text-blue-600'>{t('online')}</span>
 									</span>
 									<div
 										className='absolute -bottom-2 right-6 w-2 h-2 bg-white transform rotate-45'
@@ -166,7 +182,7 @@ const AnimatedAssistantButton = () => {
 					<button
 						onClick={() => setIsDialogOpen(true)}
 						className='absolute -top-2 -right-2 p-1.5 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors z-30'
-						aria-label='Asistanı Gizle'>
+						aria-label={t('hideAssistant')}>
 						<X className='w-3 h-3 text-blue-500' />
 					</button>
 
@@ -195,14 +211,14 @@ const AnimatedAssistantButton = () => {
 						{!isMobile && (
 							<div className='flex flex-col items-start'>
 								<span className='text-[15px] font-medium text-blue-800 truncate max-w-[180px]'>
-									Yapı Güvenliği Asistanı
+									{t('buildingSafetyAssistant')}
 								</span>
 								<div className='flex items-center gap-2'>
 									<span className='text-sm font-medium text-blue-500'>
-										Çevrimiçi
+										{t('online')}
 									</span>
 									<span className='text-sm text-blue-400 font-medium'>
-										• Yardıma Hazır
+										• {t('readyToHelp')}
 									</span>
 								</div>
 							</div>
@@ -215,19 +231,19 @@ const AnimatedAssistantButton = () => {
 				onOpenChange={setIsDialogOpen}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Asistanı Gizle?</AlertDialogTitle>
+						<AlertDialogTitle>{t('hideAssistantQuestion')}</AlertDialogTitle>
 						<AlertDialogDescription>
-							Asistanı ne kadar süreyle gizlemek istiyorsunuz?
+							{t('hideAssistantDuration')}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter className='flex flex-col sm:flex-row gap-2'>
-						<AlertDialogCancel>İptal</AlertDialogCancel>
+						<AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={() => {
 								setIsButtonVisible(false);
 								setIsDialogOpen(false);
 							}}>
-							Geçici Olarak Gizle
+							{t('hideTemporarily')}
 						</AlertDialogAction>
 						<AlertDialogAction
 							onClick={() => {
@@ -236,7 +252,7 @@ const AnimatedAssistantButton = () => {
 								setIsDialogOpen(false);
 							}}
 							className='bg-blue-600 text-white hover:bg-blue-700'>
-							Kalıcı Olarak Gizle
+							{t('hidePermanently')}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

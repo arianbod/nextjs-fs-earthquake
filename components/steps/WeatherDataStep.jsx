@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,17 +38,28 @@ import ImageGallery from '@/components/ImageGallery';
 import { useUserInput } from '@/context/UserInputContext';
 
 const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
+	const t = useTranslations('Steps.weather');
+	const tDir = useTranslations('Assessment.directions');
 	const { getImageGallery, storeGoogleImages } = useUserInput();
-	
+
 	// Debug: Log image gallery data
 	console.log('WeatherDataStep - Image gallery data:', getImageGallery());
 	console.log('WeatherDataStep - userInput.city:', userInput.city);
 	console.log('WeatherDataStep - coordinates:', userInput.latitude, userInput.longitude);
 	const [weatherData, setWeatherData] = useState(null);
-	
+
 	// Helper function to convert heading degrees to direction names
 	const getDirectionName = (heading) => {
-		const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+		const directions = [
+			tDir('north'),
+			tDir('northeast'),
+			tDir('east'),
+			tDir('southeast'),
+			tDir('south'),
+			tDir('southwest'),
+			tDir('west'),
+			tDir('northwest')
+		];
 		const index = Math.round(heading / 45) % 8;
 		return directions[index];
 	};
@@ -148,12 +160,12 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 						windSpeed: 12,
 						pressure: 1013,
 						visibility: 10,
-						condition: 'Partly Cloudy',
+						condition: 'Partly Cloudy', // Keep as key for weather icon logic
 						icon: Sun,
 						uvIndex: 6,
 						precipitation: 0,
 						timestamp: new Date().toISOString(),
-						lastUpdated: 'Just now',
+						lastUpdated: t('justNow'),
 					},
 					location: {
 						city: detectedCity, // Use the local detectedCity variable, not userInput.city
@@ -368,9 +380,9 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					<CardContent className='pt-8'>
 						<div className='flex flex-col items-center justify-center space-y-4'>
 							<Loader2 className='h-12 w-12 animate-spin text-blue-600' />
-							<h3 className='text-lg font-medium'>Gathering Environmental Data</h3>
+							<h3 className='text-lg font-medium'>{t('gatheringData')}</h3>
 							<p className='text-sm text-gray-600 dark:text-gray-400'>
-								Fetching weather and seismic information for your location...
+								{t('fetchingWeather')}
 							</p>
 						</div>
 					</CardContent>
@@ -387,12 +399,12 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 						<div className='flex items-start gap-3'>
 							<AlertTriangle className='h-5 w-5 text-red-600 mt-0.5' />
 							<div>
-								<h3 className='font-medium text-red-800 dark:text-red-200'>Error</h3>
+								<h3 className='font-medium text-red-800 dark:text-red-200'>{t('error')}</h3>
 								<p className='text-sm text-red-600 dark:text-red-400 mt-1'>{error}</p>
 								<Link href='/assessment/1'>
 									<Button variant='outline' className='mt-4' size='sm'>
 										<ArrowLeft className='h-4 w-4 mr-2' />
-										Back to Location
+										{t('backToLocation')}
 									</Button>
 								</Link>
 							</div>
@@ -411,7 +423,7 @@ const WeatherDataStep = ({ userInput, updateUserInput, onNext }) => {
 					<Cloud className='h-10 w-10 text-blue-600 dark:text-blue-400' />
 				</div>
 				<h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-					Environmental Insights
+					{t('title')}
 				</h1>
 				<p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
 					<span className='inline-flex items-center gap-1'>

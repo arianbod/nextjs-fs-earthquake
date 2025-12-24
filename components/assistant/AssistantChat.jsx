@@ -4,12 +4,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowBigUp, Video, Mic, Building2 } from 'lucide-react';
 import { useAssistant } from '@/context/AssistantContext';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import TypingIndicator from './TypingIndicator';
 import ChatMessage from './ChatMessage';
 import Link from 'next/link';
 
 const AssistantChat = () => {
+	const t = useTranslations('Assistant.chat');
 	const { messages, sendMessage, isLoading, sendConferenceNotification } =
 		useAssistant();
 	const [input, setInput] = useState('');
@@ -81,7 +83,7 @@ const AssistantChat = () => {
 		if (
 			!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 		) {
-			alert("Your browser doesn't support voice recognition.");
+			alert(t('voiceNotSupported'));
 			return;
 		}
 
@@ -138,32 +140,30 @@ const AssistantChat = () => {
 					<div className='max-w-md mx-auto'>
 						<h3 className='text-2xl font-semibold mb-4 text-gray-800 dark:text-blue-100 flex items-center justify-center gap-2'>
 							<Building2 className='w-6 h-6' />
-							Earthquake Impact Assessment
+							{t('title')}
 						</h3>
 						<h4 className='text-xl mb-4 text-gray-700 dark:text-blue-200'>
-							Supported by Assistant Professor Hamid F Ghatte
+							{t('supportedBy')}
 						</h4>
 						<p className='text-base text-gray-600 dark:text-blue-200 mb-4'>
-							I'll help you assess your building's earthquake safety through a
-							simple conversation. Just describe your building, and I'll guide
-							you through the process step by step.
+							{t('welcomeMessage')}
 						</p>
 						<div className='grid gap-4'>
 							<div className='grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-blue-200'>
 								<div className='bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg'>
 									<p className='font-semibold'>10,000+</p>
-									<p>Buildings Assessed</p>
+									<p>{t('buildingsAssessed')}</p>
 								</div>
 								<div className='bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg'>
 									<p className='font-semibold'>95%</p>
-									<p>Accuracy Rate</p>
+									<p>{t('accuracyRate')}</p>
 								</div>
 							</div>
 							<button
 								onClick={handleStartConference}
 								className='flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 mx-auto'>
 								<Video className='w-5 h-5' />
-								Connect with Expert
+								{t('connectWithExpert')}
 							</button>
 						</div>
 					</div>
@@ -213,7 +213,7 @@ const AssistantChat = () => {
 								onKeyDown={handleKeyDown}
 								onCompositionStart={() => setIsComposing(true)}
 								onCompositionEnd={() => setIsComposing(false)}
-								placeholder='Describe your building or ask any questions...'
+								placeholder={t('inputPlaceholder')}
 								className='w-full bg-white dark:bg-blue-900 rounded-2xl px-4 py-3
                                     text-gray-900 dark:text-blue-100 placeholder-gray-500 dark:placeholder-blue-400
                                     min-h-[48px] max-h-[150px] resize-none shadow-sm
@@ -260,7 +260,7 @@ const AssistantChat = () => {
 					<Link
 						href='https://babaai.ca'
 						className='text-blue-900/50 dark:text-blue-300/50 text-xs text-center flex place-content-center place-items-center mt-2'>
-						Learn more about assistant!
+						{t('learnMore')}
 					</Link>
 				</form>
 			</div>

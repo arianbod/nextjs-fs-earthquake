@@ -211,19 +211,38 @@
       "dataGathered": "Собрана информация о местоположении, панорамы улиц и данные о сейсмической зоне.",
       "images": "изображений",
       "loading": "Загрузка...",
-      "unavailable": "недоступно"
+      "unavailable": "недоступно",
+      "satelliteUnavailable": "Спутниковый снимок недоступен",
+      "streetViewUnavailable": "Панорама улицы недоступна",
+      "geolocationNotSupported": "Геолокация не поддерживается этим браузером.",
+      "unableToAccessLocation": "Невозможно получить доступ к местоположению. Пожалуйста, убедитесь, что вы предоставили разрешение.",
+      "allowLocationAccess": "Разрешить доступ к местоположению",
+      "north": "Север",
+      "east": "Восток",
+      "south": "Юг",
+      "west": "Запад"
     },
     "weather": {
       "title": "Экологические данные",
-      "description": "Сюрприз! Мы проанализировали ваше местоположение и покажем вам кое-что удивительное...",
+      "description": "Мы проанализировали ваше местоположение и покажем вам кое-что удивительное...",
+      "surprise": "Сюрприз!",
       "includingSatellite": "Включая спутниковый снимок вашего здания!",
       "gatheringData": "Сбор экологических данных",
       "fetchingWeather": "Получение погодных и сейсмических данных для вашего местоположения...",
+      "error": "Ошибка",
+      "backToLocation": "Назад к местоположению",
+      "justNow": "Только что",
+      "unknownLocation": "Неизвестное местоположение",
       "locationInfo": "Информация о местоположении",
       "city": "Город",
       "coordinates": "Координаты",
       "elevation": "Высота",
       "aboveSeaLevel": "м над уровнем моря",
+      "zone": "Зона",
+      "partlyCloudy": "Переменная облачность",
+      "inValue": "в",
+      "mmValue": "мм",
+      "kmValue": "км",
       "surpriseFindBuilding": "Сюрприз! Мы нашли ваше здание!",
       "wow": "ВАУ",
       "collectingVisualData": "Пока вы настраивали, мы собирали визуальные данные из нескольких источников...",
@@ -807,7 +826,43 @@
     "english": "English",
     "turkish": "Türkçe",
     "russian": "Русский",
-    "changed": "Язык изменён на {language}"
+    "changed": "Язык изменён на {language}",
+    "changeLanguage": "Изменить язык"
+  },
+  "Assistant": {
+    "tips": {
+      "buildingSafety": "Руководство по безопасности зданий",
+      "quickAssessment": "Быстрая оценка",
+      "structuralAnalysis": "Структурный анализ",
+      "expertSupport": "Экспертная поддержка",
+      "reinforcementTips": "Советы по усилению",
+      "earthquakeSafety": "Сейсмобезопасность",
+      "easyToUse": "Простота использования",
+      "proConsultation": "Профессиональная консультация",
+      "reliableResults": "Надёжные результаты",
+      "preventiveMeasures": "Профилактические меры",
+      "locationAnalysis": "Анализ местоположения"
+    },
+    "buildingSafetyAssistant": "Помощник по безопасности зданий",
+    "online": "Онлайн",
+    "readyToHelp": "Готов помочь",
+    "hideAssistant": "Скрыть помощника",
+    "hideAssistantQuestion": "Скрыть помощника?",
+    "hideAssistantDuration": "На какое время вы хотите скрыть помощника?",
+    "cancel": "Отмена",
+    "hideTemporarily": "Скрыть временно",
+    "hidePermanently": "Скрыть навсегда",
+    "chat": {
+      "title": "Оценка сейсмического воздействия",
+      "supportedBy": "При поддержке доцента Хамида Ф. Гатте",
+      "welcomeMessage": "Я помогу вам оценить сейсмобезопасность вашего здания через простой разговор. Просто опишите ваше здание, и я проведу вас шаг за шагом.",
+      "buildingsAssessed": "Оценённых зданий",
+      "accuracyRate": "Точность",
+      "connectWithExpert": "Связаться с экспертом",
+      "inputPlaceholder": "Опишите ваше здание или задайте вопросы...",
+      "learnMore": "Узнать больше о помощнике!",
+      "voiceNotSupported": "Ваш браузер не поддерживает голосовое распознавание."
+    }
   },
   "Home": {
     "letsStart": "Начнём",
@@ -1366,5 +1421,32 @@
       "updateFailed": "Не удалось обновить",
       "exportFailed": "Не удалось экспортировать"
     }
+  },
+  "PWA": {
+    "installApp": "Установить приложение",
+    "installing": "Установка...",
+    "installQuakeWise": "Установить QuakeWise",
+    "getInstantAccess": "Получите мгновенный доступ и поддержку офлайн-режима",
+    "install": "Установить",
+    "dismiss": "Закрыть",
+    "installOnIOS": "Установить QuakeWise на iOS",
+    "followSteps": "Следуйте этим шагам, чтобы добавить QuakeWise на главный экран",
+    "tapShare": "Нажмите кнопку «Поделиться»",
+    "shareIconLocation": "Найдите значок общего доступа в нижней части Safari",
+    "addToHomeScreen": "Прокрутите и нажмите «На экран Домой»",
+    "plusIconLocation": "Найдите значок плюса в меню",
+    "tapAdd": "Нажмите «Добавить»",
+    "willAppear": "QuakeWise появится на вашем главном экране",
+    "gotIt": "Понятно"
+  },
+  "Offline": {
+    "title": "Вы офлайн",
+    "message": "Похоже, вы потеряли подключение к интернету. Не волнуйтесь — QuakeWise снова заработает, когда вы вернётесь в сеть.",
+    "tryAgain": "Попробовать снова",
+    "waitingConnection": "Ожидание подключения...",
+    "connectionRestored": "Подключение восстановлено! Перенаправление...",
+    "checking": "Проверка...",
+    "availableOffline": "Доступно офлайн:",
+    "home": "Главная"
   }
 }

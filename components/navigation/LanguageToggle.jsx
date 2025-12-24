@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
@@ -18,16 +18,17 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-const languages = [
-	{ code: 'en', label: 'English', flag: '🇺🇸' },
-	{ code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
-	{ code: 'ru', label: 'Русский', flag: '🇷🇺' },
-];
-
 const LanguageToggle = () => {
 	const locale = useLocale();
 	const router = useRouter();
 	const pathname = usePathname();
+	const t = useTranslations('Language');
+
+	const languages = [
+		{ code: 'en', label: t('english'), flag: '🇺🇸' },
+		{ code: 'tr', label: t('turkish'), flag: '🇹🇷' },
+		{ code: 'ru', label: t('russian'), flag: '🇷🇺' },
+	];
 
 	const currentLanguage = languages.find((lang) => lang.code === locale) || languages[0];
 
@@ -47,7 +48,7 @@ const LanguageToggle = () => {
 								className="transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20"
 							>
 								<Globe className="h-5 w-5" />
-								<span className="sr-only">Change language</span>
+								<span className="sr-only">{t('changeLanguage')}</span>
 							</Button>
 						</motion.div>
 					</DropdownMenuTrigger>

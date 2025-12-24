@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Download, X, Share, Plus, Smartphone } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +25,7 @@ import {
  * - "floating": Floating action button
  */
 export function InstallAppButton({ variant = 'button', className = '' }) {
+  const t = useTranslations('PWA');
   const { canInstall, isInstalled, isIOS, promptInstall, dismissPrompt } = usePWAInstall();
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
@@ -65,7 +67,7 @@ export function InstallAppButton({ variant = 'button', className = '' }) {
           variant="outline"
         >
           <Download className="h-4 w-4" />
-          {isInstalling ? 'Installing...' : 'Install App'}
+          {isInstalling ? t('installing') : t('installApp')}
         </Button>
 
         <IOSInstructionsDialog
@@ -89,9 +91,9 @@ export function InstallAppButton({ variant = 'button', className = '' }) {
                 <Smartphone className="h-6 w-6" />
               </div>
               <div>
-                <p className="font-semibold">Install QuakeWise</p>
+                <p className="font-semibold">{t('installQuakeWise')}</p>
                 <p className="text-sm text-blue-100">
-                  Get instant access and offline support
+                  {t('getInstantAccess')}
                 </p>
               </div>
             </div>
@@ -104,12 +106,12 @@ export function InstallAppButton({ variant = 'button', className = '' }) {
                 className="gap-2"
               >
                 <Download className="h-4 w-4" />
-                Install
+                {t('install')}
               </Button>
               <button
                 onClick={dismissPrompt}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Dismiss"
+                aria-label={t('dismiss')}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -153,16 +155,18 @@ export function InstallAppButton({ variant = 'button', className = '' }) {
  * iOS Installation Instructions Dialog
  */
 function IOSInstructionsDialog({ open, onClose }) {
+  const t = useTranslations('PWA');
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Smartphone className="h-5 w-5" />
-            Install QuakeWise on iOS
+            {t('installOnIOS')}
           </DialogTitle>
           <DialogDescription>
-            Follow these steps to add QuakeWise to your home screen
+            {t('followSteps')}
           </DialogDescription>
         </DialogHeader>
 
@@ -172,9 +176,9 @@ function IOSInstructionsDialog({ open, onClose }) {
               1
             </div>
             <div>
-              <p className="font-medium">Tap the Share button</p>
+              <p className="font-medium">{t('tapShare')}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                Look for the <Share className="h-4 w-4 inline" /> icon at the bottom of Safari
+                {t('shareIconLocation')}
               </p>
             </div>
           </div>
@@ -184,9 +188,9 @@ function IOSInstructionsDialog({ open, onClose }) {
               2
             </div>
             <div>
-              <p className="font-medium">Scroll and tap "Add to Home Screen"</p>
+              <p className="font-medium">{t('addToHomeScreen')}</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                Look for the <Plus className="h-4 w-4 inline" /> icon in the menu
+                {t('plusIconLocation')}
               </p>
             </div>
           </div>
@@ -196,9 +200,9 @@ function IOSInstructionsDialog({ open, onClose }) {
               3
             </div>
             <div>
-              <p className="font-medium">Tap "Add"</p>
+              <p className="font-medium">{t('tapAdd')}</p>
               <p className="text-sm text-muted-foreground">
-                QuakeWise will appear on your home screen
+                {t('willAppear')}
               </p>
             </div>
           </div>
@@ -206,7 +210,7 @@ function IOSInstructionsDialog({ open, onClose }) {
 
         <div className="flex justify-end">
           <Button onClick={onClose} variant="outline">
-            Got it
+            {t('gotIt')}
           </Button>
         </div>
       </DialogContent>

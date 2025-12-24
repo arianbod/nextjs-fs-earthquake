@@ -190,8 +190,8 @@
       </svg>
     </div>
 
-    <h1>You're Offline</h1>
-    <p>
+    <h1 id="title">You're Offline</h1>
+    <p id="message">
       It looks like you've lost your internet connection.
       Don't worry - QuakeWise will work again once you're back online.
     </p>
@@ -211,13 +211,84 @@
     </div>
 
     <div class="cached-pages" id="cachedPages" style="display: none;">
-      <h3>Available Offline:</h3>
-      <a href="/" class="cached-link">Home</a>
+      <h3 id="cachedPagesTitle">Available Offline:</h3>
+      <a href="/" class="cached-link" id="homeLink">Home</a>
     </div>
   </div>
 
   <script>
     (function() {
+      // Translation strings
+      var translations = {
+        en: {
+          title: "You're Offline",
+          message: "It looks like you've lost your internet connection. Don't worry - QuakeWise will work again once you're back online.",
+          tryAgain: "Try Again",
+          waitingConnection: "Waiting for connection...",
+          connectionRestored: "Connection restored! Redirecting...",
+          checking: "Checking...",
+          availableOffline: "Available Offline:",
+          home: "Home"
+        },
+        tr: {
+          title: "Çevrimdışısınız",
+          message: "İnternet bağlantınızı kaybetmiş görünüyorsunuz. Endişelenmeyin - tekrar çevrimiçi olduğunuzda QuakeWise çalışacaktır.",
+          tryAgain: "Tekrar Dene",
+          waitingConnection: "Bağlantı bekleniyor...",
+          connectionRestored: "Bağlantı geri yüklendi! Yönlendiriliyor...",
+          checking: "Kontrol ediliyor...",
+          availableOffline: "Çevrimdışı Kullanılabilir:",
+          home: "Ana Sayfa"
+        },
+        ru: {
+          title: "Вы офлайн",
+          message: "Похоже, вы потеряли подключение к интернету. Не волнуйтесь — QuakeWise снова заработает, когда вы вернётесь в сеть.",
+          tryAgain: "Попробовать снова",
+          waitingConnection: "Ожидание подключения...",
+          connectionRestored: "Подключение восстановлено! Перенаправление...",
+          checking: "Проверка...",
+          availableOffline: "Доступно офлайн:",
+          home: "Главная"
+        }
+      };
+
+      // Detect locale from localStorage or URL
+      function getLocale() {
+        try {
+          // Try to get from localStorage
+          var storedLocale = localStorage.getItem('locale');
+          if (storedLocale && translations[storedLocale]) {
+            return storedLocale;
+          }
+
+          // Try to get from URL path
+          var path = window.location.pathname;
+          var pathParts = path.split('/').filter(Boolean);
+          if (pathParts.length > 0 && translations[pathParts[0]]) {
+            return pathParts[0];
+          }
+        } catch (e) {
+          // Ignore localStorage errors
+        }
+
+        // Default to English
+        return 'en';
+      }
+
+      // Apply translations
+      function applyTranslations() {
+        var locale = getLocale();
+        var t = translations[locale] || translations.en;
+
+        document.getElementById('title').textContent = t.title;
+        document.getElementById('message').textContent = t.message;
+        document.getElementById('retryText').textContent = t.tryAgain;
+        document.getElementById('statusText').textContent = t.waitingConnection;
+        document.getElementById('cachedPagesTitle').textContent = t.availableOffline;
+        document.getElementById('homeLink').textContent = t.home;
+        document.documentElement.lang = locale;
+      }
+
       var statusDot = document.getElementById('statusDot');
       var statusText = document.getElementById('statusText');
       var retryButton = document.getElementById('retryButton');
@@ -225,22 +296,28 @@
       var cachedPages = document.getElementById('cachedPages');
 
       function updateStatus() {
+        var locale = getLocale();
+        var t = translations[locale] || translations.en;
+
         if (navigator.onLine) {
           statusDot.classList.add('online');
-          statusText.textContent = 'Connection restored! Redirecting...';
+          statusText.textContent = t.connectionRestored;
           setTimeout(function() {
             window.location.reload();
           }, 1000);
         } else {
           statusDot.classList.remove('online');
-          statusText.textContent = 'Waiting for connection...';
+          statusText.textContent = t.waitingConnection;
         }
       }
 
       function retryConnection() {
+        var locale = getLocale();
+        var t = translations[locale] || translations.en;
+
         retryButton.disabled = true;
         retryButton.classList.add('loading');
-        retryText.textContent = 'Checking...';
+        retryText.textContent = t.checking;
 
         fetch('/', { cache: 'no-store' })
           .then(function(response) {
@@ -253,7 +330,7 @@
           .catch(function() {
             retryButton.disabled = false;
             retryButton.classList.remove('loading');
-            retryText.textContent = 'Try Again';
+            retryText.textContent = t.tryAgain;
           });
       }
 
@@ -262,6 +339,8 @@
 
       retryButton.addEventListener('click', retryConnection);
 
+      // Apply translations on load
+      applyTranslations();
       updateStatus();
 
       if ('caches' in window) {
