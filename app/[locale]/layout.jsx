@@ -14,17 +14,19 @@ import '../voice-assistant-bundle.css'
 // For now, we import them statically (will be optimized later)
 import enMessages from '@/messages/en.json';
 import trMessages from '@/messages/tr.json';
+import ruMessages from '@/messages/ru.json';
 
 const messages = {
   en: enMessages,
   tr: trMessages,
+  ru: ruMessages,
 };
 
 const LocaleLayout = ({ children, params }) => {
   const pathname = usePathname();
 
   // Extract locale from params or pathname
-  const localeMatch = pathname.match(/^\/(en|tr)/);
+  const localeMatch = pathname.match(/^\/(en|tr|ru)/);
   const locale = localeMatch ? localeMatch[1] : 'en';
 
   return (
