@@ -1254,6 +1254,17 @@
   },
   "About": {
     "title": "About QuakeWise",
+    "hero": {
+      "badge": "Earthquake Safety Platform",
+      "badgeLabel": "AI-Powered",
+      "highlight": "Building Safety"
+    },
+    "stats": {
+      "assessments": "Assessments Completed",
+      "accuracy": "Accuracy Rate",
+      "countries": "Countries Served",
+      "availability": "Availability"
+    },
     "mission": {
       "label": "Our Mission",
       "title": "Making Earthquake Safety Accessible",
@@ -1264,6 +1275,36 @@
       "title": "Research-Based Approach",
       "subtitle": "Combining engineering principles with practical solutions",
       "alt": "Our Mission"
+    },
+    "timeline": {
+      "label": "Our Journey",
+      "title": "Milestones & Growth",
+      "subtitle": "From concept to global impact, see how QuakeWise has evolved",
+      "item1": {
+        "title": "Project Inception",
+        "description": "QuakeWise was born from research collaboration between structural engineers and AI specialists"
+      },
+      "item2": {
+        "title": "AI Integration",
+        "description": "Claude AI integration enables instant building photo analysis and structural assessment"
+      },
+      "item3": {
+        "title": "Global Expansion",
+        "description": "Platform expanded to support multiple languages and international building codes"
+      },
+      "item4": {
+        "title": "Continuous Innovation",
+        "description": "Ongoing improvements with real-time alerts and predictive analytics"
+      }
+    },
+    "tech": {
+      "label": "Our Technology",
+      "title": "Powered by Innovation",
+      "subtitle": "Advanced technologies working together to keep you safe",
+      "aiml": "Deep learning models analyze building structures and identify vulnerabilities with unprecedented accuracy",
+      "seismicdata": "Real-time seismic data integration from global monitoring networks for accurate risk assessment",
+      "gismapping": "Precise geolocation and terrain analysis for site-specific safety recommendations",
+      "realtimeanalysis": "Instant processing of building data with immediate safety score generation"
     },
     "objectives": {
       "title": "What We Aim to Accomplish",
@@ -1289,6 +1330,12 @@
       "professor": "Assistant Professor Hamid F Ghatte",
       "university": "Structural Engineering Department, Antalya Bilim University",
       "specialization": "Specializing in seismic analysis and structural vulnerability assessment",
+      "expertise1": "Seismic Analysis",
+      "expertise2": "Structural Engineering",
+      "stat1": "Research Papers",
+      "stat2": "Students Trained",
+      "stat3": "Years Experience",
+      "stat4": "Partner Institutions",
       "imageAlt1": "Research",
       "imageAlt2": "Laboratory",
       "imageAlt3": "Academic Team"
@@ -1305,19 +1352,21 @@
         "description": "Analyzes structural systems, irregularities, and building specifications using advanced engineering principles"
       },
       "feature3": {
-        "title": "User-Friendly Interface",
-        "description": "Simple step-by-step process guides users through providing necessary building information without requiring technical expertise"
+        "title": "AI-Powered Insights",
+        "description": "Advanced machine learning models analyze building photos and structural data for accurate assessments"
       }
     },
     "cta": {
+      "badge": "Start Your Journey",
       "title": "Ready to assess your building?",
       "subtitle": "Get started with our easy-to-use assessment tool and receive detailed insights about your building's earthquake readiness.",
       "backButton": "Back to Home",
-      "assessButton": "Start Assessment"
+      "assessButton": "Start Free Assessment"
     },
     "footer": {
       "title": "Building a Safer Future Together",
-      "disclaimer": "This assessment is based on the information provided and serves as a general guide. For comprehensive structural analysis, consult a licensed professional engineer."
+      "disclaimer": "This assessment is based on the information provided and serves as a general guide. For comprehensive structural analysis, consult a licensed professional engineer.",
+      "copyright": "© 2025 QuakeWise. All rights reserved."
     }
   },
   "Pages": {

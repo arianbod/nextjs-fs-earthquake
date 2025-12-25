@@ -1260,6 +1260,17 @@
   },
   "About": {
     "title": "QuakeWise Hakkında",
+    "hero": {
+      "badge": "Deprem Güvenliği Platformu",
+      "badgeLabel": "Yapay Zeka Destekli",
+      "highlight": "Bina Güvenliği"
+    },
+    "stats": {
+      "assessments": "Tamamlanan Değerlendirme",
+      "accuracy": "Doğruluk Oranı",
+      "countries": "Hizmet Verilen Ülke",
+      "availability": "Erişilebilirlik"
+    },
     "mission": {
       "label": "Misyonumuz",
       "title": "Deprem Güvenliğini Erişilebilir Kılmak",
@@ -1270,6 +1281,36 @@
       "title": "Araştırma Tabanlı Yaklaşım",
       "subtitle": "Mühendislik prensiplerini pratik çözümlerle birleştirmek",
       "alt": "Misyonumuz"
+    },
+    "timeline": {
+      "label": "Yolculuğumuz",
+      "title": "Kilometre Taşları ve Büyüme",
+      "subtitle": "Konseptten küresel etkiye, QuakeWise'ın nasıl geliştiğini görün",
+      "item1": {
+        "title": "Proje Başlangıcı",
+        "description": "QuakeWise, yapı mühendisleri ve yapay zeka uzmanları arasındaki araştırma işbirliğinden doğdu"
+      },
+      "item2": {
+        "title": "Yapay Zeka Entegrasyonu",
+        "description": "Claude AI entegrasyonu, anlık bina fotoğrafı analizi ve yapısal değerlendirme sağlıyor"
+      },
+      "item3": {
+        "title": "Küresel Genişleme",
+        "description": "Platform, birden fazla dili ve uluslararası yapı kodlarını destekleyecek şekilde genişletildi"
+      },
+      "item4": {
+        "title": "Sürekli Yenilik",
+        "description": "Gerçek zamanlı uyarılar ve tahmine dayalı analizlerle sürekli iyileştirmeler"
+      }
+    },
+    "tech": {
+      "label": "Teknolojimiz",
+      "title": "İnovasyonla Desteklenen",
+      "subtitle": "Sizi güvende tutmak için birlikte çalışan ileri teknolojiler",
+      "aiml": "Derin öğrenme modelleri bina yapılarını analiz eder ve benzersiz doğrulukla zayıflıkları tespit eder",
+      "seismicdata": "Doğru risk değerlendirmesi için küresel izleme ağlarından gerçek zamanlı sismik veri entegrasyonu",
+      "gismapping": "Siteye özel güvenlik önerileri için hassas coğrafi konum ve arazi analizi",
+      "realtimeanalysis": "Anında güvenlik puanı üretimi ile bina verilerinin anlık işlenmesi"
     },
     "objectives": {
       "title": "Hedeflerimiz",
@@ -1295,6 +1336,12 @@
       "professor": "Yrd. Doç. Dr. Hamid F Ghatte",
       "university": "Yapı Mühendisliği Bölümü, Antalya Bilim Üniversitesi",
       "specialization": "Sismik analiz ve yapısal kırılganlık değerlendirmesi konusunda uzmanlaşmış",
+      "expertise1": "Sismik Analiz",
+      "expertise2": "Yapı Mühendisliği",
+      "stat1": "Araştırma Makalesi",
+      "stat2": "Eğitilen Öğrenci",
+      "stat3": "Yıllık Deneyim",
+      "stat4": "Ortak Kurum",
       "imageAlt1": "Araştırma",
       "imageAlt2": "Laboratuvar",
       "imageAlt3": "Akademik Ekip"
@@ -1311,19 +1358,21 @@
         "description": "Gelişmiş mühendislik prensiplerini kullanarak yapısal sistemleri, düzensizlikleri ve bina özelliklerini analiz eder"
       },
       "feature3": {
-        "title": "Kullanıcı Dostu Arayüz",
-        "description": "Basit adım adım süreç, kullanıcılara teknik uzmanlık gerektirmeden gerekli bina bilgilerini sağlama konusunda rehberlik eder"
+        "title": "Yapay Zeka Destekli İçgörüler",
+        "description": "Gelişmiş makine öğrenimi modelleri, doğru değerlendirmeler için bina fotoğraflarını ve yapısal verileri analiz eder"
       }
     },
     "cta": {
+      "badge": "Yolculuğunuza Başlayın",
       "title": "Binanızı değerlendirmeye hazır mısınız?",
       "subtitle": "Kullanımı kolay değerlendirme aracımızla başlayın ve binanızın depreme hazırlığı hakkında detaylı bilgiler alın.",
       "backButton": "Ana Sayfaya Dön",
-      "assessButton": "Değerlendirmeye Başla"
+      "assessButton": "Ücretsiz Değerlendirmeye Başla"
     },
     "footer": {
       "title": "Birlikte Daha Güvenli Bir Gelecek İnşa Ediyoruz",
-      "disclaimer": "Bu değerlendirme, sağlanan bilgilere dayanmaktadır ve genel bir rehber olarak hizmet eder. Kapsamlı yapısal analiz için lisanslı bir profesyonel mühendise danışın."
+      "disclaimer": "Bu değerlendirme, sağlanan bilgilere dayanmaktadır ve genel bir rehber olarak hizmet eder. Kapsamlı yapısal analiz için lisanslı bir profesyonel mühendise danışın.",
+      "copyright": "© 2025 QuakeWise. Tüm hakları saklıdır."
     }
   },
   "Pages": {
