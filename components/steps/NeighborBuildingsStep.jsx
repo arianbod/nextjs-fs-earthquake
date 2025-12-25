@@ -2,6 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import Data from '@/utils/Data.json';
 import { Button } from '@/components/ui/button';
 import { useUserInput } from '@/context/UserInputContext';
@@ -59,6 +60,8 @@ const neighborBuildings = [
 
 const NeighborBuildingsStep = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
+	const t = useTranslations('Steps.neighbors');
+	const tCommon = useTranslations('Common');
 	const stepNineData = Data.steps.find((step) => step.step === 9);
 
 	const handleSelectionChange = (id) => {

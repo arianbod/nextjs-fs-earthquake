@@ -1,6 +1,7 @@
 // components/homepage/HowItWorksSection.jsx
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Slider } from '@/components/ui/slider';
 import {
 	Card,
@@ -24,6 +25,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 const HowItWorksSection = () => {
+	const t = useTranslations('HowItWorks');
+	const tCommon = useTranslations('Common');
+
 	const [buildingAge, setBuildingAge] = useState([30]);
 	const [structuralCondition, setStructuralCondition] = useState([70]);
 	const [seismicZone, setSeismicZone] = useState([50]);
@@ -42,13 +46,13 @@ const HowItWorksSection = () => {
 
 		// Determine risk level and color
 		if (score >= 80) {
-			setRiskLevel('High Risk');
+			setRiskLevel(tCommon('riskLevels.high'));
 			setRiskColor('text-red-600 dark:text-red-400');
 		} else if (score >= 50) {
-			setRiskLevel('Moderate Risk');
+			setRiskLevel(tCommon('riskLevels.moderate'));
 			setRiskColor('text-amber-600 dark:text-amber-400');
 		} else {
-			setRiskLevel('Low Risk');
+			setRiskLevel(tCommon('riskLevels.low'));
 			setRiskColor('text-green-600 dark:text-green-400');
 		}
 	}, [buildingAge, structuralCondition, seismicZone]);
@@ -66,23 +70,20 @@ const HowItWorksSection = () => {
 	const steps = [
 		{
 			number: 1,
-			title: 'Input Building Details',
-			description:
-				"Provide information about your building's location, structure type, and age.",
+			title: t('step1.title'),
+			description: t('step1.description'),
 			icon: <Building className='w-6 h-6 text-blue-600 dark:text-blue-400' />,
 		},
 		{
 			number: 2,
-			title: 'AI-Powered Analysis',
-			description:
-				'Our algorithm analyzes your building data against seismic standards and risk factors.',
+			title: t('step2.title'),
+			description: t('step2.description'),
 			icon: <BarChart4 className='w-6 h-6 text-blue-600 dark:text-blue-400' />,
 		},
 		{
 			number: 3,
-			title: 'Get Detailed Results',
-			description:
-				'Receive a comprehensive report with safety score and recommendations.',
+			title: t('step3.title'),
+			description: t('step3.description'),
 			icon: (
 				<CheckCircle2 className='w-6 h-6 text-blue-600 dark:text-blue-400' />
 			),
@@ -98,11 +99,10 @@ const HowItWorksSection = () => {
 			<div className='container mx-auto px-4'>
 				<div className='text-center mb-12'>
 					<h2 className='text-3xl font-bold mb-4 text-gray-900 dark:text-white'>
-						How It Works
+						{t('title')}
 					</h2>
 					<p className='text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
-						Our simple 3-step process provides accurate earthquake risk
-						assessment for your building
+						{t('subtitle')}
 					</p>
 				</div>
 
@@ -146,11 +146,10 @@ const HowItWorksSection = () => {
 							<CardHeader>
 								<CardTitle className='flex items-center gap-2 text-xl'>
 									<BarChart4 className='w-5 h-5 text-blue-600 dark:text-blue-400' />
-									Interactive Risk Simulator
+									{t('simulator.title')}
 								</CardTitle>
 								<CardDescription>
-									Adjust the parameters to see how different factors affect your
-									building's risk assessment
+									{t('simulator.description')}
 								</CardDescription>
 							</CardHeader>
 
@@ -159,7 +158,7 @@ const HowItWorksSection = () => {
 									<div>
 										<div className='flex justify-between mb-2'>
 											<label className='text-sm font-medium text-gray-600 dark:text-gray-300'>
-												Building Age (Years)
+												{t('simulator.buildingAge')}
 											</label>
 											<span className='text-sm font-semibold'>
 												{buildingAge}
@@ -173,16 +172,16 @@ const HowItWorksSection = () => {
 											className='w-full'
 										/>
 										<div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1'>
-											<span>New</span>
-											<span>50 years</span>
-											<span>100+ years</span>
+											<span>{t('ages.new')}</span>
+											<span>{t('ages.fifty')}</span>
+											<span>{t('ages.hundred')}</span>
 										</div>
 									</div>
 
 									<div>
 										<div className='flex justify-between mb-2'>
 											<label className='text-sm font-medium text-gray-600 dark:text-gray-300'>
-												Structural Condition Score
+												{t('simulator.structuralCondition')}
 											</label>
 											<span className='text-sm font-semibold'>
 												{structuralCondition}
@@ -196,16 +195,16 @@ const HowItWorksSection = () => {
 											className='w-full'
 										/>
 										<div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1'>
-											<span>Poor</span>
-											<span>Average</span>
-											<span>Excellent</span>
+											<span>{t('condition.poor')}</span>
+											<span>{t('condition.average')}</span>
+											<span>{t('condition.excellent')}</span>
 										</div>
 									</div>
 
 									<div>
 										<div className='flex justify-between mb-2'>
 											<label className='text-sm font-medium text-gray-600 dark:text-gray-300'>
-												Seismic Zone Risk
+												{t('simulator.seismicZone')}
 											</label>
 											<span className='text-sm font-semibold'>
 												{seismicZone}
@@ -219,9 +218,9 @@ const HowItWorksSection = () => {
 											className='w-full'
 										/>
 										<div className='flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1'>
-											<span>Low</span>
-											<span>Medium</span>
-											<span>High</span>
+											<span>{t('risk.low')}</span>
+											<span>{t('risk.medium')}</span>
+											<span>{t('risk.high')}</span>
 										</div>
 									</div>
 								</div>
@@ -248,10 +247,10 @@ const HowItWorksSection = () => {
 									) : (
 										<ShieldCheck className='w-5 h-5 text-green-600 dark:text-green-400' />
 									)}
-									Assessment Result
+									{t('simulator.result.title')}
 								</CardTitle>
 								<CardDescription>
-									Based on the parameters you've adjusted
+									{t('simulator.result.subtitle')}
 								</CardDescription>
 							</CardHeader>
 
@@ -295,7 +294,7 @@ const HowItWorksSection = () => {
 												{riskScore}
 											</span>
 											<span className={`text-sm font-medium ${riskColor}`}>
-												Risk Score
+												{tCommon('riskScore')}
 											</span>
 										</div>
 									</div>
@@ -307,13 +306,13 @@ const HowItWorksSection = () => {
 
 								<div className='space-y-3'>
 									<h4 className='font-medium text-gray-900 dark:text-white'>
-										Risk Factors:
+										{t('simulator.riskFactors')}
 									</h4>
 									<ul className='space-y-2'>
 										<li className='flex items-start gap-2'>
 											<ChevronRight className='w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5' />
 											<div>
-												<span className='font-medium'>Building Age:</span>{' '}
+												<span className='font-medium'>{t('factors.age')}</span>{' '}
 												<span
 													className={`${
 														buildingAge[0] > 50
@@ -323,11 +322,10 @@ const HowItWorksSection = () => {
 															: 'text-green-600 dark:text-green-400'
 													}`}>
 													{buildingAge[0] > 50
-														? 'High'
+														? t('impact.high')
 														: buildingAge[0] > 30
-														? 'Moderate'
-														: 'Low'}{' '}
-													Impact
+														? t('impact.moderate')
+														: t('impact.low')}
 												</span>
 											</div>
 										</li>
@@ -336,7 +334,7 @@ const HowItWorksSection = () => {
 											<ChevronRight className='w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5' />
 											<div>
 												<span className='font-medium'>
-													Structural Condition:
+													{t('factors.condition')}
 												</span>{' '}
 												<span
 													className={`${
@@ -347,11 +345,10 @@ const HowItWorksSection = () => {
 															: 'text-green-600 dark:text-green-400'
 													}`}>
 													{structuralCondition[0] < 60
-														? 'High'
+														? t('impact.high')
 														: structuralCondition[0] < 80
-														? 'Moderate'
-														: 'Low'}{' '}
-													Impact
+														? t('impact.moderate')
+														: t('impact.low')}
 												</span>
 											</div>
 										</li>
@@ -359,7 +356,7 @@ const HowItWorksSection = () => {
 										<li className='flex items-start gap-2'>
 											<ChevronRight className='w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5' />
 											<div>
-												<span className='font-medium'>Seismic Risk:</span>{' '}
+												<span className='font-medium'>{t('factors.seismic')}</span>{' '}
 												<span
 													className={`${
 														seismicZone[0] > 70
@@ -369,11 +366,10 @@ const HowItWorksSection = () => {
 															: 'text-green-600 dark:text-green-400'
 													}`}>
 													{seismicZone[0] > 70
-														? 'High'
+														? t('impact.high')
 														: seismicZone[0] > 40
-														? 'Moderate'
-														: 'Low'}{' '}
-													Impact
+														? t('impact.moderate')
+														: t('impact.low')}
 												</span>
 											</div>
 										</li>
@@ -386,7 +382,7 @@ const HowItWorksSection = () => {
 									href='/assessment/1'
 									className='w-full'>
 									<Button className='w-full gap-2'>
-										Start Real Assessment <ArrowRight className='w-4 h-4' />
+										{t('simulator.startButton')} <ArrowRight className='w-4 h-4' />
 									</Button>
 								</Link>
 							</CardFooter>

@@ -28,23 +28,23 @@ import { useTranslations } from 'next-intl';
 const RETROFIT_COSTS_TRY = {
 	// Structural strengthening costs per m2
 	structural: {
-		columnJacketing: { min: 2500, max: 4500, label: 'Column Jacketing' },
-		beamStrengthening: { min: 2000, max: 3500, label: 'Beam Strengthening' },
-		foundationRepair: { min: 3500, max: 6000, label: 'Foundation Repair' },
-		wallAddition: { min: 1800, max: 3000, label: 'Shear Wall Addition' },
-		bracingSystem: { min: 1500, max: 2800, label: 'Steel Bracing System' },
+		columnJacketing: { min: 2500, max: 4500, labelKey: 'structural.columnJacketing' },
+		beamStrengthening: { min: 2000, max: 3500, labelKey: 'structural.beamStrengthening' },
+		foundationRepair: { min: 3500, max: 6000, labelKey: 'structural.foundationRepair' },
+		wallAddition: { min: 1800, max: 3000, labelKey: 'structural.wallAddition' },
+		bracingSystem: { min: 1500, max: 2800, labelKey: 'structural.bracingSystem' },
 	},
 	// Non-structural improvements per m2
 	nonStructural: {
-		facadeRetrofit: { min: 800, max: 1500, label: 'Facade Retrofit' },
-		roofRepair: { min: 600, max: 1200, label: 'Roof Strengthening' },
-		connectionUpgrade: { min: 500, max: 900, label: 'Connection Upgrades' },
+		facadeRetrofit: { min: 800, max: 1500, labelKey: 'nonStructural.facadeRetrofit' },
+		roofRepair: { min: 600, max: 1200, labelKey: 'nonStructural.roofStrengthening' },
+		connectionUpgrade: { min: 500, max: 900, labelKey: 'nonStructural.connectionUpgrades' },
 	},
 	// Fixed costs (not per m2)
 	fixed: {
-		engineeringAssessment: { min: 25000, max: 50000, label: 'Engineering Assessment' },
-		permits: { min: 10000, max: 30000, label: 'Permits & Documentation' },
-		projectManagement: { percent: 0.08, label: 'Project Management (8%)' },
+		engineeringAssessment: { min: 25000, max: 50000, labelKey: 'fixed.engineeringAssessment' },
+		permits: { min: 10000, max: 30000, labelKey: 'fixed.permits' },
+		projectManagement: { percent: 0.08, labelKey: 'fixed.projectManagement' },
 	}
 };
 
@@ -129,7 +129,7 @@ export function RetrofitCostCalculator({
 				totalMin += min;
 				totalMax += max;
 				items.push({
-					label: costData.label,
+					labelKey: costData.labelKey,
 					min,
 					max,
 					priority,
@@ -144,7 +144,7 @@ export function RetrofitCostCalculator({
 		totalMax += engineeringAssessment.max + permits.max;
 
 		items.push({
-			label: engineeringAssessment.label,
+			labelKey: engineeringAssessment.labelKey,
 			min: engineeringAssessment.min,
 			max: engineeringAssessment.max,
 			priority: 'required',
@@ -152,7 +152,7 @@ export function RetrofitCostCalculator({
 		});
 
 		items.push({
-			label: permits.label,
+			labelKey: permits.labelKey,
 			min: permits.min,
 			max: permits.max,
 			priority: 'required',
@@ -166,7 +166,7 @@ export function RetrofitCostCalculator({
 		totalMax += pmMax;
 
 		items.push({
-			label: projectManagement.label,
+			labelKey: projectManagement.labelKey,
 			min: pmMin,
 			max: pmMax,
 			priority: 'required',
@@ -344,7 +344,7 @@ export function RetrofitCostCalculator({
 												{item.priority === 'medium' && <Info className={`w-4 h-4 ${colors.text}`} />}
 												{item.priority === 'low' && <CheckCircle2 className={`w-4 h-4 ${colors.text}`} />}
 												{item.priority === 'required' && <Shield className={`w-4 h-4 ${colors.text}`} />}
-												<span className="text-sm text-gray-700 dark:text-gray-300">{item.label}</span>
+												<span className="text-sm text-gray-700 dark:text-gray-300">{t(item.labelKey)}</span>
 											</div>
 											<span className="text-sm font-medium text-gray-900 dark:text-white">
 												{formatCurrency(item.min)} - {formatCurrency(item.max)}
@@ -357,7 +357,7 @@ export function RetrofitCostCalculator({
 							{/* Total */}
 							<div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
 								<div className="flex items-center justify-between">
-									<span className="font-semibold text-blue-800 dark:text-blue-300">{t('totalEstimate')}</span>
+									<span className="font-semibold text-blue-800 dark:text-blue-300">{t('totalCost')}</span>
 									<span className="text-xl font-bold text-blue-600">
 										{formatCurrency(costBreakdown.totalMin)} - {formatCurrency(costBreakdown.totalMax)}
 									</span>

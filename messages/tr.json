@@ -26,7 +26,14 @@
     "assessmentProgress": "Değerlendirme İlerlemesi",
     "completedAssessments": "{count} tamamlanmış değerlendirmeniz var",
     "openMenu": "Menüyü aç",
-    "toggleTheme": "Tema değiştir"
+    "toggleTheme": "Tema değiştir",
+    "more": "Daha Fazla",
+    "resume": "Devam Et",
+    "stats": {
+      "completed": "Tamamlandı",
+      "inProgress": "Devam Ediyor",
+      "avgScore": "Ort. Puan"
+    }
   },
   "Greeting": {
     "morning": "Günaydın",
@@ -293,7 +300,6 @@
       "riskAssessmentOverview": "Risk Değerlendirme Özeti",
       "howDataAffects": "Bu Veriler Değerlendirmenizi Nasıl Etkiler",
       "howDataAffectsDesc": "Yukarıdaki çevresel veriler binanızın sismik risk değerlendirmesi için önemli bağlam sağlar. Hava durumu desenleri zamanla zemin koşullarını ve yapı malzemelerini etkilerken, sismik bölge sınıflandırması yapınız için güvenlik gereksinimlerini doğrudan etkiler. Bu bilgiler otomatik olarak nihai güvenlik puanınıza dahil edilecektir.",
-      "backToLocation": "Konuma Geri Dön",
       "continueToPhoto": "Fotoğraf Yüklemeye Devam Et"
     },
     "aiPhoto": {
@@ -414,6 +420,12 @@
       "disclaimerFooter": "Bu değerlendirme sağlanan bilgilere dayanmaktadır ve genel bir rehber niteliğindedir. Kapsamlı yapısal analiz için lisanslı bir profesyonel mühendise danışın.",
       "scrollForDetails": "Detaylar için aşağı kaydırın",
       "linkCopied": "Bağlantı panoya kopyalandı"
+    },
+    "neighbors": {
+      "standalone": "Bağımsız Bina",
+      "sameHeight": "Bitişik Binalar - Aynı Yükseklikte",
+      "differentHeight": "Bitişik Binalar - Farklı Yüksekliklerde",
+      "corner": "Köşe Binası"
     }
   },
   "Results": {
@@ -762,11 +774,11 @@
     "errors": {
       "loadFailed": "Değerlendirmeler yüklenemedi",
       "deleteFailed": "Değerlendirme silinemedi",
-      "duplicateFailed": "Değerlendirme çoğaltılamadı"
+      "duplicateFailed": "Değerlendirme kopyalanamadı"
     },
     "notifications": {
       "deleted": "Değerlendirme silindi",
-      "duplicated": "Değerlendirme çoğaltıldı",
+      "duplicated": "Değerlendirme başarıyla kopyalandı",
       "linkCopied": "Bağlantı panoya kopyalandı"
     },
     "dueForReassessment": "Yeniden değerlendirme gerekiyor"
@@ -977,7 +989,28 @@
     "paybackPeriod": "Geri Ödeme Süresi",
     "tenYearBenefit": "10 Yıllık Fayda",
     "years": "yıl",
-    "disclaimer": "Bunlar Türkiye ortalama güçlendirme maliyetlerine dayalı yaklaşık tahminlerdir. Gerçek maliyetler yerel müteahhitlere, malzeme fiyatlarına, bina koşullarına ve özel mühendislik gereksinimlerine göre önemli ölçüde değişebilir. Doğru fiyat teklifleri için lisanslı bir yapı mühendisine danışın."
+    "disclaimer": "Bunlar Türkiye ortalama güçlendirme maliyetlerine dayalı yaklaşık tahminlerdir. Gerçek maliyetler yerel müteahhitlere, malzeme fiyatlarına, bina koşullarına ve özel mühendislik gereksinimlerine göre önemli ölçüde değişebilir. Doğru fiyat teklifleri için lisanslı bir yapı mühendisine danışın.",
+    "totalCost": "Tahmini Toplam Maliyet",
+    "structural": {
+      "title": "Yapısal Öğeler",
+      "columnJacketing": "Kolon Güçlendirme",
+      "beamStrengthening": "Kiriş Güçlendirme",
+      "foundationRepair": "Temel Onarımı",
+      "wallAddition": "Perde Duvar Ekleme",
+      "bracingSystem": "Çelik Destek Sistemi"
+    },
+    "nonStructural": {
+      "title": "Yapısal Olmayan Öğeler",
+      "facadeRetrofit": "Cephe Güçlendirme",
+      "roofStrengthening": "Çatı Güçlendirme",
+      "connectionUpgrades": "Bağlantı İyileştirmeleri"
+    },
+    "fixed": {
+      "title": "Sabit Maliyetler",
+      "engineeringAssessment": "Mühendislik Değerlendirmesi",
+      "permits": "İzinler ve Belgeler",
+      "projectManagement": "Proje Yönetimi (%8)"
+    }
   },
   "EarthquakeMap": {
     "title": "Geçmiş Depremler",
@@ -1062,7 +1095,13 @@
     "comparisonSummary": "Karşılaştırma Özeti",
     "highestScore": "En Yüksek Güvenlik Puanı",
     "lowestScore": "En Çok Dikkat Gerektiren",
-    "scoreRange": "Puan Aralığı"
+    "scoreRange": "Puan Aralığı",
+    "riskLevels": {
+      "low": "Düşük Risk",
+      "moderate": "Orta Risk",
+      "high": "Yüksek Risk",
+      "veryHigh": "Çok Yüksek Risk"
+    }
   },
   "Alerts": {
     "title": "Deprem Uyarıları",
@@ -1137,7 +1176,82 @@
     "frequency90Days": "90 gün (Önerilen)",
     "frequency6Months": "6 ay",
     "frequency1Year": "1 yıl",
-    "frequencyDescription": "Binalarınızı ne sıklıkla yeniden değerlendirmek istediğinizi belirleyin"
+    "frequencyDescription": "Binalarınızı ne sıklıkla yeniden değerlendirmek istediğinizi belirleyin",
+    "settings": {
+      "saved": "Ayarlar kaydedildi",
+      "saveFailed": "Ayarlar kaydedilemedi",
+      "pushEnabled": "Anlık bildirimler etkinleştirildi",
+      "pushFailed": "Anlık bildirimler etkinleştirilemedi",
+      "pushDisabled": "Anlık bildirimler devre dışı bırakıldı"
+    }
+  },
+  "About": {
+    "title": "QuakeWise Hakkında",
+    "mission": {
+      "label": "Misyonumuz",
+      "title": "Deprem Güvenliğini Erişilebilir Kılmak",
+      "description": "QuakeWise, gelişmiş mühendislik prensiplerini en son yapay zeka teknolojisiyle birleştirerek deprem güvenliği değerlendirmesini demokratikleştirmeyi amaçlamaktadır. Platformumuz, profesyonel düzeyde bina değerlendirmelerini herkes için erişilebilir kılarak, bina sahiplerinin ve kullanıcılarının sismik güvenliklerini anlamalarını ve geliştirmelerini sağlar.",
+      "vision": "Vizyonumuz, bina sakinlerinin bilinçli güvenlik önlemleri ve yapısal iyileştirmeler sayesinde sismik olaylar sırasında kendilerini güvende hissettikleri bir dünyadır."
+    },
+    "missionImage": {
+      "title": "Araştırma Tabanlı Yaklaşım",
+      "subtitle": "Mühendislik prensiplerini pratik çözümlerle birleştirmek",
+      "alt": "Misyonumuz"
+    },
+    "objectives": {
+      "title": "Hedeflerimiz",
+      "subtitle": "QuakeWise'da, platform geliştirmemize rehberlik eden bu temel hedeflere kendimizi adadık",
+      "label": "Hedeflerimiz",
+      "objective1": {
+        "title": "Kapsamlı Veri Toplama",
+        "description": "Doğru analiz sağlamak için kapsamlı bina verileri topluyoruz."
+      },
+      "objective2": {
+        "title": "Yapısal Kırılganlık Değerlendirmesi",
+        "description": "Algoritmalarımız yapısal kırılganlığı ve potansiyel deprem etkilerini değerlendirir."
+      },
+      "objective3": {
+        "title": "Risk Görselleştirme",
+        "description": "Görsel sunumlar, potansiyel riskleri ve azaltma stratejilerini anlamanıza yardımcı olur."
+      }
+    },
+    "academic": {
+      "label": "Akademik Destek",
+      "title": "Araştırma Destekli",
+      "description": "QuakeWise, yapı mühendisliği ve sismik analiz alanındaki akademik araştırmalarla geliştirilmiş ve doğrulanmıştır. Metodolojilerimiz, hakemli mühendislik prensipleri üzerine kurulmuştur ve akademik kurumlarla işbirliği sayesinde sürekli olarak iyileştirilmektedir.",
+      "professor": "Yrd. Doç. Dr. Hamid F Ghatte",
+      "university": "Yapı Mühendisliği Bölümü, Antalya Bilim Üniversitesi",
+      "specialization": "Sismik analiz ve yapısal kırılganlık değerlendirmesi konusunda uzmanlaşmış",
+      "imageAlt1": "Araştırma",
+      "imageAlt2": "Laboratuvar",
+      "imageAlt3": "Akademik Ekip"
+    },
+    "features": {
+      "title": "Temel Platform Özellikleri",
+      "subtitle": "QuakeWise, kapsamlı bina değerlendirmeleri sağlamak için birden fazla teknolojiyi birleştirir",
+      "feature1": {
+        "title": "Konum Tabanlı Analiz",
+        "description": "Yerel zemin koşullarını ve sismik bölgeleri dikkate alarak hassas konum ve ölçümler için Google Earth entegrasyonunu kullanır"
+      },
+      "feature2": {
+        "title": "Kapsamlı Bina Değerlendirmesi",
+        "description": "Gelişmiş mühendislik prensiplerini kullanarak yapısal sistemleri, düzensizlikleri ve bina özelliklerini analiz eder"
+      },
+      "feature3": {
+        "title": "Kullanıcı Dostu Arayüz",
+        "description": "Basit adım adım süreç, kullanıcılara teknik uzmanlık gerektirmeden gerekli bina bilgilerini sağlama konusunda rehberlik eder"
+      }
+    },
+    "cta": {
+      "title": "Binanızı değerlendirmeye hazır mısınız?",
+      "subtitle": "Kullanımı kolay değerlendirme aracımızla başlayın ve binanızın depreme hazırlığı hakkında detaylı bilgiler alın.",
+      "backButton": "Ana Sayfaya Dön",
+      "assessButton": "Değerlendirmeye Başla"
+    },
+    "footer": {
+      "title": "Birlikte Daha Güvenli Bir Gelecek İnşa Ediyoruz",
+      "disclaimer": "Bu değerlendirme, sağlanan bilgilere dayanmaktadır ve genel bir rehber olarak hizmet eder. Kapsamlı yapısal analiz için lisanslı bir profesyonel mühendise danışın."
+    }
   },
   "Pages": {
     "about": {
@@ -1462,5 +1576,51 @@
     "checking": "Kontrol ediliyor...",
     "availableOffline": "Çevrimdışı Kullanılabilir:",
     "home": "Ana Sayfa"
+  },
+  "ImageType": {
+    "streetView": "Sokak Görünümü",
+    "satellite": "Uydu",
+    "photo": "Fotoğraf"
+  },
+  "PDFReport": {
+    "title": "Deprem Güvenliği Değerlendirme Raporu",
+    "defaultTitle": "Bina Değerlendirmesi",
+    "buildingIsSafe": "Bina Güvenli",
+    "needsAttention": "Dikkat Gerekiyor",
+    "buildingInfo": "Bina Bilgileri",
+    "location": "Konum",
+    "seismicZone": "Deprem Bölgesi",
+    "numberOfStories": "Kat Sayısı",
+    "yearBuilt": "İnşa Yılı",
+    "structuralSystem": "Taşıyıcı Sistem",
+    "soilType": "Zemin Tipi",
+    "notSpecified": "Belirtilmedi",
+    "keyFindings": "Önemli Bulgular",
+    "goodIntegrity": "İyi yapısal bütünlük",
+    "needsReinforcement": "Güçlendirme gerekebilir",
+    "builtIn": "{year} yılında inşa edildi ({age} yaşında)",
+    "modernConstruction": "Modern inşaat standartları",
+    "needsSeismicUpdates": "Deprem güncellemeleri gerekebilir",
+    "olderConstruction": "Eski yapı, değerlendirme önerilir",
+    "storyBuilding": "{count} katlı bina",
+    "lowerHeight": "Düşük yükseklik deprem riskini azaltır",
+    "mediumRise": "Orta yükseklikte bina",
+    "higherNeedsStronger": "Yüksek binalara daha güçlü temel gerekir",
+    "earthquakeImpact": "Deprem Etkisi:",
+    "minimalDamage": "Minimum beklenen hasar",
+    "someDamage": "Bazı hasarlar olabilir",
+    "highVulnerability": "Daha yüksek kırılganlık",
+    "recommendations": "Öneriler",
+    "rec1Pass": "Güvenlik standartlarını korumak için yıllık yapısal denetimleri planlayın.",
+    "rec2Pass": "Tüm bina sakinleri için deprem hazırlık planı oluşturun.",
+    "rec3Pass": "Bu raporu sigorta ve mülk belgeleri için erişilebilir tutun.",
+    "rec1Fail": "Profesyonel değerlendirme için lisanslı bir yapı mühendisine danışın.",
+    "rec2Fail": "Binayı güçlendirmek için sismik güçlendirme seçeneklerini keşfedin.",
+    "rec3Fail": "Tüm sakinler için tahliye yollarını gözden geçirin ve iyileştirin.",
+    "viewOnline": "Tam Etkileşimli Raporu Çevrimiçi Görüntüle",
+    "disclaimerTitle": "Önemli Sorumluluk Reddi",
+    "disclaimerText": "Bu değerlendirme sağlanan bilgilere dayanır ve genel bir rehber niteliğindedir. Profesyonel yapısal mühendislik değerlendirmesinin yerini tutmamalıdır. Kapsamlı yapısal analiz için lütfen lisanslı profesyonel bir mühendise danışın.",
+    "footerGenerated": "QuakeWise tarafından oluşturuldu - AI Destekli Deprem Güvenlik Değerlendirme Platformu",
+    "assessmentId": "Değerlendirme ID"
   }
 }

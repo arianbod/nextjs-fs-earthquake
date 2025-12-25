@@ -214,7 +214,7 @@ const Navbar = () => {
 											size="sm"
 											className="h-9 px-3 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
 										>
-											More
+											{t('more')}
 											<ChevronDown className="h-3.5 w-3.5 ml-1" />
 										</Button>
 									</DropdownMenuTrigger>
@@ -270,7 +270,7 @@ const Navbar = () => {
 															{t('continueAssessment')}
 														</div>
 														<span className="text-xs text-muted-foreground mt-1 ml-6">
-															Step {draftAssessment.currentStep || 1} of {AssessmentSteps.length}
+															{t('step', { current: draftAssessment.currentStep || 1, total: AssessmentSteps.length })}
 														</span>
 													</DropdownMenuItem>
 													<DropdownMenuSeparator />
@@ -461,10 +461,10 @@ const Navbar = () => {
 											</div>
 											<div className="flex-1 min-w-0">
 												<p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-													Continue Assessment
+													{t('continueAssessment')}
 												</p>
 												<p className="text-xs text-gray-500 dark:text-gray-400">
-													Step {draftAssessment.currentStep || 1} of {AssessmentSteps.length}
+													{t('step', { current: draftAssessment.currentStep || 1, total: AssessmentSteps.length })}
 												</p>
 											</div>
 											<Button
@@ -473,7 +473,7 @@ const Navbar = () => {
 												className="shrink-0 bg-blue-600 hover:bg-blue-700"
 											>
 												<Play className="h-4 w-4 mr-1" />
-												Resume
+												{t('resume')}
 											</Button>
 										</div>
 									</div>
@@ -540,7 +540,7 @@ const Navbar = () => {
 													{stats.totalCompleted || 0}
 												</p>
 												<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-													Completed
+													{t('stats.completed')}
 												</p>
 											</div>
 											<div className="text-center border-x border-gray-200 dark:border-gray-700">
@@ -548,7 +548,7 @@ const Navbar = () => {
 													{stats.inProgress || 0}
 												</p>
 												<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-													In Progress
+													{t('stats.inProgress')}
 												</p>
 											</div>
 											<div className="text-center">
@@ -556,7 +556,7 @@ const Navbar = () => {
 													{stats.averageScore ? Math.round(stats.averageScore) : '--'}
 												</p>
 												<p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-													Avg Score
+													{t('stats.avgScore')}
 												</p>
 											</div>
 										</div>

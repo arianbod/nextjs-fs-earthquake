@@ -26,7 +26,14 @@
     "assessmentProgress": "Assessment Progress",
     "completedAssessments": "You have {count} completed assessments",
     "openMenu": "Open menu",
-    "toggleTheme": "Toggle theme"
+    "toggleTheme": "Toggle theme",
+    "more": "More",
+    "resume": "Resume",
+    "stats": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "avgScore": "Avg Score"
+    }
   },
   "Greeting": {
     "morning": "Good morning",
@@ -63,6 +70,10 @@
     "progress": "Assessment Progress",
     "untitled": "Untitled Assessment",
     "stepProgress": "Step {step} of {total}",
+    "step": "Step",
+    "floors": "floors",
+    "built": "Built",
+    "locationSet": "Location set",
     "step1": {
       "title": "Location Detection",
       "description": "Detect building location and capture satellite/street view images"
@@ -293,7 +304,6 @@
       "riskAssessmentOverview": "Risk Assessment Overview",
       "howDataAffects": "How This Data Affects Your Assessment",
       "howDataAffectsDesc": "The environmental data above provides crucial context for your building's seismic risk assessment. Weather patterns affect soil conditions and material integrity over time, while seismic zone classification directly impacts the safety requirements for your structure. This information will be automatically factored into your final safety score.",
-      "backToLocation": "Back to Location",
       "continueToPhoto": "Continue to Photo Upload"
     },
     "aiPhoto": {
@@ -414,6 +424,12 @@
       "disclaimerFooter": "This assessment is based on the information provided and serves as a general guide. For comprehensive structural analysis, consult a licensed professional engineer.",
       "scrollForDetails": "Scroll for details",
       "linkCopied": "Link copied to clipboard"
+    },
+    "neighbors": {
+      "standalone": "Standalone Building",
+      "sameHeight": "Adjacent Buildings - Same Height",
+      "differentHeight": "Adjacent Buildings - Different Heights",
+      "corner": "Corner Building"
     }
   },
   "Results": {
@@ -719,18 +735,16 @@
     "stepOf": "Step {step} of {total}",
     "copyLink": "Copy Link",
     "duplicate": "Duplicate",
-    "stats": {
-      "total": "Total Assessments",
-      "completed": "Completed",
-      "inProgress": "In Progress",
-      "avgScore": "Avg Score",
-      "averageScore": "Average Score"
-    },
+    "yourAssessments": "Your Assessments",
+    "newAssessment": "New Assessment",
+    "buildingEvaluations": "building evaluation(s)",
+    "evaluationsAppearHere": "Your building evaluations will appear here",
     "empty": {
       "title": "No assessments yet",
+      "subtitle": "Start your first building safety assessment to see your results here",
+      "button": "Start Your First Assessment",
       "description": "Start your first earthquake safety assessment to evaluate building vulnerability and get personalized safety recommendations.",
       "cta": "Start Assessment",
-      "button": "Start Your First Assessment",
       "time": "5 min",
       "timeLabel": "Average time",
       "aiLabel": "AI",
@@ -738,6 +752,12 @@
       "priceLabel": "Free",
       "priceDescription": "Always free",
       "filteredMessage": "No {filter} assessments found."
+    },
+    "time": {
+      "minutesAgo": "{minutes}m ago",
+      "hoursAgo": "{hours}h ago",
+      "yesterday": "Yesterday",
+      "daysAgo": "{days}d ago"
     },
     "card": {
       "viewDetails": "View Details",
@@ -759,6 +779,13 @@
     "selectToCompare": "Select to Compare",
     "cancelCompare": "Cancel",
     "selected": "selected",
+    "stats": {
+      "total": "Total Assessments",
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "avgScore": "Avg Score",
+      "averageScore": "Average Score"
+    },
     "errors": {
       "loadFailed": "Failed to load assessments",
       "deleteFailed": "Failed to delete assessment",
@@ -766,7 +793,7 @@
     },
     "notifications": {
       "deleted": "Assessment deleted",
-      "duplicated": "Assessment duplicated",
+      "duplicated": "Assessment duplicated successfully",
       "linkCopied": "Link copied to clipboard"
     },
     "dueForReassessment": "Due for reassessment"
@@ -793,6 +820,7 @@
     "viewLess": "View Less",
     "loadMore": "Load More",
     "previous": "Previous",
+    "continue": "Continue",
     "yes": "Yes",
     "no": "No",
     "celsius": "°C",
@@ -800,6 +828,19 @@
     "humidity": "humidity",
     "mmRain": "mm rain",
     "gravity": "g",
+    "riskScore": "Risk Score",
+    "safetyScore": "Safety Score",
+    "riskLevels": {
+      "low": "Low Risk",
+      "moderate": "Moderate Risk",
+      "high": "High Risk"
+    },
+    "safetyStatus": {
+      "safe": "Safe",
+      "moderate": "Moderate",
+      "atRisk": "At Risk"
+    },
+    "viewResults": "View Results",
     "time": {
       "minutesAgo": "m ago",
       "hoursAgo": "h ago",
@@ -811,6 +852,11 @@
       "dark": "Dark",
       "system": "System"
     }
+  },
+  "ImageType": {
+    "streetView": "Street View",
+    "satellite": "Satellite",
+    "photo": "Photo"
   },
   "Errors": {
     "generic": "An error occurred. Please try again.",
@@ -946,6 +992,60 @@
       "button": "Start New Assessment"
     }
   },
+  "HowItWorks": {
+    "title": "How It Works",
+    "subtitle": "Our simple 3-step process provides accurate earthquake risk assessment for your building",
+    "step1": {
+      "title": "Input Building Details",
+      "description": "Provide information about your building's location, structure type, and age."
+    },
+    "step2": {
+      "title": "AI-Powered Analysis",
+      "description": "Our algorithm analyzes your building data against seismic standards and risk factors."
+    },
+    "step3": {
+      "title": "Get Detailed Results",
+      "description": "Receive a comprehensive report with safety score and recommendations."
+    },
+    "simulator": {
+      "title": "Interactive Risk Simulator",
+      "description": "Adjust the parameters to see how different factors affect your building's risk assessment",
+      "buildingAge": "Building Age (Years)",
+      "structuralCondition": "Structural Condition Score",
+      "seismicZone": "Seismic Zone Risk",
+      "result": {
+        "title": "Assessment Result",
+        "subtitle": "Based on the parameters you've adjusted"
+      },
+      "riskFactors": "Risk Factors:",
+      "startButton": "Start Real Assessment"
+    },
+    "ages": {
+      "new": "New",
+      "fifty": "50 years",
+      "hundred": "100+ years"
+    },
+    "condition": {
+      "poor": "Poor",
+      "average": "Average",
+      "excellent": "Excellent"
+    },
+    "risk": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "impact": {
+      "high": "High Impact",
+      "moderate": "Moderate Impact",
+      "low": "Low Impact"
+    },
+    "factors": {
+      "age": "Building Age:",
+      "condition": "Structural Condition:",
+      "seismic": "Seismic Risk:"
+    }
+  },
   "Email": {
     "emailReport": "Email Report",
     "yourEmail": "Your Email",
@@ -971,13 +1071,75 @@
     "safetyScore": "Safety Score",
     "costBreakdown": "Cost Breakdown",
     "totalEstimate": "Total Estimated Cost",
+    "totalCost": "Total Estimated Cost",
     "roiAnalysis": "Return on Investment",
     "propertyIncrease": "Property Value Increase",
     "insuranceSavings": "Insurance Savings",
     "paybackPeriod": "Payback Period",
     "tenYearBenefit": "10-Year Benefit",
     "years": "years",
+    "structural": {
+      "title": "Structural Items",
+      "columnJacketing": "Column Jacketing",
+      "beamStrengthening": "Beam Strengthening",
+      "foundationRepair": "Foundation Repair",
+      "wallAddition": "Shear Wall Addition",
+      "bracingSystem": "Steel Bracing System"
+    },
+    "nonStructural": {
+      "title": "Non-Structural Items",
+      "facadeRetrofit": "Facade Retrofit",
+      "roofStrengthening": "Roof Strengthening",
+      "connectionUpgrades": "Connection Upgrades"
+    },
+    "fixed": {
+      "title": "Fixed Costs",
+      "engineeringAssessment": "Engineering Assessment",
+      "permits": "Permits & Documentation",
+      "projectManagement": "Project Management (8%)"
+    },
     "disclaimer": "These are rough estimates based on average Turkey retrofit costs. Actual costs may vary significantly based on local contractors, material prices, building conditions, and specific engineering requirements. Always consult with a licensed structural engineer for accurate quotes."
+  },
+  "PDFReport": {
+    "title": "Earthquake Safety Assessment Report",
+    "defaultTitle": "Building Assessment",
+    "buildingIsSafe": "Building is Safe",
+    "needsAttention": "Needs Attention",
+    "buildingInfo": "Building Information",
+    "location": "Location",
+    "seismicZone": "Seismic Zone",
+    "numberOfStories": "Number of Stories",
+    "yearBuilt": "Year Built",
+    "structuralSystem": "Structural System",
+    "soilType": "Soil Type",
+    "notSpecified": "Not specified",
+    "keyFindings": "Key Findings",
+    "goodIntegrity": "Good structural integrity",
+    "needsReinforcement": "May need reinforcement",
+    "builtIn": "Built in {year} ({age} years old)",
+    "modernConstruction": "Modern construction standards",
+    "needsSeismicUpdates": "May need seismic updates",
+    "olderConstruction": "Older construction, consider evaluation",
+    "storyBuilding": "{count} story building",
+    "lowerHeight": "Lower height reduces seismic risk",
+    "mediumRise": "Medium-rise building",
+    "higherNeedsStronger": "Higher buildings need stronger foundations",
+    "earthquakeImpact": "Earthquake Impact:",
+    "minimalDamage": "Minimal expected damage",
+    "someDamage": "Some damage possible",
+    "highVulnerability": "Higher vulnerability",
+    "recommendations": "Recommendations",
+    "rec1Pass": "Schedule annual structural inspections to maintain safety standards.",
+    "rec2Pass": "Create an earthquake preparedness plan for all building occupants.",
+    "rec3Pass": "Keep this report accessible for insurance and property documentation.",
+    "rec1Fail": "Consult a licensed structural engineer for professional evaluation.",
+    "rec2Fail": "Explore seismic retrofitting options to strengthen the building.",
+    "rec3Fail": "Review and improve evacuation routes for all occupants.",
+    "viewOnline": "View Full Interactive Report Online",
+    "disclaimerTitle": "Important Disclaimer",
+    "disclaimerText": "This assessment is based on the information provided and serves as a general guide. It should not replace a professional structural engineering evaluation. For comprehensive structural analysis, please consult a licensed professional engineer.",
+    "footerGenerated": "Generated by QuakeWise - AI-Powered Earthquake Safety Assessment Platform",
+    "assessmentId": "Assessment ID"
   },
   "EarthquakeMap": {
     "title": "Historical Earthquakes",
@@ -1016,6 +1178,74 @@
     "shareText": "My building scored {score}% on earthquake safety assessment! Check out my results on QuakeWise.",
     "copied": "Copied!",
     "copyFailed": "Failed to copy"
+  },
+  "About": {
+    "title": "About QuakeWise",
+    "mission": {
+      "label": "Our Mission",
+      "title": "Making Earthquake Safety Accessible",
+      "description": "QuakeWise aims to democratize earthquake safety assessment by combining advanced engineering principles with cutting-edge AI technology. Our platform makes professional-grade building assessments accessible to everyone, empowering building owners and occupants to understand and improve their seismic safety.",
+      "vision": "Our vision is a world where building occupants feel secure during seismic events, thanks to informed safety measures and structural improvements."
+    },
+    "missionImage": {
+      "title": "Research-Based Approach",
+      "subtitle": "Combining engineering principles with practical solutions",
+      "alt": "Our Mission"
+    },
+    "objectives": {
+      "title": "What We Aim to Accomplish",
+      "subtitle": "At QuakeWise, we're dedicated to these key objectives that guide our platform development",
+      "label": "Our Objectives",
+      "objective1": {
+        "title": "Comprehensive Data Collection",
+        "description": "We gather comprehensive building data to enable accurate analysis."
+      },
+      "objective2": {
+        "title": "Structural Vulnerability Assessment",
+        "description": "Our algorithms assess structural vulnerability and potential earthquake impacts."
+      },
+      "objective3": {
+        "title": "Risk Visualization",
+        "description": "Visual representations help you understand potential risks and mitigation strategies."
+      }
+    },
+    "academic": {
+      "label": "Academic Support",
+      "title": "Backed by Research",
+      "description": "QuakeWise is developed and validated through academic research in structural engineering and seismic analysis. Our methodologies are grounded in peer-reviewed engineering principles and continuously refined through collaboration with academic institutions.",
+      "professor": "Assistant Professor Hamid F Ghatte",
+      "university": "Structural Engineering Department, Antalya Bilim University",
+      "specialization": "Specializing in seismic analysis and structural vulnerability assessment",
+      "imageAlt1": "Research",
+      "imageAlt2": "Laboratory",
+      "imageAlt3": "Academic Team"
+    },
+    "features": {
+      "title": "Key Platform Features",
+      "subtitle": "QuakeWise combines multiple technologies to provide comprehensive building assessments",
+      "feature1": {
+        "title": "Location-Based Analysis",
+        "description": "Utilizes Google Earth integration for precise location and measurements, considering local soil conditions and seismic zones"
+      },
+      "feature2": {
+        "title": "Comprehensive Building Assessment",
+        "description": "Analyzes structural systems, irregularities, and building specifications using advanced engineering principles"
+      },
+      "feature3": {
+        "title": "User-Friendly Interface",
+        "description": "Simple step-by-step process guides users through providing necessary building information without requiring technical expertise"
+      }
+    },
+    "cta": {
+      "title": "Ready to assess your building?",
+      "subtitle": "Get started with our easy-to-use assessment tool and receive detailed insights about your building's earthquake readiness.",
+      "backButton": "Back to Home",
+      "assessButton": "Start Assessment"
+    },
+    "footer": {
+      "title": "Building a Safer Future Together",
+      "disclaimer": "This assessment is based on the information provided and serves as a general guide. For comprehensive structural analysis, consult a licensed professional engineer."
+    }
   },
   "Pages": {
     "about": {
@@ -1089,12 +1319,24 @@
     "comparisonSummary": "Comparison Summary",
     "highestScore": "Highest Safety Score",
     "lowestScore": "Needs Most Attention",
-    "scoreRange": "Score Range"
+    "scoreRange": "Score Range",
+    "riskLevels": {
+      "low": "Low Risk",
+      "moderate": "Moderate Risk",
+      "high": "High Risk",
+      "veryHigh": "Very High Risk"
+    }
   },
   "Alerts": {
     "title": "Earthquake Alerts",
     "description": "Receive real-time notifications when earthquakes occur near your assessed locations",
-    "settings": "Alert Settings",
+    "settings": {
+      "saved": "Settings saved",
+      "saveFailed": "Failed to save settings",
+      "pushEnabled": "Push notifications enabled",
+      "pushFailed": "Failed to enable push notifications",
+      "pushDisabled": "Push notifications disabled"
+    },
     "settingsSaved": "Alert settings saved",
     "saveFailed": "Failed to save settings",
     "enableAlerts": "Enable Earthquake Alerts",

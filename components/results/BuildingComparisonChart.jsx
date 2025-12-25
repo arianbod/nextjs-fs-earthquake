@@ -2,8 +2,10 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Home, Award, Target } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 const BuildingComparisonChart = ({ safetyResult, userInput }) => {
+	const t = useTranslations('Results.comparison');
 	const overallScore = parseFloat(safetyResult?.overallScore || 0);
 	const buildingType = safetyResult?.buildingType || 'Unknown';
 	const yearOfConstruction = parseInt(userInput?.yearOfConstruction || 2000);
@@ -50,28 +52,28 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 	// Prepare data for chart
 	const comparisonData = [
 		{
-			category: 'Your Building',
+			category: t('yourBuilding'),
 			score: overallScore,
 			color: overallScore >= minimumRecommended ? '#22c55e' : '#ef4444',
-			description: 'Current assessment score'
+			description: t('yourDescription')
 		},
 		{
-			category: `Avg for ${buildingType}`,
+			category: t('avgType', { type: buildingType }),
 			score: buildingTypeAverage,
 			color: buildingTypeAverage >= minimumRecommended ? '#22c55e' : '#ef4444',
-			description: 'Average for this building type'
+			description: t('avgTypeDescription')
 		},
 		{
-			category: `Avg for Age (${new Date().getFullYear() - yearOfConstruction}y)`,
+			category: t('avgAge', { age: new Date().getFullYear() - yearOfConstruction }),
 			score: ageAverage,
 			color: ageAverage >= minimumRecommended ? '#22c55e' : '#ef4444',
-			description: 'Average for buildings of this age'
+			description: t('avgAgeDescription')
 		},
 		{
-			category: 'Recommended Min',
+			category: t('recommendedMin'),
 			score: minimumRecommended,
 			color: '#3b82f6',
-			description: 'Minimum recommended safety score'
+			description: t('recommendedMinDescription')
 		}
 	];
 
@@ -82,7 +84,7 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 				<div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
 					<p className="font-semibold">{label}</p>
 					<p className="text-blue-600 dark:text-blue-400">
-						Score: {data.score}%
+						{t('scoreLabel')}: {data.score}%
 					</p>
 					<p className="text-sm text-gray-600 dark:text-gray-400">
 						{data.description}
@@ -101,33 +103,33 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 	// Performance analysis
 	const getPerformanceComparison = () => {
 		const comparisons = [];
-		
+
 		if (overallScore > buildingTypeAverage) {
 			comparisons.push({
 				type: 'positive',
-				text: `${(overallScore - buildingTypeAverage).toFixed(1)} points above average for ${buildingType} buildings`
+				text: t('above', { points: (overallScore - buildingTypeAverage).toFixed(1), type: buildingType })
 			});
 		} else if (overallScore < buildingTypeAverage) {
 			comparisons.push({
 				type: 'negative',
-				text: `${(buildingTypeAverage - overallScore).toFixed(1)} points below average for ${buildingType} buildings`
+				text: t('below', { points: (buildingTypeAverage - overallScore).toFixed(1), type: buildingType })
 			});
 		} else {
 			comparisons.push({
 				type: 'neutral',
-				text: `Performs at average level for ${buildingType} buildings`
+				text: t('average', { type: buildingType })
 			});
 		}
 
 		if (overallScore > ageAverage) {
 			comparisons.push({
 				type: 'positive',
-				text: `${(overallScore - ageAverage).toFixed(1)} points above average for buildings of this age`
+				text: t('ageAbove', { points: (overallScore - ageAverage).toFixed(1) })
 			});
 		} else if (overallScore < ageAverage) {
 			comparisons.push({
 				type: 'negative',
-				text: `${(ageAverage - overallScore).toFixed(1)} points below average for buildings of this age`
+				text: t('ageBelow', { points: (ageAverage - overallScore).toFixed(1) })
 			});
 		}
 
@@ -141,10 +143,10 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
 					<TrendingUp className="w-5 h-5 text-blue-600" />
-					Building Performance Comparison
+					{t('title')}
 				</CardTitle>
 				<CardDescription>
-					Compare your building's safety score against industry benchmarks
+					{t('description')}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -162,8 +164,8 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 									interval={0}
 									className="text-gray-600 dark:text-gray-400"
 								/>
-								<YAxis 
-									label={{ value: 'Safety Score (%)', angle: -90, position: 'insideLeft' }}
+								<YAxis
+									label={{ value: t('scoreLabel'), angle: -90, position: 'insideLeft' }}
 									domain={[0, 100]}
 									className="text-gray-600 dark:text-gray-400"
 								/>
@@ -196,7 +198,7 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 						<div className="space-y-3">
 							<h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
 								<Award className="w-4 h-4 text-blue-600" />
-								Performance Insights
+								{t('insightsTitle')}
 							</h4>
 							{performanceComparisons.map((comparison, index) => (
 								<div key={index} className="flex items-start gap-2">
@@ -215,20 +217,20 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 						<div className="space-y-3">
 							<h4 className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
 								<Target className="w-4 h-4 text-green-600" />
-								Recommendations
+								{t('recommendationsTitle')}
 							</h4>
 							{overallScore < minimumRecommended && (
 								<div className="space-y-2">
 									<div className="flex items-start gap-2">
 										<div className="w-2 h-2 rounded-full mt-2 bg-red-500" />
 										<p className="text-sm text-gray-600 dark:text-gray-400">
-											Consider structural improvements to reach the {minimumRecommended}% safety threshold
+											{t('improve', { threshold: minimumRecommended })}
 										</p>
 									</div>
 									<div className="flex items-start gap-2">
 										<div className="w-2 h-2 rounded-full mt-2 bg-orange-500" />
 										<p className="text-sm text-gray-600 dark:text-gray-400">
-											Consult with a structural engineer for professional assessment
+											{t('consult')}
 										</p>
 									</div>
 								</div>
@@ -238,13 +240,13 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 									<div className="flex items-start gap-2">
 										<div className="w-2 h-2 rounded-full mt-2 bg-green-500" />
 										<p className="text-sm text-gray-600 dark:text-gray-400">
-											Your building meets the recommended safety standards
+											{t('meets')}
 										</p>
 									</div>
 									<div className="flex items-start gap-2">
 										<div className="w-2 h-2 rounded-full mt-2 bg-blue-500" />
 										<p className="text-sm text-gray-600 dark:text-gray-400">
-											Continue regular maintenance to preserve safety levels
+											{t('maintain')}
 										</p>
 									</div>
 								</div>
@@ -271,8 +273,7 @@ const BuildingComparisonChart = ({ safetyResult, userInput }) => {
 					{/* Methodology Note */}
 					<div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
 						<p className="text-sm text-blue-700 dark:text-blue-300">
-							<strong>Note:</strong> Comparison averages are based on statistical data from similar buildings in Turkey. 
-							Individual performance may vary based on construction quality, maintenance, and local conditions.
+							<strong>Note:</strong> {t('methodology')}
 						</p>
 					</div>
 				</div>
