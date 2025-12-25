@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import AssessmentSteps from '@/components/AssessmentSteps';
 import {
@@ -21,8 +22,15 @@ import {
 
 const Sidebar = ({ currentStep = 0 }) => {
 	const pathname = usePathname();
+	const tSteps = useTranslations('Steps');
 	const isAssessmentActive = pathname.includes('/assessment/');
 	const isResultActive = pathname.includes('/result/');
+
+	// Helper function to get translated step name
+	const getStepName = (stepNumber) => {
+		const stepKeys = ['location', 'photos', 'confirmDetails', 'extraDetails'];
+		return tSteps(`names.${stepKeys[stepNumber - 1]}`);
+	};
 
 	// Main navigation links
 	const mainLinks = [
@@ -169,7 +177,7 @@ const Sidebar = ({ currentStep = 0 }) => {
 												<span>{stepNumber}</span>
 											)}
 										</div>
-										{step.title}
+										{getStepName(stepNumber)}
 									</div>
 								</Link>
 							);

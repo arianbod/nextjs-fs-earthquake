@@ -40,6 +40,15 @@
     "afternoon": "Добрый день",
     "evening": "Добрый вечер"
   },
+  "Steps": {
+    "stepOf": "Шаг {current} из {total}",
+    "names": {
+      "location": "Местоположение",
+      "photos": "Фотографии",
+      "confirmDetails": "Подтвердить детали",
+      "extraDetails": "Дополнительные детали"
+    }
+  },
   "Hero": {
     "badge": "На основе Claude AI Vision",
     "new": "НОВОЕ",
@@ -227,7 +236,30 @@
       "north": "Север",
       "east": "Восток",
       "south": "Юг",
-      "west": "Запад"
+      "west": "Запад",
+      "findingYou": "Определяем ваше местоположение...",
+      "locationNeeded": "Требуется местоположение",
+      "enableAccess": "Включите доступ к местоположению для продолжения",
+      "mapTypes": {
+        "road": "Дорога",
+        "satellite": "Спутник",
+        "hybrid": "Гибрид",
+        "info": "Информация"
+      },
+      "clickInstruction": "Нажмите в любом месте карты или перетащите маркер, чтобы обновить местоположение здания",
+      "locationLabel": "Местоположение",
+      "seismicZone": "Сейсмическая зона",
+      "imagesCount": "{count} изображений",
+      "streetView": "Панорама улицы",
+      "directions": {
+        "north": "Север",
+        "east": "Восток",
+        "south": "Юг",
+        "west": "Запад"
+      },
+      "locationSet": "Местоположение установлено",
+      "continue": "Продолжить",
+      "tapToAdjust": "Нажмите на карту для корректировки местоположения"
     },
     "weather": {
       "title": "Экологические данные",
@@ -324,6 +356,47 @@
       "tryAgain": "Попробовать снова",
       "skip": "Пропустить",
       "back": "Назад"
+    },
+    "buildingInfo": {
+      "title": "Данные о здании",
+      "subtitle": "Расскажите о вашем здании",
+      "subtitleCorrect": "Исправьте детали ниже",
+      "aiDetected": "ИИ определил ваше здание",
+      "doesThisLookRight": "Всё правильно?",
+      "buildingType": "Тип здания",
+      "selectType": "Выберите тип",
+      "numberOfStories": "Количество этажей",
+      "storiesPlaceholder": "напр., 4",
+      "yearBuilt": "Год постройки (приблизительно)",
+      "yearPlaceholder": "напр., 2005",
+      "moreOptions": "Дополнительные параметры",
+      "continue": "Продолжить",
+      "back": "Назад",
+      "looksRight": "Всё верно",
+      "editDetails": "Изменить детали",
+      "backToSummary": "Вернуться к сводке",
+      "readyForResults": "Готовы к результатам!",
+      "addDetailsAccuracy": "Добавьте детали для точности или пропустите",
+      "getResults": "Получить результаты",
+      "optionalDetails": "Необязательно: добавить детали",
+      "dimensions": "Размеры",
+      "buildingSize": "Размер здания",
+      "neighbors": "Соседние здания",
+      "adjacentBuildings": "Примыкающие здания",
+      "extraLoads": "Дополнительные нагрузки",
+      "rooftopItems": "Объекты на крыше",
+      "structuralModifications": "Структурные изменения?",
+      "basementFloors": "Подвальные этажи",
+      "yes": "Да",
+      "no": "Нет",
+      "stories": "Этажей",
+      "type": "Тип",
+      "built": "Построено",
+      "reinforcedConcrete": "Железобетон",
+      "steel": "Стальная конструкция",
+      "masonry": "Кирпичная кладка",
+      "timber": "Деревянная",
+      "mixed": "Смешанная конструкция"
     },
     "finalReview": {
       "title": "Финальный обзор и подтверждение",

@@ -40,6 +40,15 @@
     "afternoon": "İyi günler",
     "evening": "İyi akşamlar"
   },
+  "Steps": {
+    "stepOf": "Adım {current} / {total}",
+    "names": {
+      "location": "Konum",
+      "photos": "Fotoğraflar",
+      "confirmDetails": "Detayları Onayla",
+      "extraDetails": "Ek Detaylar"
+    }
+  },
   "Hero": {
     "badge": "Artık Claude AI Vision ile Güçlendirildi",
     "new": "YENİ",
@@ -227,7 +236,30 @@
       "north": "Kuzey",
       "east": "Doğu",
       "south": "Güney",
-      "west": "Batı"
+      "west": "Batı",
+      "findingYou": "Sizi buluyoruz...",
+      "locationNeeded": "Konum gerekli",
+      "enableAccess": "Devam etmek için konum erişimini etkinleştirin",
+      "mapTypes": {
+        "road": "Yol",
+        "satellite": "Uydu",
+        "hybrid": "Hibrit",
+        "info": "Bilgi"
+      },
+      "clickInstruction": "Bina konumunu güncellemek için haritada herhangi bir yere tıklayın veya işaretçiyi sürükleyin",
+      "locationLabel": "Konum",
+      "seismicZone": "Sismik Bölge",
+      "imagesCount": "{count} görüntü",
+      "streetView": "Sokak görünümü",
+      "directions": {
+        "north": "Kuzey",
+        "east": "Doğu",
+        "south": "Güney",
+        "west": "Batı"
+      },
+      "locationSet": "Konum ayarlandı",
+      "continue": "Devam Et",
+      "tapToAdjust": "Konumu ayarlamak için haritaya dokunun"
     },
     "weather": {
       "title": "Çevresel Bilgiler",
@@ -324,6 +356,47 @@
       "tryAgain": "Tekrar dene",
       "skip": "Atla",
       "back": "Geri"
+    },
+    "buildingInfo": {
+      "title": "Bina detayları",
+      "subtitle": "Binanız hakkında bilgi verin",
+      "subtitleCorrect": "Aşağıdaki detayları düzeltin",
+      "aiDetected": "AI binanızı tespit etti",
+      "doesThisLookRight": "Bu doğru görünüyor mu?",
+      "buildingType": "Bina Tipi",
+      "selectType": "Tip seçin",
+      "numberOfStories": "Kat Sayısı",
+      "storiesPlaceholder": "örn: 4",
+      "yearBuilt": "Yapım Yılı (yaklaşık)",
+      "yearPlaceholder": "örn: 2005",
+      "moreOptions": "Daha fazla seçenek",
+      "continue": "Devam Et",
+      "back": "Geri",
+      "looksRight": "Doğru görünüyor",
+      "editDetails": "Detayları düzenle",
+      "backToSummary": "Özete dön",
+      "readyForResults": "Sonuçlar için hazır!",
+      "addDetailsAccuracy": "Daha fazla doğruluk için detay ekleyin veya atlayın",
+      "getResults": "Sonuçları Al",
+      "optionalDetails": "İsteğe bağlı: daha fazla detay ekle",
+      "dimensions": "Boyutlar",
+      "buildingSize": "Bina boyutu",
+      "neighbors": "Komşular",
+      "adjacentBuildings": "Bitişik binalar",
+      "extraLoads": "Ek yükler",
+      "rooftopItems": "Çatı öğeleri",
+      "structuralModifications": "Yapısal değişiklikler?",
+      "basementFloors": "Bodrum katları",
+      "yes": "Evet",
+      "no": "Hayır",
+      "stories": "Kat",
+      "type": "Tip",
+      "built": "Yapım",
+      "reinforcedConcrete": "Betonarme",
+      "steel": "Çelik Yapı",
+      "masonry": "Yığma/Tuğla",
+      "timber": "Ahşap",
+      "mixed": "Karma Yapı"
     },
     "finalReview": {
       "title": "Son İnceleme ve Onay",

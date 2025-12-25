@@ -4,13 +4,22 @@
 import Link from 'next/link';
 import React from 'react';
 import { ChevronRight, Home } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import AssessmentSteps from '@/components/AssessmentSteps';
 
 const Breadcrumb = ({ currentStep }) => {
+	const tSteps = useTranslations('Steps');
+
 	if (!currentStep) return null;
 
 	const stepInfo = AssessmentSteps[currentStep - 1];
 	if (!stepInfo) return null;
+
+	// Helper function to get translated step name
+	const getStepName = (stepNumber) => {
+		const stepKeys = ['location', 'photos', 'confirmDetails', 'extraDetails'];
+		return tSteps(`names.${stepKeys[stepNumber - 1]}`);
+	};
 
 	return (
 		<nav className='flex items-center text-sm py-2'>
@@ -37,7 +46,7 @@ const Breadcrumb = ({ currentStep }) => {
 					<ChevronRight className='h-4 w-4 text-gray-400' />
 				</li>
 				<li className='text-gray-900 dark:text-white font-medium'>
-					Step {currentStep}: {stepInfo.title}
+					{tSteps('stepOf', { current: currentStep, total: AssessmentSteps.length })}: {getStepName(currentStep)}
 				</li>
 			</ol>
 		</nav>

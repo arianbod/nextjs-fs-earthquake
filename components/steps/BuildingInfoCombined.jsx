@@ -14,14 +14,7 @@ import {
 } from '@/components/ui/select';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const buildingTypes = [
-	{ value: 'reinforced-concrete', label: 'Reinforced Concrete' },
-	{ value: 'steel', label: 'Steel Structure' },
-	{ value: 'masonry', label: 'Masonry/Brick' },
-	{ value: 'timber', label: 'Timber/Wood' },
-	{ value: 'mixed', label: 'Mixed Construction' },
-];
+import { useTranslations } from 'next-intl';
 
 const mapAiBuildingType = (aiType) => {
 	if (!aiType) return null;
@@ -36,10 +29,20 @@ const mapAiBuildingType = (aiType) => {
 
 const BuildingInfoCombined = ({ onNext }) => {
 	const { userInput, updateUserInput } = useUserInput();
+	const t = useTranslations('Steps.buildingInfo');
+	const tSteps = useTranslations('Steps');
 	const [mode, setMode] = useState('confirm'); // confirm, edit
 	const [showAdvanced, setShowAdvanced] = useState(false);
 
 	const hasAiData = userInput.aiAnalysisData || userInput.aiAnalysisComplete;
+
+	const buildingTypes = [
+		{ value: 'reinforced-concrete', label: t('reinforcedConcrete') },
+		{ value: 'steel', label: t('steel') },
+		{ value: 'masonry', label: t('masonry') },
+		{ value: 'timber', label: t('timber') },
+		{ value: 'mixed', label: t('mixed') },
+	];
 
 	// Get AI suggestions
 	const getAiData = () => {
@@ -111,7 +114,7 @@ const BuildingInfoCombined = ({ onNext }) => {
 						transition={{ delay: 0.1 }}
 						className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
 					>
-						AI detected your building
+						{t('aiDetected')}
 					</motion.h1>
 
 					<motion.p
@@ -120,7 +123,7 @@ const BuildingInfoCombined = ({ onNext }) => {
 						transition={{ delay: 0.2 }}
 						className="text-gray-500 dark:text-gray-400 mb-8"
 					>
-						Does this look right?
+						{t('doesThisLookRight')}
 					</motion.p>
 
 					{/* Detection card */}
@@ -136,21 +139,21 @@ const BuildingInfoCombined = ({ onNext }) => {
 								<div className="text-2xl font-bold text-gray-900 dark:text-white">
 									{displayStories}
 								</div>
-								<div className="text-xs text-gray-500 uppercase">Stories</div>
+								<div className="text-xs text-gray-500 uppercase">{t('stories')}</div>
 							</div>
 							<div>
 								<Building2 className="w-6 h-6 mx-auto mb-2 text-violet-500" />
 								<div className="text-sm font-bold text-gray-900 dark:text-white">
 									{displayType.split(' ')[0]}
 								</div>
-								<div className="text-xs text-gray-500 uppercase">Type</div>
+								<div className="text-xs text-gray-500 uppercase">{t('type')}</div>
 							</div>
 							<div>
 								<Calendar className="w-6 h-6 mx-auto mb-2 text-violet-500" />
 								<div className="text-lg font-bold text-gray-900 dark:text-white">
 									{displayYear}
 								</div>
-								<div className="text-xs text-gray-500 uppercase">Built</div>
+								<div className="text-xs text-gray-500 uppercase">{t('built')}</div>
 							</div>
 						</div>
 					</motion.div>
@@ -169,14 +172,14 @@ const BuildingInfoCombined = ({ onNext }) => {
 							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:opacity-90 shadow-xl shadow-violet-500/25"
 						>
 							<Check className="w-5 h-5" />
-							Looks right
+							{t('looksRight')}
 						</Button>
 						<button
 							onClick={() => setMode('edit')}
 							className="w-full text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center justify-center gap-1.5 py-2"
 						>
 							<Pencil className="w-3.5 h-3.5" />
-							Edit details
+							{t('editDetails')}
 						</button>
 					</motion.div>
 				</motion.div>
@@ -199,10 +202,10 @@ const BuildingInfoCombined = ({ onNext }) => {
 							<Building2 className="w-8 h-8 text-white" />
 						</motion.div>
 						<h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-							Building details
+							{t('title')}
 						</h1>
 						<p className="text-sm text-gray-500">
-							{hasAiData ? 'Correct any details below' : 'Tell us about your building'}
+							{hasAiData ? t('subtitleCorrect') : t('subtitle')}
 						</p>
 					</div>
 
@@ -211,14 +214,14 @@ const BuildingInfoCombined = ({ onNext }) => {
 						{/* Building Type */}
 						<div>
 							<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-								Building Type
+								{t('buildingType')}
 							</label>
 							<Select
 								value={userInput.buildingType || ''}
 								onValueChange={(v) => handleChange('buildingType', v)}
 							>
 								<SelectTrigger className="h-12">
-									<SelectValue placeholder="Select type" />
+									<SelectValue placeholder={t('selectType')} />
 								</SelectTrigger>
 								<SelectContent>
 									{buildingTypes.map((type) => (
@@ -233,13 +236,13 @@ const BuildingInfoCombined = ({ onNext }) => {
 						{/* Stories */}
 						<div>
 							<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-								Number of Stories
+								{t('numberOfStories')}
 							</label>
 							<Input
 								type="number"
 								min="1"
 								max="100"
-								placeholder="e.g., 4"
+								placeholder={t('storiesPlaceholder')}
 								value={userInput.numberOfStories || ''}
 								onChange={(e) => handleChange('numberOfStories', e.target.value)}
 								className="h-12"
@@ -249,13 +252,13 @@ const BuildingInfoCombined = ({ onNext }) => {
 						{/* Year */}
 						<div>
 							<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-								Year Built (approximate)
+								{t('yearBuilt')}
 							</label>
 							<Input
 								type="number"
 								min="1900"
 								max={new Date().getFullYear()}
-								placeholder="e.g., 2005"
+								placeholder={t('yearPlaceholder')}
 								value={userInput.yearOfConstruction || ''}
 								onChange={(e) => handleChange('yearOfConstruction', e.target.value)}
 								className="h-12"
@@ -267,7 +270,7 @@ const BuildingInfoCombined = ({ onNext }) => {
 							onClick={() => setShowAdvanced(!showAdvanced)}
 							className="flex items-center justify-between w-full py-2 text-sm text-gray-500 hover:text-gray-700"
 						>
-							<span>More options</span>
+							<span>{t('moreOptions')}</span>
 							{showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
 						</button>
 
@@ -282,20 +285,23 @@ const BuildingInfoCombined = ({ onNext }) => {
 									{/* Modifications */}
 									<div>
 										<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-											Structural modifications?
+											{t('structuralModifications')}
 										</label>
 										<div className="flex gap-3">
-											{['no', 'yes'].map((v) => (
+											{[
+												{ value: 'no', label: t('no') },
+												{ value: 'yes', label: t('yes') }
+											].map((option) => (
 												<button
-													key={v}
-													onClick={() => handleChange('hasModifications', v)}
+													key={option.value}
+													onClick={() => handleChange('hasModifications', option.value)}
 													className={`flex-1 py-3 rounded-xl border-2 transition-all ${
-														userInput.hasModifications === v
+														userInput.hasModifications === option.value
 															? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20'
 															: 'border-gray-200 dark:border-gray-700'
 													}`}
 												>
-													<span className="capitalize">{v}</span>
+													<span>{option.label}</span>
 												</button>
 											))}
 										</div>
@@ -304,7 +310,7 @@ const BuildingInfoCombined = ({ onNext }) => {
 									{/* Basement */}
 									<div>
 										<label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 block">
-											Basement floors
+											{t('basementFloors')}
 										</label>
 										<Input
 											type="number"
@@ -329,7 +335,7 @@ const BuildingInfoCombined = ({ onNext }) => {
 							size="lg"
 							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:opacity-90 shadow-xl shadow-violet-500/25"
 						>
-							Continue
+							{t('continue')}
 							<ArrowRight className="w-5 h-5" />
 						</Button>
 						{hasAiData && (
@@ -337,7 +343,7 @@ const BuildingInfoCombined = ({ onNext }) => {
 								onClick={() => setMode('confirm')}
 								className="w-full text-sm text-gray-500 hover:text-gray-700 py-2"
 							>
-								Back to summary
+								{t('backToSummary')}
 							</button>
 						)}
 					</div>
@@ -347,9 +353,9 @@ const BuildingInfoCombined = ({ onNext }) => {
 			{/* Footer nav */}
 			<div className="flex justify-between items-center px-4 py-3 border-t border-gray-100 dark:border-gray-800">
 				<Link href="/assessment/2" className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
-					Back
+					{t('back')}
 				</Link>
-				<span className="text-xs text-gray-400">Step 3 of 4</span>
+				<span className="text-xs text-gray-400">{tSteps('stepOf', { current: 3, total: 4 })}</span>
 			</div>
 		</div>
 	);

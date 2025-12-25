@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslations } from 'next-intl';
 import {
 	Building,
 	Building2,
@@ -185,6 +186,7 @@ function EmptyState() {
 
 // Vertical Assessment Card
 function AssessmentCard({ assessment, onClick, index }) {
+	const tSteps = useTranslations('Steps');
 	const coverImage = getCoverImage(assessment);
 	const hasScore = assessment.status === 'COMPLETE' && assessment.safetyResult?.overallScore !== undefined;
 
@@ -300,7 +302,7 @@ function AssessmentCard({ assessment, onClick, index }) {
 									/>
 								</div>
 								<span className="text-xs text-gray-500 dark:text-gray-400">
-									Step {assessment.currentStep || 1}/4
+									{tSteps('stepOf', { current: assessment.currentStep || 1, total: 4 })}
 								</span>
 							</div>
 						)}

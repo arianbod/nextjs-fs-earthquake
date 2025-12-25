@@ -14,8 +14,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 const LocationStepSimple = ({ onNext }) => {
+	const t = useTranslations('Steps.location');
 	const { userInput, updateUserInput, storeGoogleImages } = useUserInput();
 	const [status, setStatus] = useState('idle'); // idle, loading, success, error
 	const [error, setError] = useState(null);
@@ -32,7 +34,7 @@ const LocationStepSimple = ({ onNext }) => {
 		const streetViewUrls = headings.map(heading => ({
 			url: `https://maps.googleapis.com/maps/api/streetview?size=640x400&location=${latitude},${longitude}&heading=${heading}&pitch=0&fov=90&key=${apiKey}`,
 			heading,
-			description: heading === 0 ? 'North' : heading === 90 ? 'East' : heading === 180 ? 'South' : 'West',
+			description: heading === 0 ? t('directions.north') : heading === 90 ? t('directions.east') : heading === 180 ? t('directions.south') : t('directions.west'),
 			available: true
 		}));
 
@@ -221,7 +223,7 @@ const LocationStepSimple = ({ onNext }) => {
 				},
 				(err) => {
 					clearInterval(progressTimer);
-					setError("Enable location access to continue");
+					setError(t('enableAccess'));
 					setStatus('error');
 				},
 				{ timeout: 10000, maximumAge: 0 }
@@ -307,7 +309,7 @@ const LocationStepSimple = ({ onNext }) => {
 						transition={{ delay: 0.2 }}
 						className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
 					>
-						{status === 'loading' ? 'Finding you...' : 'Where\'s your building?'}
+						{status === 'loading' ? t('findingYou') : t('title')}
 					</motion.h1>
 
 					<motion.p
@@ -316,7 +318,7 @@ const LocationStepSimple = ({ onNext }) => {
 						transition={{ delay: 0.3 }}
 						className="text-gray-500 dark:text-gray-400 mb-6"
 					>
-						{status === 'loading' ? 'Accessing GPS...' : 'We\'ll check seismic risk'}
+						{status === 'loading' ? t('accessingGPS') : t('description')}
 					</motion.p>
 
 					{status === 'loading' && (
@@ -346,14 +348,14 @@ const LocationStepSimple = ({ onNext }) => {
 						<AlertTriangle className="w-10 h-10 text-red-500" />
 					</div>
 					<h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-						Location needed
+						{t('locationNeeded')}
 					</h1>
 					<p className="text-gray-500 dark:text-gray-400 mb-6 text-center max-w-xs">
 						{error}
 					</p>
 					<Button onClick={requestLocation} className="gap-2">
 						<Navigation className="w-4 h-4" />
-						Try again
+						{t('tryAgain')}
 					</Button>
 				</motion.div>
 			)}
@@ -390,19 +392,19 @@ const LocationStepSimple = ({ onNext }) => {
 						<div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
 							<div className="flex items-center gap-2 mb-1">
 								<MapPin className="w-4 h-4 text-gray-400" />
-								<span className="text-xs text-gray-500">Location</span>
+								<span className="text-xs text-gray-500">{t('locationLabel')}</span>
 							</div>
 							<p className="font-medium text-gray-900 dark:text-white text-sm truncate">
-								{userInput.city || userInput.address || 'Detected'}
+								{userInput.city || userInput.address || t('loading')}
 							</p>
 						</div>
 						<div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
 							<div className="flex items-center gap-2 mb-1">
 								<div className={`w-2 h-2 rounded-full ${seismicZone?.zone === 'Zone 1' ? 'bg-red-500' : seismicZone?.zone === 'Zone 2' ? 'bg-orange-500' : 'bg-yellow-500'}`} />
-								<span className="text-xs text-gray-500">Seismic Zone</span>
+								<span className="text-xs text-gray-500">{t('seismicZone')}</span>
 							</div>
 							<p className={`font-medium text-sm ${getZoneColor(seismicZone?.zone)}`}>
-								{seismicZone?.zone || 'Checking...'}
+								{seismicZone?.zone || t('loading')}
 							</p>
 						</div>
 					</motion.div>
@@ -417,11 +419,11 @@ const LocationStepSimple = ({ onNext }) => {
 							<CardHeader className='pb-2 py-3'>
 								<CardTitle className='flex items-center gap-2 text-base'>
 									<Camera className='h-4 w-4 text-blue-600' />
-									Google Maps Images
+									{t('googleMapsImages')}
 									{googleImages.satellite && (
 										<Badge variant='secondary' className='ml-auto text-xs'>
 											<CheckCircle2 className='h-3 w-3 mr-1' />
-											{googleImages.streetViews.length + 1} images
+											{t('imagesCount', { count: googleImages.streetViews.length + 1 })}
 										</Badge>
 									)}
 								</CardTitle>
@@ -431,7 +433,7 @@ const LocationStepSimple = ({ onNext }) => {
 									<div className='grid grid-cols-2 gap-2'>
 										<Skeleton className='aspect-video rounded-lg' />
 										<Skeleton className='aspect-video rounded-lg' />
-										<p className='col-span-2 text-xs text-gray-500 text-center'>Loading images...</p>
+										<p className='col-span-2 text-xs text-gray-500 text-center'>{t('loadingImages')}</p>
 									</div>
 								) : (
 									<div className='space-y-2'>
@@ -441,11 +443,11 @@ const LocationStepSimple = ({ onNext }) => {
 												<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 													<img
 														src={googleImages.satellite}
-														alt='Satellite view'
+														alt={t('satelliteView')}
 														className='w-full h-full object-cover'
 													/>
 													<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center'>
-														Satellite
+														{t('satelliteView')}
 													</div>
 												</div>
 											)}
@@ -453,11 +455,11 @@ const LocationStepSimple = ({ onNext }) => {
 												<div className='relative aspect-video rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
 													<img
 														src={googleImages.streetViews[0].url}
-														alt='Street view'
+														alt={t('streetView')}
 														className='w-full h-full object-cover'
 													/>
 													<div className='absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 text-center'>
-														Street View
+														{t('streetView')}
 													</div>
 												</div>
 											)}
@@ -491,7 +493,7 @@ const LocationStepSimple = ({ onNext }) => {
 						<div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
 							<Check className="w-3 h-3 text-white" strokeWidth={3} />
 						</div>
-						<span className="text-sm font-medium">Location set</span>
+						<span className="text-sm font-medium">{t('locationSet')}</span>
 					</motion.div>
 
 					{/* Continue button */}
@@ -505,7 +507,7 @@ const LocationStepSimple = ({ onNext }) => {
 							size="lg"
 							className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90 shadow-xl shadow-emerald-500/25"
 						>
-							Continue
+							{t('continue')}
 							<ArrowRight className="w-5 h-5" />
 						</Button>
 					</motion.div>
@@ -520,7 +522,7 @@ const LocationStepSimple = ({ onNext }) => {
 					transition={{ delay: 0.6 }}
 					className="text-center text-xs text-gray-400 pb-4"
 				>
-					Tap map to adjust location
+					{t('tapToAdjust')}
 				</motion.p>
 			)}
 		</div>

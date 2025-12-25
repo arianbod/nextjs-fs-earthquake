@@ -54,10 +54,17 @@ const Navbar = () => {
 
 	const t = useTranslations('Navigation');
 	const tGreeting = useTranslations('Greeting');
+	const tSteps = useTranslations('Steps');
 
 	const isAssessmentPath = pathname.includes('/assessment/');
 	const currentStepMatch = pathname.match(/\/assessment\/(\d+)/);
 	const currentStep = currentStepMatch ? parseInt(currentStepMatch[1]) : 0;
+
+	// Helper function to get translated step name
+	const getStepName = (stepNumber) => {
+		const stepKeys = ['location', 'photos', 'confirmDetails', 'extraDetails'];
+		return tSteps(`names.${stepKeys[stepNumber - 1]}`);
+	};
 
 	// Track scroll for navbar style
 	useEffect(() => {
@@ -170,7 +177,7 @@ const Navbar = () => {
 								</span>
 								{isAssessmentPath && (
 									<span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium hidden sm:block">
-										Step {currentStep} of {AssessmentSteps.length}
+										{tSteps('stepOf', { current: currentStep, total: AssessmentSteps.length })}
 									</span>
 								)}
 							</div>
@@ -407,7 +414,7 @@ const Navbar = () => {
 												>
 													{isComplete ? <CheckCircle2 className="h-3 w-3" /> : stepNumber}
 												</span>
-												<span className="hidden sm:inline">{step.title}</span>
+												<span className="hidden sm:inline">{getStepName(stepNumber)}</span>
 											</Link>
 											{index < 3 && (
 												<div

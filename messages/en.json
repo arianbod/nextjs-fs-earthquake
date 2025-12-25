@@ -40,6 +40,15 @@
     "afternoon": "Good afternoon",
     "evening": "Good evening"
   },
+  "Steps": {
+    "stepOf": "Step {current} of {total}",
+    "names": {
+      "location": "Location",
+      "photos": "Photos",
+      "confirmDetails": "Confirm Details",
+      "extraDetails": "Extra Details"
+    }
+  },
   "Hero": {
     "badge": "Now Powered by Claude AI Vision",
     "new": "NEW",
@@ -231,7 +240,30 @@
       "north": "North",
       "east": "East",
       "south": "South",
-      "west": "West"
+      "west": "West",
+      "findingYou": "Finding you...",
+      "locationNeeded": "Location needed",
+      "enableAccess": "Enable location access to continue",
+      "mapTypes": {
+        "road": "Road",
+        "satellite": "Satellite",
+        "hybrid": "Hybrid",
+        "info": "Info"
+      },
+      "clickInstruction": "Click anywhere on the map or drag the marker to update the building location",
+      "locationLabel": "Location",
+      "seismicZone": "Seismic Zone",
+      "imagesCount": "{count} images",
+      "streetView": "Street view",
+      "directions": {
+        "north": "North",
+        "east": "East",
+        "south": "South",
+        "west": "West"
+      },
+      "locationSet": "Location set",
+      "continue": "Continue",
+      "tapToAdjust": "Tap map to adjust location"
     },
     "weather": {
       "title": "Environmental Insights",
@@ -328,6 +360,47 @@
       "tryAgain": "Try again",
       "skip": "Skip",
       "back": "Back"
+    },
+    "buildingInfo": {
+      "title": "Building details",
+      "subtitle": "Tell us about your building",
+      "subtitleCorrect": "Correct any details below",
+      "aiDetected": "AI detected your building",
+      "doesThisLookRight": "Does this look right?",
+      "buildingType": "Building Type",
+      "selectType": "Select type",
+      "numberOfStories": "Number of Stories",
+      "storiesPlaceholder": "e.g., 4",
+      "yearBuilt": "Year Built (approximate)",
+      "yearPlaceholder": "e.g., 2005",
+      "moreOptions": "More options",
+      "continue": "Continue",
+      "back": "Back",
+      "looksRight": "Looks right",
+      "editDetails": "Edit details",
+      "backToSummary": "Back to summary",
+      "readyForResults": "Ready for results!",
+      "addDetailsAccuracy": "Add details for more accuracy, or skip ahead",
+      "getResults": "Get Results",
+      "optionalDetails": "Optional: add more details",
+      "dimensions": "Dimensions",
+      "buildingSize": "Building size",
+      "neighbors": "Neighbors",
+      "adjacentBuildings": "Adjacent buildings",
+      "extraLoads": "Extra loads",
+      "rooftopItems": "Rooftop items",
+      "structuralModifications": "Structural modifications?",
+      "basementFloors": "Basement floors",
+      "yes": "Yes",
+      "no": "No",
+      "stories": "Stories",
+      "type": "Type",
+      "built": "Built",
+      "reinforcedConcrete": "Reinforced Concrete",
+      "steel": "Steel Structure",
+      "masonry": "Masonry/Brick",
+      "timber": "Timber/Wood",
+      "mixed": "Mixed Construction"
     },
     "finalReview": {
       "title": "Final Review & Confirmation",
