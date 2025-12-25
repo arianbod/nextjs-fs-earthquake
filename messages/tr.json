@@ -1308,8 +1308,11 @@
       "title": "İnovasyonla Desteklenen",
       "subtitle": "Sizi güvende tutmak için birlikte çalışan ileri teknolojiler",
       "aiml": "Derin öğrenme modelleri bina yapılarını analiz eder ve benzersiz doğrulukla zayıflıkları tespit eder",
+      "seismicLabel": "Sismik Veri",
       "seismicdata": "Doğru risk değerlendirmesi için küresel izleme ağlarından gerçek zamanlı sismik veri entegrasyonu",
+      "gisLabel": "CBS Haritalama",
       "gismapping": "Siteye özel güvenlik önerileri için hassas coğrafi konum ve arazi analizi",
+      "realtimeLabel": "Gerçek Zamanlı",
       "realtimeanalysis": "Anında güvenlik puanı üretimi ile bina verilerinin anlık işlenmesi"
     },
     "objectives": {

@@ -1302,8 +1302,11 @@
       "title": "Powered by Innovation",
       "subtitle": "Advanced technologies working together to keep you safe",
       "aiml": "Deep learning models analyze building structures and identify vulnerabilities with unprecedented accuracy",
+      "seismicLabel": "Seismic Data",
       "seismicdata": "Real-time seismic data integration from global monitoring networks for accurate risk assessment",
+      "gisLabel": "GIS Mapping",
       "gismapping": "Precise geolocation and terrain analysis for site-specific safety recommendations",
+      "realtimeLabel": "Real-time",
       "realtimeanalysis": "Instant processing of building data with immediate safety score generation"
     },
     "objectives": {
